@@ -1,0 +1,12 @@
+FLDriveID    =  3;
+FLSteeringID =  7;
+FLCANCoderID = 11;
+FRDriveID    =  1;
+FRSteeringID =  5;
+FRCANCoderID =  9;
+BLDriveID    =  2;
+BLSteeringID =  6;
+BLCANCoderID = 10;
+BRDriveID    =  4;
+BRSteeringID =  8;
+BRCANCoderID = 12;
