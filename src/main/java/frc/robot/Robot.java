@@ -4,56 +4,104 @@
 
 package frc.robot;
 
+// wpilib imports
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+// phoenix6 imports
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.CANcoder;
+
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to
+ * each mode, as described in the TimedRobot documentation. If you change the
+ * name of this class or
+ * the package after creating this project, you must also update the
+ * build.gradle file in the
  * project.
  */
 public class Robot extends TimedRobot {
+  // wpilib boilerplate
   private Command m_autonomousCommand;
-
   private RobotContainer m_robotContainer;
 
+  // Swerve Module Devices
+  // the first 2 characters indicate what module the motor is on
+  // fl = front left
+  // fr = front right
+  // bl = back left
+  // br = back right
+
+  // NOTE: NEVER SET SWERVE MODULE ENCODER POSITION!
+
+  // front left module
+  private final TalonFX flDrive = new TalonFX(Constants.CANIDs.FL_DRIVE_ID, Constants.CANIDs.CANBUS_NAME);
+  private final TalonFX flSteer = new TalonFX(Constants.CANIDs.FL_STEER_ID, Constants.CANIDs.CANBUS_NAME);
+  private final CANcoder flEncoder = new CANcoder(Constants.CANIDs.FL_ENCODER_ID, Constants.CANIDs.CANBUS_NAME);
+  // front right module
+  private final TalonFX frDrive = new TalonFX(Constants.CANIDs.FR_DRIVE_ID, Constants.CANIDs.CANBUS_NAME);
+  private final TalonFX frSteer = new TalonFX(Constants.CANIDs.FR_STEER_ID, Constants.CANIDs.CANBUS_NAME);
+  private final CANcoder frEncoder = new CANcoder(Constants.CANIDs.FR_ENCODER_ID, Constants.CANIDs.CANBUS_NAME);
+  // back left module
+  private final TalonFX blDrive = new TalonFX(Constants.CANIDs.BL_DRIVE_ID, Constants.CANIDs.CANBUS_NAME);
+  private final TalonFX blSteer = new TalonFX(Constants.CANIDs.BL_STEER_ID, Constants.CANIDs.CANBUS_NAME);
+  private final CANcoder blEncoder = new CANcoder(Constants.CANIDs.BL_ENCODER_ID, Constants.CANIDs.CANBUS_NAME);
+  // back right module
+  private final TalonFX brDrive = new TalonFX(Constants.CANIDs.BR_DRIVE_ID, Constants.CANIDs.CANBUS_NAME);
+  private final TalonFX brSteer = new TalonFX(Constants.CANIDs.BR_STEER_ID, Constants.CANIDs.CANBUS_NAME);
+  private final CANcoder brEncoder = new CANcoder(Constants.CANIDs.BR_ENCODER_ID, Constants.CANIDs.CANBUS_NAME);
+
   /**
-   * This function is run when the robot is first started up and should be used for any
+   * This function is run when the robot is first started up and should be used
+   * for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+    // Instantiate our RobotContainer. This will perform all our button bindings,
+    // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
   }
 
   /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
+   * This function is called every 20 ms, no matter the mode. Use this for items
+   * like diagnostics
    * that you want ran during disabled, autonomous, teleoperated and test.
    *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow
+   * and
    * SmartDashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled
+    // commands, running already-scheduled commands, removing finished or
+    // interrupted commands,
+    // and running subsystem periodic() methods. This must be called from the
+    // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /**
+   * This autonomous runs the autonomous command selected by your
+   * {@link RobotContainer} class.
+   */
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -66,7 +114,8 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
   public void teleopInit() {
@@ -81,7 +130,8 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
   public void testInit() {
@@ -91,13 +141,16 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }
