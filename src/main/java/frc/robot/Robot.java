@@ -9,11 +9,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-// phoenix6 imports
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.CANcoder;
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -27,32 +22,6 @@ public class Robot extends TimedRobot {
   // wpilib boilerplate
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-
-  // Swerve Module Devices
-  // the first 2 characters indicate what module the motor is on
-  // fl = front left
-  // fr = front right
-  // bl = back left
-  // br = back right
-
-  // NOTE: NEVER SET SWERVE MODULE ENCODER POSITION!
-
-  // front left module
-  private final TalonFX flDrive = new TalonFX(Constants.CANIDs.FL_DRIVE_ID, Constants.CANIDs.CANBUS_NAME);
-  private final TalonFX flSteer = new TalonFX(Constants.CANIDs.FL_STEER_ID, Constants.CANIDs.CANBUS_NAME);
-  private final CANcoder flEncoder = new CANcoder(Constants.CANIDs.FL_ENCODER_ID, Constants.CANIDs.CANBUS_NAME);
-  // front right module
-  private final TalonFX frDrive = new TalonFX(Constants.CANIDs.FR_DRIVE_ID, Constants.CANIDs.CANBUS_NAME);
-  private final TalonFX frSteer = new TalonFX(Constants.CANIDs.FR_STEER_ID, Constants.CANIDs.CANBUS_NAME);
-  private final CANcoder frEncoder = new CANcoder(Constants.CANIDs.FR_ENCODER_ID, Constants.CANIDs.CANBUS_NAME);
-  // back left module
-  private final TalonFX blDrive = new TalonFX(Constants.CANIDs.BL_DRIVE_ID, Constants.CANIDs.CANBUS_NAME);
-  private final TalonFX blSteer = new TalonFX(Constants.CANIDs.BL_STEER_ID, Constants.CANIDs.CANBUS_NAME);
-  private final CANcoder blEncoder = new CANcoder(Constants.CANIDs.BL_ENCODER_ID, Constants.CANIDs.CANBUS_NAME);
-  // back right module
-  private final TalonFX brDrive = new TalonFX(Constants.CANIDs.BR_DRIVE_ID, Constants.CANIDs.CANBUS_NAME);
-  private final TalonFX brSteer = new TalonFX(Constants.CANIDs.BR_STEER_ID, Constants.CANIDs.CANBUS_NAME);
-  private final CANcoder brEncoder = new CANcoder(Constants.CANIDs.BR_ENCODER_ID, Constants.CANIDs.CANBUS_NAME);
 
   /**
    * This function is run when the robot is first started up and should be used

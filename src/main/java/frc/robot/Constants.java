@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+// wpilib imports
+import edu.wpi.first.math.geometry.Translation2d;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -18,6 +21,27 @@ package frc.robot;
  */
 public final class Constants {
   /**
+   * The DrivetrainConstants class is used for the drivetrain. For example,
+   * maximum speed
+   */
+  public static class DrivetrainConstants {
+    // units are in meters and radians
+    public static final double WHEEL_RADIUS = 0.0508;
+    public static final double WHEEL_DIAMETER = 2 * WHEEL_RADIUS;
+    public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+    public static final double MAX_LINEAR_SPEED = 3.0;
+    public static final double MAX_LINEAR_ACCELERATION = 6.0;
+    public static final double MAX_LINEAR_JERK = 12.0;
+    public static final double MAX_ANGULAR_SPEED = Math.PI;
+    public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI;
+    public static final double MAX_ANGULAR_JERK = 4 * Math.PI;
+    public static final Translation2d FL_SWERVE_LOCATION = new Translation2d(-0.381, 0.381);
+    public static final Translation2d FR_SWERVE_LOCATION = new Translation2d(0.381, 0.381);
+    public static final Translation2d BL_SWERVE_LOCATION = new Translation2d(-0.381, -0.381);
+    public static final Translation2d BR_SWERVE_LOCATION = new Translation2d(0.381, -0.381);
+  }
+
+  /**
    * The OperatorConstants class contains constants used wherever driver control
    * is involved
    */
@@ -29,7 +53,7 @@ public final class Constants {
    * The CANIDs class contains CAN IDs used by devices on the CAN bus
    */
   public static class CANIDs {
-    public static final String CANBUS_NAME = "";
+    public static final String CANBUS_NAME = "rio";
     public static final int FL_DRIVE_ID = 3;
     public static final int FL_STEER_ID = 7;
     public static final int FL_ENCODER_ID = 11;
