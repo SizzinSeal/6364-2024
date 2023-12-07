@@ -13,16 +13,16 @@ import com.kauailabs.navx.frc.AHRS;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-    private final SwerveModule m_frontLeft = new SwerveModule(CANIDs.FL_DRIVE_ID,
+    public final SwerveModule m_frontLeft = new SwerveModule(CANIDs.FL_DRIVE_ID,
             CANIDs.CANBUS_NAME, CANIDs.FL_STEER_ID, CANIDs.CANBUS_NAME,
             CANIDs.FL_ENCODER_ID, CANIDs.CANBUS_NAME);
-    private final SwerveModule m_frontRight = new SwerveModule(CANIDs.FR_DRIVE_ID,
+    public final SwerveModule m_frontRight = new SwerveModule(CANIDs.FR_DRIVE_ID,
             CANIDs.CANBUS_NAME, CANIDs.FR_STEER_ID, CANIDs.CANBUS_NAME,
             CANIDs.FR_ENCODER_ID, CANIDs.CANBUS_NAME);
-    private final SwerveModule m_backLeft = new SwerveModule(CANIDs.BL_DRIVE_ID,
+    public final SwerveModule m_backLeft = new SwerveModule(CANIDs.BL_DRIVE_ID,
             CANIDs.CANBUS_NAME, CANIDs.BL_STEER_ID, CANIDs.CANBUS_NAME,
             CANIDs.BL_ENCODER_ID, CANIDs.CANBUS_NAME);
-    private final SwerveModule m_backRight = new SwerveModule(CANIDs.BR_DRIVE_ID,
+    public final SwerveModule m_backRight = new SwerveModule(CANIDs.BR_DRIVE_ID,
             CANIDs.CANBUS_NAME, CANIDs.BR_STEER_ID, CANIDs.CANBUS_NAME,
             CANIDs.BR_ENCODER_ID, CANIDs.CANBUS_NAME);
 

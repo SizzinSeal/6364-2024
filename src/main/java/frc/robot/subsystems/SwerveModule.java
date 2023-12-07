@@ -74,7 +74,8 @@ public class SwerveModule {
          */
         public SwerveModuleState getState() {
                 return new SwerveModuleState(
-                                m_driveMotor.getVelocity().getValueAsDouble(),
+                                (m_driveMotor.getVelocity().getValueAsDouble()
+                                                * DrivetrainConstants.WHEEL_CIRCUMFERENCE),
                                 new Rotation2d(m_encoder.getAbsolutePosition().getValueAsDouble() * 2 * Math.PI));
         }
 
@@ -85,7 +86,7 @@ public class SwerveModule {
          */
         public SwerveModulePosition getPosition() {
                 return new SwerveModulePosition(
-                                m_driveMotor.getPosition().getValueAsDouble(),
+                                m_driveMotor.getPosition().getValueAsDouble() * DrivetrainConstants.WHEEL_CIRCUMFERENCE,
                                 new Rotation2d(m_encoder.getAbsolutePosition().getValueAsDouble() * 2 * Math.PI));
         }
 
@@ -108,7 +109,8 @@ public class SwerveModule {
                 state.speedMetersPerSecond *= state.angle.minus(encoderRotation).getCos();
 
                 // Calculate the drive output from the drive PID controller.
-                final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble(),
+                final double driveOutput = m_drivePIDController.calculate(
+                                m_driveMotor.getVelocity().getValueAsDouble() * DrivetrainConstants.WHEEL_CIRCUMFERENCE,
                                 state.speedMetersPerSecond);
 
                 final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
