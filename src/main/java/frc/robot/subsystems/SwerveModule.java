@@ -7,7 +7,10 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 // phoenix 6 imports
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -25,13 +28,10 @@ public class SwerveModule {
         private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
 
         // Gains are for example purposes only - must be determined for your own robot!
-        private final ProfiledPIDController m_steerPIDController = new ProfiledPIDController(
-                        1,
+        private final PIDController m_steerPIDController = new PIDController(
+                        2,
                         0,
-                        0,
-                        new TrapezoidProfile.Constraints(
-                                        DrivetrainConstants.MAX_ANGULAR_SPEED,
-                                        DrivetrainConstants.MAX_ANGULAR_ACCELERATION));
+                        0);
 
         // Gains are for example purposes only - must be determined for your own robot!
         private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
@@ -122,11 +122,11 @@ public class SwerveModule {
                                 m_encoder.getAbsolutePosition().getValueAsDouble() * 2 * Math.PI,
                                 state.angle.getRadians());
 
-                final double turnFeedforward = m_steerFeedforward
-                                .calculate(m_steerPIDController.getSetpoint().velocity);
+                // final double turnFeedforward = m_steerFeedforward
+                // .calculate(m_steerPIDController.getSetpoint().velocity);
 
                 m_driveMotor.setVoltage(driveOutput + driveFeedforward);
-                m_steerMotor.setVoltage(turnOutput + turnFeedforward);
-                System.out.println(driveOutput);
+                m_steerMotor.setVoltage(turnOutput);
+                // System.out.println(turnOutput);
         }
 }

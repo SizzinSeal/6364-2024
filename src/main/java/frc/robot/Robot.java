@@ -12,6 +12,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,7 +31,11 @@ public class Robot extends TimedRobot {
     // wpilib boilerplate
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
+    private ShuffleboardTab tab;
+    GenericEntry shooterEnable;
+
     private Drivetrain drivetrain;
+    private XboxController controller;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -40,6 +49,9 @@ public class Robot extends TimedRobot {
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
         drivetrain = new Drivetrain();
+        controller = new XboxController(0);
+        tab = Shuffleboard.getTab("Shooter");
+        shooterEnable = tab.add("Shooter Enable", false).getEntry();
     }
 
     /**
@@ -64,6 +76,8 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         // drivetrain.m_frontLeft.setDesiredState(new SwerveModuleState(0.1, new
         // Rotation2d(0.0)));
+        // System.out.println(new Rotation2d(controller.getLeftX(),
+        // controller.getLeftY()));
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -108,6 +122,10 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
+        // drivetrain.drive(0, 0, new Rotation2d(controller.getLeftX(),
+        // controller.getLeftY()).getDegrees(), true, 0.02);
+        drivetrain.m_frontLeft.setDesiredState(
+                new SwerveModuleState(0, new Rotation2d(controller.getLeftY(), controller.getLeftX())));
     }
 
     @Override
