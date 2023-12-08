@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -60,7 +62,8 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-        System.out.println(drivetrain.m_frontLeft.getPosition().distanceMeters);
+        // drivetrain.m_frontLeft.setDesiredState(new SwerveModuleState(0.1, new
+        // Rotation2d(0.0)));
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
