@@ -20,9 +20,10 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import frc.robot.Constants.DrivetrainConstants;
 
 public class SwerveModule {
-        private final TalonFX m_driveMotor;
-        private final TalonFX m_steerMotor;
-        private final CANcoder m_encoder;
+        public final TalonFX m_driveMotor;
+        public final TalonFX m_steerMotor;
+        public final CANcoder m_encoder;
+
 
         // Gains are for example purposes only - must be determined for your own robot!
         private final PIDController m_drivePIDController = new PIDController(1, 0, 0);

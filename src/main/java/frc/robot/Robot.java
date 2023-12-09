@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -31,10 +32,12 @@ public class Robot extends TimedRobot {
     // wpilib boilerplate
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
-    private ShuffleboardTab tab;
+    public ShuffleboardTab tab;
+    public SimpleWidget motorTab;
+
     GenericEntry shooterEnable;
 
-    private Drivetrain drivetrain;
+    public Drivetrain drivetrain;
     private XboxController controller;
 
     /**
@@ -50,8 +53,10 @@ public class Robot extends TimedRobot {
         m_robotContainer = new RobotContainer();
         drivetrain = new Drivetrain();
         controller = new XboxController(0);
-        tab = Shuffleboard.getTab("Shooter");
+        ShuffleboardTab tab = Shuffleboard.getTab("Shooter");
         shooterEnable = tab.add("Shooter Enable", false).getEntry();
+        double speed = drivetrain.m_frontLeft.m_driveMotor.getVelocity().getValueAsDouble();
+        motorTab = Shuffleboard.getTab("Motor").add("Speed", speed);
     }
 
     /**
@@ -117,6 +122,7 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+
     }
 
     /** This function is called periodically during operator control. */
@@ -124,6 +130,8 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         // drivetrain.drive(0, 0, new Rotation2d(controller.getLeftX(),
         // controller.getLeftY()).getDegrees(), true, 0.02);
+
+
         drivetrain.m_frontLeft.setDesiredState(
                 new SwerveModuleState(0, new Rotation2d(controller.getLeftY(), controller.getLeftX())));
     }
