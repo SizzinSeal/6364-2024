@@ -2,15 +2,10 @@ package frc.robot.subsystems;
 
 // wpilib imports
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 // phoenix 6 imports
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -35,7 +30,6 @@ public class SwerveModule {
 
     // Gains are for example purposes only - must be determined for your own robot!
     private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
-    private final SimpleMotorFeedforward m_steerFeedforward = new SimpleMotorFeedforward(1, 0.5);
 
     /**
      * Constructs a SwerveModule with a drive motor, turning motor, drive encoder

@@ -13,7 +13,6 @@ import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -59,7 +58,6 @@ public class Robot extends TimedRobot {
         m_robotContainer = new RobotContainer();
         drivetrain = new Drivetrain();
         controller = new XboxController(0);
-        ShuffleboardTab tab = Shuffleboard.getTab("Shooter");
         steeringTab = Shuffleboard.getTab("Steering").add("Pos", position).withWidget(BuiltInWidgets.kGraph);
         motorTab = Shuffleboard.getTab("Drive").add("Speed", speed).withWidget(BuiltInWidgets.kGraph);
     }
