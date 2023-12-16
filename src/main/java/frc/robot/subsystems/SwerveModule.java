@@ -29,7 +29,7 @@ public class SwerveModule {
         private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
 
         // Gains are for example purposes only - must be determined for your own robot!
-        private final PIDController m_steerPIDController = new PIDController(
+        public PIDController m_steerPIDController = new PIDController(
                         2,
                         0,
                         0);

@@ -15,9 +15,11 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -34,11 +36,15 @@ public class Robot extends TimedRobot {
     private RobotContainer m_robotContainer;
     public ShuffleboardTab tab;
     public SimpleWidget motorTab;
+    public SimpleWidget steeringTab;
 
     GenericEntry shooterEnable;
 
     public Drivetrain drivetrain;
     private XboxController controller;
+
+    double speed;
+    double position;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -54,9 +60,8 @@ public class Robot extends TimedRobot {
         drivetrain = new Drivetrain();
         controller = new XboxController(0);
         ShuffleboardTab tab = Shuffleboard.getTab("Shooter");
-        shooterEnable = tab.add("Shooter Enable", false).getEntry();
-        double speed = drivetrain.m_frontLeft.m_driveMotor.getVelocity().getValueAsDouble();
-        motorTab = Shuffleboard.getTab("Motor").add("Speed", speed);
+        steeringTab = Shuffleboard.getTab("Steering").add("Pos", position).withWidget(BuiltInWidgets.kGraph);
+        motorTab = Shuffleboard.getTab("Drive").add("Speed", speed).withWidget(BuiltInWidgets.kGraph);
     }
 
     /**
@@ -83,6 +88,10 @@ public class Robot extends TimedRobot {
         // Rotation2d(0.0)));
         // System.out.println(new Rotation2d(controller.getLeftX(),
         // controller.getLeftY()));
+        speed = drivetrain.m_frontLeft.m_driveMotor.getVelocity().getValueAsDouble();
+        position = drivetrain.m_frontLeft.m_steerMotor.getPosition().getValueAsDouble();
+
+        SmartDashboard.putNumber("Pos", position);
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -130,7 +139,6 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         // drivetrain.drive(0, 0, new Rotation2d(controller.getLeftX(),
         // controller.getLeftY()).getDegrees(), true, 0.02);
-
 
         drivetrain.m_frontLeft.setDesiredState(
                 new SwerveModuleState(0, new Rotation2d(controller.getLeftY(), controller.getLeftX())));
