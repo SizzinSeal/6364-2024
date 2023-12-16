@@ -86,6 +86,7 @@ public class Robot extends TimedRobot {
         // Rotation2d(0.0)));
         // System.out.println(new Rotation2d(controller.getLeftX(),
         // controller.getLeftY()));
+
         speed = drivetrain.m_frontLeft.m_driveMotor.getVelocity().getValueAsDouble();
         position = drivetrain.m_frontLeft.m_steerMotor.getPosition().getValueAsDouble();
 

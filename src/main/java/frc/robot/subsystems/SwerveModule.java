@@ -18,6 +18,7 @@ public class SwerveModule {
     public final TalonFX m_driveMotor;
     public final TalonFX m_steerMotor;
     public final CANcoder m_encoder;
+    public final String m_name;
 
     // Gains are for example purposes only - must be determined for your own robot!
     private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
@@ -48,7 +49,10 @@ public class SwerveModule {
             int steerMotorID,
             String steerMotorBus,
             int encoderID,
-            String encoderBus) {
+            String encoderBus,
+            String name) {
+
+        m_name = name;
 
         // device initialization
         m_driveMotor = new TalonFX(driveMotorID, driveMotorBus);
