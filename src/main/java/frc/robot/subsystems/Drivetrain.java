@@ -8,6 +8,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Constants.CANIDs;
 import frc.robot.Constants.DrivetrainConstants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 // navx
 import com.kauailabs.navx.frc.AHRS;
 
@@ -15,16 +17,16 @@ import com.kauailabs.navx.frc.AHRS;
 public class Drivetrain {
     public final SwerveModule m_frontLeft = new SwerveModule(CANIDs.FL_DRIVE_ID,
             CANIDs.CANBUS_NAME, CANIDs.FL_STEER_ID, CANIDs.CANBUS_NAME,
-            CANIDs.FL_ENCODER_ID, CANIDs.CANBUS_NAME, "FL");
+            CANIDs.FL_ENCODER_ID, CANIDs.CANBUS_NAME);
     private final SwerveModule m_frontRight = new SwerveModule(CANIDs.FR_DRIVE_ID,
             CANIDs.CANBUS_NAME, CANIDs.FR_STEER_ID, CANIDs.CANBUS_NAME,
-            CANIDs.FR_ENCODER_ID, CANIDs.CANBUS_NAME, "FR");
+            CANIDs.FR_ENCODER_ID, CANIDs.CANBUS_NAME);
     private final SwerveModule m_backLeft = new SwerveModule(CANIDs.BL_DRIVE_ID,
             CANIDs.CANBUS_NAME, CANIDs.BL_STEER_ID, CANIDs.CANBUS_NAME,
-            CANIDs.BL_ENCODER_ID, CANIDs.CANBUS_NAME, "BL");
+            CANIDs.BL_ENCODER_ID, CANIDs.CANBUS_NAME);
     private final SwerveModule m_backRight = new SwerveModule(CANIDs.BR_DRIVE_ID,
             CANIDs.CANBUS_NAME, CANIDs.BR_STEER_ID, CANIDs.CANBUS_NAME,
-            CANIDs.BR_ENCODER_ID, CANIDs.CANBUS_NAME, "BR");
+            CANIDs.BR_ENCODER_ID, CANIDs.CANBUS_NAME);
 
     private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
 
@@ -77,13 +79,17 @@ public class Drivetrain {
 
     /** Updates the field relative position of the robot. */
     public void updateOdometry() {
+        SwerveModulePosition[] pos = new SwerveModulePosition[] {
+                m_frontLeft.getPosition(),
+                m_frontRight.getPosition(),
+                m_backLeft.getPosition(),
+                m_backRight.getPosition()
+        };
+        SmartDashboard.putNumber("FL Angle", pos[0].angle.getDegrees());
+        SmartDashboard.putNumber("FR Angle", pos[1].angle.getDegrees());
+        SmartDashboard.putNumber("BL Angle", pos[2].angle.getDegrees());
+        SmartDashboard.putNumber("BR Angle", pos[3].angle.getDegrees());
         m_odometry.update(
-                m_gyro.getRotation2d(),
-                new SwerveModulePosition[] {
-                        m_frontLeft.getPosition(),
-                        m_frontRight.getPosition(),
-                        m_backLeft.getPosition(),
-                        m_backRight.getPosition()
-                });
+                m_gyro.getRotation2d(), pos);
     }
 }

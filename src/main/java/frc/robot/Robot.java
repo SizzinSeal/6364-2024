@@ -8,17 +8,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-import frc.robot.subsystems.Drivetrain;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+// internal imports
+import frc.robot.subsystems.Drivetrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -33,17 +28,11 @@ public class Robot extends TimedRobot {
     // wpilib boilerplate
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
-    public ShuffleboardTab tab;
-    public SimpleWidget motorTab;
-    public SimpleWidget steeringTab;
+    public ShuffleboardTab m_tab;
+    public SimpleWidget m_motorTab;
 
-    GenericEntry shooterEnable;
-
-    public Drivetrain drivetrain;
-    private XboxController controller;
-
-    double speed;
-    double position;
+    public Drivetrain m_drivetrain;
+    private XboxController m_controller;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -56,10 +45,8 @@ public class Robot extends TimedRobot {
         // and put our
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
-        drivetrain = new Drivetrain();
-        controller = new XboxController(0);
-        steeringTab = Shuffleboard.getTab("Steering").add("Pos", position).withWidget(BuiltInWidgets.kGraph);
-        motorTab = Shuffleboard.getTab("Drive").add("Speed", speed).withWidget(BuiltInWidgets.kGraph);
+        m_drivetrain = new Drivetrain();
+        m_controller = new XboxController(0);
     }
 
     /**
@@ -82,15 +69,8 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-        // drivetrain.m_frontLeft.setDesiredState(new SwerveModuleState(0.1, new
-        // Rotation2d(0.0)));
-        // System.out.println(new Rotation2d(controller.getLeftX(),
-        // controller.getLeftY()));
-
-        speed = drivetrain.m_frontLeft.m_driveMotor.getVelocity().getValueAsDouble();
-        position = drivetrain.m_frontLeft.m_steerMotor.getPosition().getValueAsDouble();
-
-        SmartDashboard.putNumber("Pos", position);
+        // update odometry
+        m_drivetrain.updateOdometry();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -136,11 +116,6 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
-        // drivetrain.drive(0, 0, new Rotation2d(controller.getLeftX(),
-        // controller.getLeftY()).getDegrees(), true, 0.02);
-
-        drivetrain.m_frontLeft.setDesiredState(
-                new SwerveModuleState(0, new Rotation2d(controller.getLeftY(), controller.getLeftX())));
     }
 
     @Override
