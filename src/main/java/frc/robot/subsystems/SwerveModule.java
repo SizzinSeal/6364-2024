@@ -6,6 +6,9 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 // phoenix 6 imports
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -15,6 +18,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import frc.robot.Constants.DrivetrainConstants;
 
 public class SwerveModule {
+    // hardware
     public final TalonFX m_driveMotor;
     public final TalonFX m_steerMotor;
     public final CANcoder m_encoder;
@@ -30,6 +34,11 @@ public class SwerveModule {
 
     // Gains are for example purposes only - must be determined for your own robot!
     private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
+
+    // shuffleboard objects
+    private final String m_name;
+    private ShuffleboardTab m_tab = Shuffleboard.getTab("Drive");
+    private GenericEntry m_posEntry;
 
     /**
      * Constructs a SwerveModule with a drive motor, turning motor, drive encoder
@@ -48,7 +57,8 @@ public class SwerveModule {
             int steerMotorID,
             String steerMotorBus,
             int encoderID,
-            String encoderBus) {
+            String encoderBus,
+            String name) {
 
         // device initialization
         m_driveMotor = new TalonFX(driveMotorID, driveMotorBus);
@@ -61,6 +71,10 @@ public class SwerveModule {
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
         m_steerPIDController.enableContinuousInput(-Math.PI, Math.PI);
+
+        // shuffleboard
+        m_name = name;
+        m_posEntry = m_tab.add(m_name, 0).getEntry();
     }
 
     /**
@@ -81,9 +95,13 @@ public class SwerveModule {
      * @return The current position of the module.
      */
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(
+        // get position
+        SwerveModulePosition pos = new SwerveModulePosition(
                 m_driveMotor.getPosition().getValueAsDouble() * DrivetrainConstants.WHEEL_CIRCUMFERENCE,
                 new Rotation2d(m_encoder.getAbsolutePosition().getValueAsDouble() * 2 * Math.PI));
+        // post position on shuffleboard
+        m_posEntry.setDouble(pos.angle.getDegrees());
+        return pos;
     }
 
     /**
