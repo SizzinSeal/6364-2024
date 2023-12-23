@@ -23,3 +23,4 @@ See [contributing.md](contributing.md) on how to contribute to the project. It c
 | BR Drive    | 4           | RIO         |
 | BR Steering | 8           | RIO         |
 | BR CANcoder | 12          | RIO         |
+| Pigeon 2.0  | 13          | RIO         |
