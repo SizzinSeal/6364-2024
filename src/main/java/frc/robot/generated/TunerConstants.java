@@ -27,9 +27,11 @@ public class TunerConstants {
 
         // The closed-loop output type to use for the steer motors;
         // This affects the PID/FF gains for the steer motors
+        // TODO: switch to FOC when PRO license has been obtained
         private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
         // The closed-loop output type to use for the drive motors;
         // This affects the PID/FF gains for the drive motors
+        // TODO: switch to FOC when PRO license has been obtained
         private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
         // The stator current at which the wheels start to slip;
