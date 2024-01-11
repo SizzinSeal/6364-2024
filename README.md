@@ -35,4 +35,20 @@ We use the Phoenix Pro vendordep for interacting with CTRE hardware, such as can
 ## CANivores
 We use CANivores for all drive/steer motors and encoders. A swerve module cancoder will always be on the same CANivore bus as the drive and steer motors of that module, to minimize latency for sensor fusion.
 
-CANivores enable us to poll sensors much faster than the RIO can bus (250hz vs 100hz). However, it is limited on how many devices can be on a single bus. Therefore we use 2 CANivores, one for each side of the drivetrain. All other motors and sensors are on the RIO can bus. We would have used a third CANivore, but the RIO only has 2 USB ports, so we are limited to a maximum of 2 CANivores.
+CANivores enable us to poll sensors much faster than the RIO CAN bus (250hz vs 100hz). However, it is limited on how many devices can be on a single bus. Therefore we use 2 CANivores, one for each side of the drivetrain. All other motors and sensors are on the RIO can bus. We would have used a third CANivore, but the RIO only has 2 USB ports, so we are limited to a maximum of 2 CANivores.
+
+## Swerve Module Control
+We use TalonFX motors on the swerve modules. Each module has a steering motor and a driving module. These use different methods of control.
+
+__**Steering motors: Position Motion Magic**__
+Position Motion Magic is just a fancy motion profile that is calculated by the motor itself. It uses a positional PID, along with the other constants (kV, kA, etc.)
+
+__**Drive motors: Open Loop Voltage / ClosedLoopVelociy (or simply Velocity)**__
+The drive motors use Open Loop Voltage during teleop, so the driver has more control over the motors. Closed Loop Velocity is used during autonomous, where high consistency is necessary.
+Closed Loop Velocity uses a PID and the other constants (kV, kA, etc.) including kF. Tuning the Velocity controller does take the longest time to tune, but it will improve performance during autonomous.
+
+## Motor Controller Policy
+Unless absolutely necessary, all motors should be using their onboard PID controllers. It reduces CAN bus utilization and performs better thanks to the 1000hz polling rate.
+
+## Path Planning
+We use [Choreo](https://sleipnirgroup.github.io/Choreo) for path planning. It performs better than the WPILib path planner, thanks to features such as numerical optimization.
