@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.generated.TunerConstant
+import frc.robot.generated.TunerConstants;
 
 public class RobotContainer {
     private static final double MaxSpeed = 0.75; // 6 meters per second desired top speed
