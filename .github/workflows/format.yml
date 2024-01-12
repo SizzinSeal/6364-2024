@@ -11,6 +11,7 @@ jobs:
       - uses: axel-op/googlejavaformat-action@v3
         with:
           args: "--replace"
+          version: 13
           skip-commit: true
       - name: Print diffs
         run: git --no-pager diff --exit-code
