@@ -3,6 +3,7 @@
     "editor.indentSize": 4,
     "editor.detectIndentation": false,
     "editor.formatOnSave": true,
+    "editor.defaultFormatter": "redhat.java",
     "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
     "java.configuration.updateBuildConfiguration": "automatic",
     "java.server.launchMode": "Standard",
