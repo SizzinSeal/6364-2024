@@ -17,7 +17,7 @@ Most of our discussions happen in person, with key points being sent to #frc-pro
 ## Code Format
  * add `,"editor.formatOnSave": true` at the end of your workspace settings JSON file, which can be opened with the `workbench.action.openWorkspaceSettingsFile` command, so it formats the code whenever you hit save.
  * Use the default Red Hat Java formatter included in the `Language Support for Java` VScode extension.
- * Use 4 space indentation. Select it by clicking `Spaces: x` in the bottom right corner of the editor.
+ * Use 2 space indentation. Select it by clicking `Spaces: x` in the bottom right corner of the editor.
 
 ## Source Control
 We use Git w/ GitHub for source control. The repo can be found [here](https://github.com/SizzinSeal/6364-2024). If you don't have access, it will 404. If you need access, contact Liam Teale on Slack or [email](mailto:liamteale6@gmail.com).
