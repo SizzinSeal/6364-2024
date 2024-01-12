@@ -34,8 +34,40 @@ Branch names should be short, to the point, and follow this prefix:
 `bugfix/branch_name` for bugfixes
 If your branch does not fit any of these categories, it has no prefix.
 
-DO NOT MERGE YOUR PULL REQUEST WITHOUT SOMEONE ELSE REVIEWING IT
+:warning: **DO NOT** merge your pull request without proper testing and review from at least 1 other programmer
 
 If you find a bug, or think a feature is needed, open an [Issue](https://github.com/SizzinSeal/6364-2024/issues/new)
 
 ## Building and Uploading
+
+__**Build**__:
+ 1. Click the WPILib logo at the top right of the editor
+ 2. Click `Build Robot Code`
+
+__**Upload (wired)**__:
+
+ 1. Connect your laptop to the roboRIO using a USB type-B cable
+ 2. Click the WPILib logo at the top right of the editor
+ 3. Click `Deploy Robot Code`
+ 4. Verify program uploaded successfully by checking the output terminal that pops up
+
+__**Upload (wireless)**__:
+ 1. Connect to the `6364_Rex` wifi network. May take up to a minute to appear after startup
+ 2. Use password `pass123word` if prompted
+ 3. Click the WPILib logo at the top right of the editor
+ 4. Click `Deploy Robot Code`
+ 5. Verify program uploaded successfully by checking the output terminal that pops up
+
+## Operating
+
+:warning: As the station operator, it is **YOUR** responsibility to ensure the safety of those around you.
+
+ 1. Connect to the `6364_Rex` wifi network. May take up to a minute to appear after startup
+ 2. Use password `pass123word` if prompted
+ 3. Open the `FRC Driver Station` app
+ 4. Connect the controller with a micro-USB cable
+ 5. Verify controller connection in Driver Station
+ 6. Verify the area around the robot is clear and you are behind cover
+ 7. Select the necessary control mode (Teleop, Autonomous, Practice, Test)
+ 8. Announce "enabling" to the room and click the `enable` button
+ 9. Click `disable` to disable the robot or press space bar for an emergency stop
