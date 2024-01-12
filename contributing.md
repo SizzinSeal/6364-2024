@@ -22,6 +22,8 @@ Most of our discussions happen in person, with key points being sent to #frc-pro
 ## Source Control
 We use Git w/ GitHub for source control. The repo can be found [here](https://github.com/SizzinSeal/6364-2024). If you don't have access, it will 404. If you need access, contact Liam Teale on Slack or [email](mailto:liamteale6@gmail.com).
 
+If you are new to Git, it's recommend installing [GitHub Desktop](https://desktop.github.com/) for an easy intro.
+
 Small commits for things like tuning can be committed directly to the master branch. Other, larger commits implementing new features, updating dependencies, removing depencies, or installing dependencies need to be done on a seperate branch and merged in through Pull Requests.
 
 Commit names should be short, and to the point. Based on the name of the commit you need to be able to tell what changed in that commit. Additional context can be added in the additional description section.
@@ -35,3 +37,5 @@ If your branch does not fit any of these categories, it has no prefix.
 DO NOT MERGE YOUR PULL REQUEST WITHOUT SOMEONE ELSE REVIEWING IT
 
 If you find a bug, or think a feature is needed, open an [Issue](https://github.com/SizzinSeal/6364-2024/issues/new)
+
+## Building and Uploading
