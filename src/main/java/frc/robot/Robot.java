@@ -12,9 +12,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private Vision Limelight1 = new Vision("/limelight/<botpose>");
 
   private RobotContainer m_robotContainer;
+  private Vision Limelight1 = new Vision("/limelight/<botpose>");
+
 
   @Override
   public void robotInit() {
@@ -24,10 +25,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-
-    Shuffleboard.getTab("Vision").add("PosX", Limelight1.getPos2D().getX());
-    Shuffleboard.getTab("Vision").add("PosY", Limelight1.getPos2D().getY());
-
+    Limelight1.Telemetry();
   }
 
   @Override

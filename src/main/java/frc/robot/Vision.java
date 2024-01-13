@@ -4,6 +4,8 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -17,6 +19,7 @@ public class Vision extends LimelightHelpers {
   // the class level
   // private static NetworkTableEntry internalPosEntry = vistable.getEntry("<botpose>");
   private DoubleArraySubscriber DASub;
+  private Pose2d fpos2d;
 
   public Vision(String name) {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -44,15 +47,19 @@ public class Vision extends LimelightHelpers {
     TimestampedDoubleArray DASubT = DASub.getAtomic(null);
     return DASubT;
   }
-  ///
-  // public double getLatestLatencyAdjustedTimeStamp() {
-  // TimestampedDoubleArray DASubT = DASub.getAtomic(null);
-  // double[] DASubTpos = DASubT.value;
 
-  // DASubTpos[];
+  public void Telemetry() {
+    // SmartDashboard.putData("VPosX", fpos2d.getX());
+    // Shuffleboard.getTab("Vision").add("PosY", fpos2d.getY());
+  }
 
-  // return null;
-  // }
+  public double getLatestLatencyAdjustedTimeStamp() {
+    TimestampedDoubleArray DASubT = DASub.getAtomic(null);
+    double latency = DASubT.value[6];
+    double internaltimestamp = DASubT.timestamp;
+
+    return internaltimestamp - (1000.0 * (latency));
+  }
 
 }
 
