@@ -14,7 +14,7 @@ public class Robot extends TimedRobot {
 
 
   private RobotContainer m_robotContainer;
-  private Vision Limelight1 = new Vision("/limelight/<botpose>");
+  // private Vision Limelight1 = new Vision("/limelight/<botpose>");
 
 
   @Override
@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    Limelight1.Telemetry();
+    // Limelight1.Telemetry();
   }
 
   @Override
