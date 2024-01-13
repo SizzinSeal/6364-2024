@@ -31,10 +31,6 @@ public class Telemetry {
     /* What to publish over networktables for telemetry */
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
-    /* Vision Robot pose for field positioning */
-    NetworkTable Vispos = inst.getTable("limelight");
-    DoubleArrayPublisher VisfieldPub = Vispos.getDoubleArrayTopic("robotPose").publish();
-
     /* Encoder Robot pose for field positioning */
     NetworkTable table = inst.getTable("Pose");
     DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();

@@ -12,8 +12,10 @@ public class Odometry extends LimelightHelpers {
     String CamName = "limelight";
     private SwerveDrivePoseEstimator VOdom = new SwerveDrivePoseEstimator(null, null, null, null, null, null);
 
-    public void UpdateVision() {
+    public void UpdateVisionOdom() {
+
         VOdom.addVisionMeasurement(Limelight1.getPos2D() , Limelight1.getLatestTimestamp());
+
     }
 
 
