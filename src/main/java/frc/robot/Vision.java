@@ -11,13 +11,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
-
-
-public class Vision extends LimelightHelpers {
+public class Vision {
   // private static NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  // private static NetworkTable vistable = inst.getTable("limelight"); // Declare Vision Table at
+  // private static NetworkTable vistable = inst.getTable("limelight"); // Declare
+  // Vision Table at
   // the class level
-  // private static NetworkTableEntry internalPosEntry = vistable.getEntry("<botpose>");
+  // private static NetworkTableEntry internalPosEntry =
+  // vistable.getEntry("<botpose>");
   private DoubleArraySubscriber DASub;
   private Pose2d fpos2d;
 
@@ -50,6 +50,7 @@ public class Vision extends LimelightHelpers {
 
   public void Telemetry() {
     // SmartDashboard.putData("VPosX", fpos2d.getX());
+    System.out.println(fpos2d.getX());
     // Shuffleboard.getTab("Vision").add("PosY", fpos2d.getY());
   }
 
@@ -62,4 +63,3 @@ public class Vision extends LimelightHelpers {
   }
 
 }
-
