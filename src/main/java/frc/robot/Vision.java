@@ -44,7 +44,7 @@ public class Vision extends LimelightHelpers {
     TimestampedDoubleArray DASubT = DASub.getAtomic(null);
     return DASubT;
   }
-
+  ///
   // public double getLatestLatencyAdjustedTimeStamp() {
   // TimestampedDoubleArray DASubT = DASub.getAtomic(null);
   // double[] DASubTpos = DASubT.value;
