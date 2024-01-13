@@ -24,11 +24,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-  }
-
-  @Override
-  public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
 
     Shuffleboard.getTab("Vision").add("PosX", Limelight1.getPos2D().getX());
     Shuffleboard.getTab("Vision").add("PosY", Limelight1.getPos2D().getY());
