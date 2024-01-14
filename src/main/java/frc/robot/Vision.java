@@ -18,44 +18,51 @@ public class Vision {
 
   private DoubleArraySubscriber DASub;
 
-  public Vision(String name) {
+  public Vision(String topicname) {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    DASub = inst.getDoubleArrayTopic(name).subscribe(new double[7]);
+    DASub = inst.getDoubleArrayTopic(topicname).subscribe(new double[7]);
   }
 
   public Pose2d getPos2D() {
-    TimestampedDoubleArray DASubT = DASub.getAtomic(null);
-    double[] DASubTpos = DASubT.value;
+    double[] DASubTpos = DASub.get(null);
 
-    Translation2d coords = new Translation2d(DASubTpos[0], DASubTpos[1]);
-    Rotation2d rot = new Rotation2d(Units.degreesToRadians(DASubTpos[5]));
 
-    Pose2d fpos2d = new Pose2d(coords, rot);
-    return fpos2d;
+    return new Pose2d(new Translation2d(DASubTpos[0], DASubTpos[1]),
+        new Rotation2d(Units.degreesToRadians(DASubTpos[5])));
   }
 
-  public double getLatestTimestamp() {
-    TimestampedDoubleArray DASubT = DASub.getAtomic(null);
-    return DASubT.timestamp;
-  }
+  // public double getLatestTimestamp() {
+  // TimestampedDoubleArray DASubT = DASub.getAtomic(null);
+  // return DASubT.timestamp;
+  // }
 
-  public TimestampedDoubleArray getPoseRaw() {
-    TimestampedDoubleArray DASubT = DASub.getAtomic(null);
-    return DASubT;
-  }
+  // public TimestampedDoubleArray getPoseRaw() {
+  // TimestampedDoubleArray DASubT = DASub.getAtomic(null);
+  // return DASubT;
+  // }
 
   public void Telemetry() {
-    // SmartDashboard.putData("VPosX", fpos2d.getX());
-    // Shuffleboard.getTab("Vision").add("PosY", fpos2d.getY());
+
+    TimestampedDoubleArray internal1 = DASub.getAtomic(null);
+
+
+    System.out.println(
+        "X:" + internal1.value[0] + " Timestamp: " + (getLatestLatencyAdjustedTimeStamp()));
+    System.out.println(
+        "Y:" + internal1.value[1] + " Timestamp: " + (getLatestLatencyAdjustedTimeStamp()));
+    System.out.println(
+        "Theta:" + internal1.value[5] + " Timestamp: " + (getLatestLatencyAdjustedTimeStamp()));
+
   }
 
   public double getLatestLatencyAdjustedTimeStamp() {
-    TimestampedDoubleArray DASubT = DASub.getAtomic(null);
-    double latency = DASubT.value[6];
-    double internaltimestamp = DASubT.timestamp;
 
-    return internaltimestamp - (1000.0 * (latency));
+    TimestampedDoubleArray internal2 = DASub.getAtomic(null);
+    return internal2.timestamp - ((internal2.value[6]) / 1000.0);
   }
 
+
+
 }
+
 
