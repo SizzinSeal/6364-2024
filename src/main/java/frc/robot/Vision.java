@@ -14,7 +14,8 @@ public class Vision {
   // private static NetworkTableInstance inst = NetworkTableInstance.getDefault();
   // private static NetworkTable vistable = inst.getTable("limelight"); // Declare Vision Table at
   // the class level
-  // private static NetworkTableEntry internalPosEntry = vistable.getEntry("<botpose>");
+  // private static NetworkTableEntry internalPosEntry = vistable.getEntry("<botpose>")
+
 
   private DoubleArraySubscriber DASub;
 
@@ -25,7 +26,6 @@ public class Vision {
 
   public Pose2d getPos2D() {
     double[] DASubTpos = DASub.get(null);
-
 
     return new Pose2d(new Translation2d(DASubTpos[0], DASubTpos[1]),
         new Rotation2d(Units.degreesToRadians(DASubTpos[5])));
@@ -55,12 +55,16 @@ public class Vision {
 
   }
 
+
   public double getLatestLatencyAdjustedTimeStamp() {
 
     TimestampedDoubleArray internal2 = DASub.getAtomic(null);
-    return internal2.timestamp - ((internal2.value[6]) / 1000.0);
+    return ((internal2.timestamp - internal2.value[6]) / 1000.0);
   }
 
+
+  // getLatestLatencyAdjustedTimeStamp() is in seconds
+  // .timestamp is in millis and .value[6] is in millis
 
 
 }
