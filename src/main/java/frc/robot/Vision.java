@@ -2,22 +2,25 @@ package frc.robot;
 
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
-
-
 public class Vision {
   // private static NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  // private static NetworkTable vistable = inst.getTable("limelight"); // Declare Vision Table at
+  // private static NetworkTable vistable = inst.getTable("limelight"); // Declare
+  // Vision Table at
   // the class level
   // private static NetworkTableEntry internalPosEntry = vistable.getEntry("<botpose>")
 
 
   private DoubleArraySubscriber DASub;
+  private Pose2d fpos2d;
 
   public Vision(String topicname) {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
