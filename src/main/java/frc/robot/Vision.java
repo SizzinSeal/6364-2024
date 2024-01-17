@@ -13,12 +13,10 @@ import edu.wpi.first.math.util.Units;
 public class Vision {
 
   private DoubleArraySubscriber DASub;
-  private final int taglistener;
 
-  public boolean isTagDetected = false;
-
-  private boolean TagDetector(Long id) {
-    if (id > -1) {
+  public boolean TagDetector() {
+    int taglistener = inst.getEntry("<tid>").getInteger(-1);
+    if (taglistener > -1) {
       return true;
     } else {
       return false;
@@ -28,13 +26,6 @@ public class Vision {
   public Vision(String topicname) {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     DASub = inst.getDoubleArrayTopic(topicname).subscribe(new double[7]);
-
-    taglistener = inst.addListener(new String[] {topicname},
-        EnumSet.of(NetworkTableEvent.Kind.kTopic), event -> {
-          if (event.is(NetworkTableEvent.Kind.kPublish)) {
-            isTagDetected = TagDetector(inst.getEntry("<tid>").getInteger(-1));
-          }
-        });
   }
 
   public Pose2d getPos2D() {
