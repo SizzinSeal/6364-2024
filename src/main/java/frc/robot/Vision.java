@@ -2,10 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,11 +13,10 @@ public class Vision {
   // private static NetworkTable vistable = inst.getTable("limelight"); // Declare
   // Vision Table at
   // the class level
-  // private static NetworkTableEntry internalPosEntry = vistable.getEntry("<botpose>")
-
+  // private static NetworkTableEntry internalPosEntry =
+  // vistable.getEntry("<botpose>")
 
   private DoubleArraySubscriber DASub;
-  private Pose2d fpos2d;
 
   public Vision(String topicname) {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -28,48 +24,43 @@ public class Vision {
   }
 
   public Pose2d getPos2D() {
-    double[] DASubTpos = DASub.get(null);
+    double[] DASubTpos = DASub.get();
 
     return new Pose2d(new Translation2d(DASubTpos[0], DASubTpos[1]),
         new Rotation2d(Units.degreesToRadians(DASubTpos[5])));
   }
 
-  // public double getLatestTimestamp() {
-  // TimestampedDoubleArray DASubT = DASub.getAtomic(null);
-  // return DASubT.timestamp;
-  // }
+  public double getLatestTimestamp() {
+    TimestampedDoubleArray DASubT = DASub.getAtomic();
+    return DASubT.timestamp;
+  }
 
-  // public TimestampedDoubleArray getPoseRaw() {
-  // TimestampedDoubleArray DASubT = DASub.getAtomic(null);
-  // return DASubT;
-  // }
+  public TimestampedDoubleArray getPoseRaw() {
+    TimestampedDoubleArray DASubT = DASub.getAtomic();
+    return DASubT;
+  }
 
   public void Telemetry() {
 
-    TimestampedDoubleArray internal1 = DASub.getAtomic(null);
+    TimestampedDoubleArray internal1 = DASub.getAtomic();
+    Pose2d postest = getPos2D();
 
+    // System.out.println("latency" + internal1.value[6]);
+    // System.out.println("timestamp" + internal1.timestamp);
+    System.out.println(postest.getX());
 
-    System.out.println(
-        "X:" + internal1.value[0] + " Timestamp: " + (getLatestLatencyAdjustedTimeStamp()));
-    System.out.println(
-        "Y:" + internal1.value[1] + " Timestamp: " + (getLatestLatencyAdjustedTimeStamp()));
-    System.out.println(
-        "Theta:" + internal1.value[5] + " Timestamp: " + (getLatestLatencyAdjustedTimeStamp()));
+    getLatestLatencyAdjustedTimeStamp();
+    // System.out.println("latency" + getLatestLatencyAdjustedTimeStamp());
 
   }
-
 
   public double getLatestLatencyAdjustedTimeStamp() {
 
-    TimestampedDoubleArray internal2 = DASub.getAtomic(null);
+    TimestampedDoubleArray internal2 = DASub.getAtomic();
     return ((internal2.timestamp - internal2.value[6]) / 1000.0);
   }
-
 
   // getLatestLatencyAdjustedTimeStamp() is in seconds
   // .timestamp is in millis and .value[6] is in millis
 
-
 }
-
-
