@@ -14,8 +14,8 @@ public class Vision {
 
   private DoubleArraySubscriber DASub;
 
-  public boolean TagDetector() {
-    int taglistener = inst.getEntry("<tid>").getInteger(-1);
+  public boolean tagDetector() {
+    long taglistener = inst.getEntry("<tid>").getInteger(-1);
     if (taglistener > -1) {
       return true;
     } else {
@@ -45,14 +45,13 @@ public class Vision {
 
   }
 
-  public void Telemetry() {
+  public void telemetry() {
 
     // TimestampedDoubleArray internal1 = DASub.getAtomic();
 
   }
 
   public double getLatestLatencyAdjustedTimeStamp() {
-
     TimestampedDoubleArray internal2 = DASub.getAtomic();
     return ((internal2.timestamp - internal2.value[6]) / 1000.0);
   }
