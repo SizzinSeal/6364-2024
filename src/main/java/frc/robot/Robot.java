@@ -13,7 +13,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private Vision Limelight1 = new Vision("/limelight/<botpose>");
 
   @Override
   public void robotInit() {
@@ -58,7 +57,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    Limelight1.Telemetry();
+    m_robotContainer.Limelight1.Telemetry();
+    if (m_robotContainer.Limelight1.isTagDetected == true) {
+      System.out.println("I see tag");
+    }
   }
 
   @Override

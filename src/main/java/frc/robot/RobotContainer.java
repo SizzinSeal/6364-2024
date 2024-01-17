@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.OdometryThread;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,7 +24,11 @@ public class RobotContainer {
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  public CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  private final OdometryThread drivetrainOdomThread = drivetrain.new OdometryThread(); // odom
+  public final Vision Limelight1 = new Vision("/limelight/<botpose>");
+  // thread
+
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.2).withRotationalDeadband(MaxAngularRate * 0.2) // Add a 10%
@@ -66,8 +71,15 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
+  private void initOdom() {
+    if (drivetrain.odometryIsValid() == false) {
+      drivetrainOdomThread.start();
+    }
+  }
+
   public RobotContainer() {
     configureBindings();
+    initOdom();
   }
 
   public Command getAutonomousCommand() {
