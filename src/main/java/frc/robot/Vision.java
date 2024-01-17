@@ -60,18 +60,13 @@ public class Vision {
 
   }
 
-
   public double getLatestLatencyAdjustedTimeStamp() {
 
     TimestampedDoubleArray internal2 = DASub.getAtomic();
     return ((internal2.timestamp - internal2.value[6]) / 1000.0);
   }
 
-
   // getLatestLatencyAdjustedTimeStamp() is in seconds
   // .timestamp is in millis and .value[6] is in millis
 
-
 }
-
-
