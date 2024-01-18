@@ -4,7 +4,10 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.EnumSet;
+import java.util.Optional;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -12,10 +15,39 @@ import edu.wpi.first.math.util.Units;
 
 public class Vision {
 
-  private DoubleArraySubscriber DASub;
+  private DoubleArraySubscriber botpos;
+  NetworkTableInstance inst;
+  private String limeLightName;
+  private Optional<Alliance> alliancecolour;
+
+  public Vision(String LimelightName) {
+    limeLightName = LimelightName;
+    inst = NetworkTableInstance.getDefault();
+  }
+
+  public void init() {
+    this.alliancecolour = DriverStation.getAlliance();
+
+    if (this.alliancecolour.get() == Alliance.Blue) {
+      botpos =
+          inst.getDoubleArrayTopic(limeLightName + "<botpose_wpiblue>").subscribe(new double[7]);
+
+    } else {
+      botpos =
+          inst.getDoubleArrayTopic(limeLightName + "<botpose_wpired>").subscribe(new double[7]);
+
+    }
+
+    botpos = inst.getDoubleArrayTopic(limeLightName + "<botpose_wpiblue>").subscribe(new double[7]);
+
+  }
+
+  public static double distanceFormula(double x1, double y1, double x2, double y2) {
+    return Math.sqrt(Math.pow((x2 - x1), 2) - (Math.pow((y2 - y1), 2)));
+  }
 
   public boolean tagDetector() {
-    long taglistener = inst.getEntry("<tid>").getInteger(-1);
+    long taglistener = inst.getTable(limeLightName).getEntry("<tid>").getInteger(-1);
     if (taglistener > -1) {
       return true;
     } else {
@@ -23,26 +55,31 @@ public class Vision {
     }
   }
 
-  public Vision(String topicname) {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    DASub = inst.getDoubleArrayTopic(topicname).subscribe(new double[7]);
-  }
-
   public Pose2d getPos2D() {
-    double[] DASubTpos = DASub.get();
-
+    double[] DASubTpos = botpos.get();
     return new Pose2d(new Translation2d(DASubTpos[0], DASubTpos[1]),
         new Rotation2d(Units.degreesToRadians(DASubTpos[5])));
   }
 
+  public double[] getTargDist() { /* Get Target Distance from robot in Meters */
+    Pose2d currpos = getPos2D();
+    double[] currtargpos = inst.getTable(limeLightName).getEntry("<targetpose_robotspace>")
+        .getDoubleArray(new double[6]);
+
+    double[] distnID = new double[2];
+    distnID[0] = distanceFormula(currtargpos[0], currtargpos[1], currpos.getX(), currpos.getY());
+    distnID[1] = inst.getTable(limeLightName).getEntry("<tid>").getInteger(-1);
+
+    return distnID;
+  }
+
+
   public double getLatestTimestamp() {
-    TimestampedDoubleArray DASubT = DASub.getAtomic();
-    return DASubT.timestamp;
+    return botpos.getAtomic().timestamp;
   }
 
   public TimestampedDoubleArray getPoseRaw() {
-    return DASub.getAtomic();
-
+    return botpos.getAtomic();
   }
 
   public void telemetry() {
@@ -52,7 +89,7 @@ public class Vision {
   }
 
   public double getLatestLatencyAdjustedTimeStamp() {
-    TimestampedDoubleArray internal2 = DASub.getAtomic();
+    TimestampedDoubleArray internal2 = botpos.getAtomic();
     return ((internal2.timestamp - internal2.value[6]) / 1000.0);
   }
 
