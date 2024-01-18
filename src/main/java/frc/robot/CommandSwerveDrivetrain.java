@@ -70,7 +70,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   }
 
-
   private void startSimThread() {
     m_lastSimTime = Utils.getCurrentTimeSeconds();
 

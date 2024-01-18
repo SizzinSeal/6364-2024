@@ -27,9 +27,6 @@ public class RobotContainer {
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
-  // private final OdometryThread drivetrainOdomThread = drivetrain.new OdometryThread(); // odom
-  // private final SwerveDrivePoseEstimator drivetrainPoseEstimator =
-  // new SwerveDrivePoseEstimator(null, null, null, null);
   public final Vision Limelight1 = new Vision("/limelight/");
   // thread
 
@@ -80,7 +77,6 @@ public class RobotContainer {
     double degstd;
     double[] internaltag = Limelight1.tagDetector();
     double posdiff = drivetrain.getPoseDifference(Limelight1.getPos2D());
-    double drivespeed = drivetrain.getspeed();
 
     if (internaltag[0] != -1) {
       if (internaltag[1] > 1) {
