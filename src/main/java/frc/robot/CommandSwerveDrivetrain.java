@@ -7,7 +7,9 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +23,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
+
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
       double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
@@ -37,6 +40,36 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       startSimThread();
     }
   }
+
+  public void StartOdomThread() {
+    if (m_odometryThread.odometryIsValid() == false) {
+      m_odometryThread.start();
+      m_odometryThread.run();
+    }
+  }
+
+  public double getPoseDifference(Pose2d pos) {
+    return m_odometry.getEstimatedPosition().getTranslation().getDistance(pos.getTranslation());
+  }
+
+
+  public double getspeed() {
+
+    double vx = m_kinematics.toChassisSpeeds().vxMetersPerSecond;
+    double vy = m_kinematics.toChassisSpeeds().vyMetersPerSecond;
+
+    double vt = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
+
+    return vt;
+  }
+
+  public void UpdateVision(Pose2d pos, double xyStds, double degStds, double timestamp) {
+
+    m_odometry.addVisionMeasurement(pos, timestamp,
+        VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
+
+  }
+
 
   private void startSimThread() {
     m_lastSimTime = Utils.getCurrentTimeSeconds();

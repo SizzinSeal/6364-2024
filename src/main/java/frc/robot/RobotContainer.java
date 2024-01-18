@@ -26,9 +26,10 @@ public class RobotContainer {
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
-  private final SwerveDrivePoseEstimator drivetrainPoseEstimator =
-      new SwerveDrivePoseEstimator(null, null, null, null);
+  public final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  // private final OdometryThread drivetrainOdomThread = drivetrain.new OdometryThread(); // odom
+  // private final SwerveDrivePoseEstimator drivetrainPoseEstimator =
+  // new SwerveDrivePoseEstimator(null, null, null, null);
   public final Vision Limelight1 = new Vision("/limelight/");
   // thread
 
@@ -74,13 +75,40 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
-  public void updatePosEstimator() {
-    // drivetrainPoseEstimator.updateWithTime(Timer.getFPGATimestamp(), null, null);
+  public void updatePosEstimatorv1() {
+    double xystd;
+    double degstd;
+    double[] internaltag = Limelight1.tagDetector();
+    double posdiff = drivetrain.getPoseDifference(Limelight1.getPos2D());
+    double drivespeed = drivetrain.getspeed();
+
+    if (internaltag[0] != -1) {
+      if (internaltag[1] > 1) {
+        xystd = 0.5;
+        degstd = 6;
+      }
+      // 1 target with large area and close to estimated pose
+      else if (internaltag[2] > 0.8 && posdiff < 0.5) {
+        xystd = 1.0;
+        degstd = 12;
+      }
+      // 1 target farther away and estimated pose is close
+      else if (internaltag[2] > 0.1 && posdiff < 0.3) {
+        xystd = 2.0;
+        degstd = 30;
+      }
+      // conditions don't match to add a vision measurement
+      else {
+        return;
+      }
+    } else {
+      return;
+    }
+
   }
 
-
-
   public RobotContainer() {
+    drivetrain.StartOdomThread();
     configureBindings();
     Limelight1.init();
   }

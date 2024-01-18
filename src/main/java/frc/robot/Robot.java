@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private RobotContainer m_robotContainer;
+  public RobotContainer m_robotContainer;
 
   @Override
   public void robotInit() {
@@ -56,12 +56,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {
-    m_robotContainer.Limelight1.telemetry();
-    if (m_robotContainer.Limelight1.tagDetector() == true) {
-      System.out.println("I see tag");
-    }
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void teleopExit() {}

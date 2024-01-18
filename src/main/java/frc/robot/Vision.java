@@ -38,21 +38,41 @@ public class Vision {
 
     }
 
-    botpos = inst.getDoubleArrayTopic(limeLightName + "<botpose_wpiblue>").subscribe(new double[7]);
-
   }
 
   public static double distanceFormula(double x1, double y1, double x2, double y2) {
     return Math.sqrt(Math.pow((x2 - x1), 2) - (Math.pow((y2 - y1), 2)));
   }
 
-  public boolean tagDetector() {
-    long taglistener = inst.getTable(limeLightName).getEntry("<tid>").getInteger(-1);
-    if (taglistener > -1) {
-      return true;
-    } else {
-      return false;
+  private double detectMultitag() {
+    double[] Cornercount =
+        inst.getTable(limeLightName).getEntry("<tcornxy>").getDoubleArray(new double[16]);
+
+    double TagCount = ((Cornercount.length) / 4);
+
+    if (TagCount < 1 && TagCount != 0) {
+      TagCount = 1;
     }
+
+    return TagCount;
+  }
+
+  private double tagSize() {
+    return inst.getTable(limeLightName).getEntry("<ta>").getDouble(0.0);
+  }
+
+  public double[] tagDetector() {
+    long tagID = inst.getTable(limeLightName).getEntry("<tid>").getInteger(-1);
+
+    double[] internal = new double[3];
+
+    internal[0] = tagID; // Tag ID
+
+    internal[1] = detectMultitag(); // Number of Tags in view
+
+    internal[2] = tagSize(); // Size of tags in view
+
+    return internal;
   }
 
   public Pose2d getPos2D() {
