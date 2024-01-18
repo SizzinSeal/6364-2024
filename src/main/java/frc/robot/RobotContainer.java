@@ -105,6 +105,9 @@ public class RobotContainer {
       return;
     }
 
+    drivetrain.UpdateVision(Limelight1.getPos2D(), xystd, degstd,
+        Limelight1.getLatestLatencyAdjustedTimeStamp());
+
   }
 
   public RobotContainer() {
