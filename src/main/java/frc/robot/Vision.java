@@ -74,18 +74,18 @@ public class Vision {
   /**
    * TODO: add documentation
    */
-  public double[] tagDetector() {
+  public long tagDetector() {
     long tagID = m_table.getEntry("tid").getInteger(-1);
 
-    double[] internal = new double[3];
+    // double[] internal = new double[3];
 
-    internal[0] = tagID; // Tag ID
+    // internal[0] = tagID; // Tag ID
 
-    internal[1] = detectMultitag(); // Number of Tags in view
+    // internal[1] = detectMultitag(); // Number of Tags in view
 
-    internal[2] = tagSize(); // Size of tags in view
+    // internal[2] = tagSize(); // Size of tags in view
 
-    return internal;
+    return tagID;
   }
 
   /**

@@ -66,39 +66,39 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
-  public void updatePosEstimatorv1() {
-    double xystd;
-    double degstd;
-    double[] internaltag = limelight1.tagDetector();
-    double posdiff = drivetrain.getPoseDifference(limelight1.getPos2D());
+  // public void updatePosEstimatorv1() {
+  // double xystd;
+  // double degstd;
+  // double[] internaltag = limelight1.tagDetector();
+  // double posdiff = drivetrain.getPoseDifference(limelight1.getPos2D());
 
-    if (internaltag[0] != -1) {
-      if (internaltag[1] > 1) {
-        xystd = 0.5;
-        degstd = 6;
-      }
-      // 1 target with large area and close to estimated pose
-      else if (internaltag[2] > 0.8 && posdiff < 0.5) {
-        xystd = 1.0;
-        degstd = 12;
-      }
-      // 1 target farther away and estimated pose is close
-      else if (internaltag[2] > 0.1 && posdiff < 0.3) {
-        xystd = 2.0;
-        degstd = 30;
-      }
-      // conditions don't match to add a vision measurement
-      else {
-        return;
-      }
-    } else {
-      return;
-    }
+  // if (internaltag[0] != -1) {
+  // if (internaltag[1] > 1) {
+  // xystd = 0.5;
+  // degstd = 6;
+  // }
+  // // 1 target with large area and close to estimated pose
+  // else if (internaltag[2] > 0.8 && posdiff < 0.5) {
+  // xystd = 1.0;
+  // degstd = 12;
+  // }
+  // // 1 target farther away and estimated pose is close
+  // else if (internaltag[2] > 0.1 && posdiff < 0.3) {
+  // xystd = 2.0;
+  // degstd = 30;
+  // }
+  // // conditions don't match to add a vision measurement
+  // else {
+  // return;
+  // }
+  // } else {
+  // return;
+  // }
 
-    drivetrain.UpdateVision(limelight1.getPos2D(), xystd, degstd,
-        limelight1.getLatestLatencyAdjustedTimeStamp());
+  // drivetrain.UpdateVision(limelight1.getPos2D(), xystd, degstd,
+  // limelight1.getLatestLatencyAdjustedTimeStamp());
 
-  }
+  // }
 
   public RobotContainer() {
     drivetrain.StartOdomThread();

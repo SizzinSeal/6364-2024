@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    m_robotContainer.updatePosEstimatorv1();
+    // m_robotContainer.updatePosEstimatorv1();
   }
 
   @Override
@@ -58,9 +58,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    if (m_robotContainer.limelight1.tagDetector().length > 0) {
-      System.out.println("I see tag");
-    }
+    System.out.println(m_robotContainer.limelight1.tagDetector());
   }
 
   @Override
