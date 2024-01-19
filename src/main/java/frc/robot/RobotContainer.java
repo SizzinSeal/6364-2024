@@ -5,15 +5,11 @@
 package frc.robot;
 
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.OdometryThread;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -27,7 +23,6 @@ public class RobotContainer {
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
   public CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
-  private final OdometryThread drivetrainOdomThread = drivetrain.new OdometryThread(); // odom
   public final Vision limelight1 = new Vision("limelight");
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -76,7 +71,6 @@ public class RobotContainer {
     double degstd;
     double[] internaltag = limelight1.tagDetector();
     double posdiff = drivetrain.getPoseDifference(limelight1.getPos2D());
-    double drivespeed = drivetrain.getspeed();
 
     if (internaltag[0] != -1) {
       if (internaltag[1] > 1) {
