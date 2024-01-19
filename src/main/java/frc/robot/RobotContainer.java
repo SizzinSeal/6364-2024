@@ -5,13 +5,15 @@
 package frc.robot;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.OdometryThread;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -26,9 +28,7 @@ public class RobotContainer {
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
   public CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
   private final OdometryThread drivetrainOdomThread = drivetrain.new OdometryThread(); // odom
-  public final Vision Limelight1 = new Vision("limelight");
-  // thread
-
+  public final Vision limelight1 = new Vision("limelight");
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.2).withRotationalDeadband(MaxAngularRate * 0.2) // Add a 10%
@@ -71,15 +71,45 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
-  private void initOdom() {
-    if (drivetrain.odometryIsValid() == false) {
-      drivetrainOdomThread.start();
+  public void updatePosEstimatorv1() {
+    double xystd;
+    double degstd;
+    double[] internaltag = limelight1.tagDetector();
+    double posdiff = drivetrain.getPoseDifference(limelight1.getPos2D());
+    double drivespeed = drivetrain.getspeed();
+
+    if (internaltag[0] != -1) {
+      if (internaltag[1] > 1) {
+        xystd = 0.5;
+        degstd = 6;
+      }
+      // 1 target with large area and close to estimated pose
+      else if (internaltag[2] > 0.8 && posdiff < 0.5) {
+        xystd = 1.0;
+        degstd = 12;
+      }
+      // 1 target farther away and estimated pose is close
+      else if (internaltag[2] > 0.1 && posdiff < 0.3) {
+        xystd = 2.0;
+        degstd = 30;
+      }
+      // conditions don't match to add a vision measurement
+      else {
+        return;
+      }
+    } else {
+      return;
     }
+
+    drivetrain.UpdateVision(limelight1.getPos2D(), xystd, degstd,
+        limelight1.getLatestLatencyAdjustedTimeStamp());
+
   }
 
   public RobotContainer() {
+    drivetrain.StartOdomThread();
     configureBindings();
-    initOdom();
+    limelight1.init();
   }
 
   public Command getAutonomousCommand() {
