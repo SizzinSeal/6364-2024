@@ -1,52 +1,60 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import java.util.EnumSet;
 import java.util.Optional;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.VisionMeasurement;
 
+/**
+ * @brief LimeLight wrapper
+ *
+ *        We interact with the limelight through networktables. It posts data, and we need to read
+ *        that data from networktables.
+ * 
+ *        Using networktables all the time inflates code size, so we have this wrapper to simplify
+ *        using limelights
+ */
 public class Vision {
+  private DoubleArraySubscriber m_poseSubscriber; // limelight pose subscriber
+  private final NetworkTable m_table; //
+  private Optional<Alliance> m_allianceColour;
 
-  private DoubleArraySubscriber botpos;
-  NetworkTableInstance inst;
-  private String limeLightName;
-  private Optional<Alliance> alliancecolour;
-
-  public Vision(String LimelightName) {
-    limeLightName = LimelightName;
-    inst = NetworkTableInstance.getDefault();
+  /**
+   * @brief Vision class constructor
+   * 
+   * @param limelightName name of the limelight
+   */
+  public Vision(String limelightName) {
+    m_table = NetworkTableInstance.getDefault().getTable(limelightName);
   }
 
+  /**
+   * TODO: explain why this logic is not just in the constructor
+   */
   public void init() {
-    this.alliancecolour = DriverStation.getAlliance();
-
-    if (this.alliancecolour.get() == Alliance.Blue) {
-      botpos =
-          inst.getDoubleArrayTopic(limeLightName + "<botpose_wpiblue>").subscribe(new double[7]);
-
+    // robot position is different if its on the Blue alliance or the Red alliance
+    m_allianceColour = DriverStation.getAlliance();
+    if (m_allianceColour.get() == Alliance.Blue) {
+      m_poseSubscriber = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[7]);
     } else {
-      botpos =
-          inst.getDoubleArrayTopic(limeLightName + "<botpose_wpired>").subscribe(new double[7]);
-
+      m_poseSubscriber = m_table.getDoubleArrayTopic("botpose_wpired").subscribe(new double[7]);
     }
-
   }
 
-  public static double distanceFormula(double x1, double y1, double x2, double y2) {
-    return Math.sqrt(Math.pow((x2 - x1), 2) - (Math.pow((y2 - y1), 2)));
-  }
-
+  /**
+   * TODO: add documentation
+   */
   private double detectMultitag() {
-    double[] Cornercount =
-        inst.getTable(limeLightName).getEntry("<tcornxy>").getDoubleArray(new double[16]);
+    double[] Cornercount = m_table.getEntry("tcornxy").getDoubleArray(new double[16]);
 
     double TagCount = ((Cornercount.length) / 4);
 
@@ -57,59 +65,88 @@ public class Vision {
     return TagCount;
   }
 
+  /**
+   * TODO: add documentation
+   */
   private double tagSize() {
-    return inst.getTable(limeLightName).getEntry("<ta>").getDouble(0.0);
+    return m_table.getEntry("ta").getDouble(0.0);
   }
 
-  public double[] tagDetector() {
-    long tagID = inst.getTable(limeLightName).getEntry("<tid>").getInteger(-1);
+  /**
+   * TODO: add documentation
+   */
+  public long tagDetector() {
+    long tagID = m_table.getEntry("tid").getInteger(-1);
 
-    double[] internal = new double[3];
+    // double[] internal = new double[3];
 
-    internal[0] = tagID; // Tag ID
+    // internal[0] = tagID; // Tag ID
 
-    internal[1] = detectMultitag(); // Number of Tags in view
+    // internal[1] = detectMultitag(); // Number of Tags in view
 
-    internal[2] = tagSize(); // Size of tags in view
+    // internal[2] = tagSize(); // Size of tags in view
 
-    return internal;
+    return tagID;
   }
 
+  /**
+   * TODO: add documentation
+   */
   public Pose2d getPos2D() {
-    double[] DASubTpos = botpos.get();
+    double[] DASubTpos = m_poseSubscriber.get();
     return new Pose2d(new Translation2d(DASubTpos[0], DASubTpos[1]),
         new Rotation2d(Units.degreesToRadians(DASubTpos[5])));
   }
 
-  public double getTargDist() { /* Get Target Distance from robot in Meters */
-    Pose2d currpos = getPos2D();
-    double[] currtargpos = inst.getTable(limeLightName).getEntry("<targetpose_robotspace>")
-        .getDoubleArray(new double[6]);
+  /**
+   * @brief get the distance from the robot to the tag
+   * 
+   * @return distance in meters
+   */
+  public double getDist3D() {
+    // get the measured pose in the target coordinate system
+    double[] measuredPoseArray =
+        m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
 
-    return distanceFormula(currtargpos[0], currtargpos[1], currpos.getX(), currpos.getY());
-
+    // create the vector
+    Translation3d measuredPose =
+        new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
+    // return the magnitude of the vector
+    return measuredPose.getNorm();
   }
 
-
+  /**
+   * TODO: add documenation
+   */
   public double getLatestTimestamp() {
-    return botpos.getAtomic().timestamp;
+    return m_poseSubscriber.getAtomic().timestamp;
   }
 
+  /**
+   * TODO: add documentation
+   */
   public TimestampedDoubleArray getPoseRaw() {
-    return botpos.getAtomic();
+    return m_poseSubscriber.getAtomic();
   }
 
+  /**
+   * TODO: add documentation
+   */
   public void telemetry() {
 
     // TimestampedDoubleArray internal1 = DASub.getAtomic();
 
   }
 
+  /**
+   * TODO: add documentation
+   */
   public double getLatestLatencyAdjustedTimeStamp() {
-    TimestampedDoubleArray internal2 = botpos.getAtomic();
+    TimestampedDoubleArray internal2 = m_poseSubscriber.getAtomic();
     return ((internal2.timestamp - internal2.value[6]) / 1000.0);
   }
 
+  // TODO: move this comment somewhere that makes more sense
   // getLatestLatencyAdjustedTimeStamp() is in seconds
   // .timestamp is in millis and .value[6] is in millis
 
