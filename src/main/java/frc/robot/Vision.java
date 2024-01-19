@@ -81,16 +81,13 @@ public class Vision {
         new Rotation2d(Units.degreesToRadians(DASubTpos[5])));
   }
 
-  public double[] getTargDist() { /* Get Target Distance from robot in Meters */
+  public double getTargDist() { /* Get Target Distance from robot in Meters */
     Pose2d currpos = getPos2D();
     double[] currtargpos = inst.getTable(limeLightName).getEntry("<targetpose_robotspace>")
         .getDoubleArray(new double[6]);
 
-    double[] distnID = new double[2];
-    distnID[0] = distanceFormula(currtargpos[0], currtargpos[1], currpos.getX(), currpos.getY());
-    distnID[1] = inst.getTable(limeLightName).getEntry("<tid>").getInteger(-1);
+    return distanceFormula(currtargpos[0], currtargpos[1], currpos.getX(), currpos.getY());
 
-    return distnID;
   }
 
 

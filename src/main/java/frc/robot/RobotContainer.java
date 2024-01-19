@@ -77,20 +77,21 @@ public class RobotContainer {
     double degstd;
     double[] internaltag = Limelight1.tagDetector();
     double posdiff = drivetrain.getPoseDifference(Limelight1.getPos2D());
+    double speed = drivetrain.getspeed();
 
     if (internaltag[0] != -1) {
       if (internaltag[1] > 1) {
-        xystd = 0.5;
+        xystd = 0.5 + ((0.5 * (Math.pow(speed, 1.5))) / 6);
         degstd = 6;
       }
       // 1 target with large area and close to estimated pose
       else if (internaltag[2] > 0.8 && posdiff < 0.5) {
-        xystd = 1.0;
+        xystd = 1.0 + ((0.5 * (Math.pow(speed, 1.5))) / 6);
         degstd = 12;
       }
       // 1 target farther away and estimated pose is close
       else if (internaltag[2] > 0.1 && posdiff < 0.3) {
-        xystd = 2.0;
+        xystd = 2.0 + ((0.5 * (Math.pow(speed, 1.5))) / 6);
         degstd = 30;
       }
       // conditions don't match to add a vision measurement
@@ -105,6 +106,7 @@ public class RobotContainer {
         Limelight1.getLatestLatencyAdjustedTimeStamp());
 
   }
+
 
   public RobotContainer() {
     drivetrain.StartOdomThread();
