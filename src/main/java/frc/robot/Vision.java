@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.VisionMeasurement;
 
 /**
  * @brief LimeLight wrapper
@@ -30,7 +31,7 @@ public class Vision {
   /**
    * @brief Vision class constructor
    * 
-   * @param limelightName {String} name of the limelight
+   * @param limelightName name of the limelight
    */
   public Vision(String limelightName) {
     m_table = NetworkTableInstance.getDefault().getTable(limelightName);
