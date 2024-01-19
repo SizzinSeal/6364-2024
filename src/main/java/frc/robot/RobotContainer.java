@@ -26,7 +26,7 @@ public class RobotContainer {
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
   public CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
   private final OdometryThread drivetrainOdomThread = drivetrain.new OdometryThread(); // odom
-  public final Vision Limelight1 = new Vision("/limelight/<botpose>");
+  public final Vision Limelight1 = new Vision("limelight");
   // thread
 
 

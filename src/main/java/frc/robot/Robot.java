@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_robotContainer.Limelight1.Telemetry();
-    if (m_robotContainer.Limelight1.isTagDetected == true) {
+    if (m_robotContainer.Limelight1.tagDetector() == true) {
       System.out.println("I see tag");
     }
   }

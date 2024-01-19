@@ -13,9 +13,16 @@ import edu.wpi.first.math.util.Units;
 public class Vision {
 
   private DoubleArraySubscriber DASub;
+  private NetworkTableInstance m_inst;
 
-  public boolean TagDetector() {
-    int taglistener = inst.getEntry("<tid>").getInteger(-1);
+  public Vision(String topicname) {
+    m_inst = NetworkTableInstance.getDefault();
+    DASub = m_inst.getTable(topicname).subscribe(new double[7]);
+  }
+
+  public boolean tagDetector() {
+    long taglistener = m_inst.getEntry("tid").getInteger(-1);
+    System.out.println("out: " + taglistener);
     if (taglistener > -1) {
       return true;
     } else {
@@ -23,10 +30,6 @@ public class Vision {
     }
   }
 
-  public Vision(String topicname) {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    DASub = inst.getDoubleArrayTopic(topicname).subscribe(new double[7]);
-  }
 
   public Pose2d getPos2D() {
     double[] DASubTpos = DASub.get();
