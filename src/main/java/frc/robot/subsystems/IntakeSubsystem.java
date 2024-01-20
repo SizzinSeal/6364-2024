@@ -1,12 +1,10 @@
-package frc.robot;
+package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import static frc.robot.Constants.*;
-
 
 
 public class IntakeSubsystem extends SubsystemBase {
