@@ -8,14 +8,12 @@ import static frc.robot.Constants.*;
 
 
 public class IntakeSubsystem extends SubsystemBase {
-  private final TalonFX m_upperIntakeMotor = new TalonFX(LOWER_INTAKE_MOTOR_ID, CANBUS_NAME);
-  private final TalonFX m_lowerIntakeMotor = new TalonFX(UPPER_INTAKE_MOTOR_ID, CANBUS_NAME);
-
+  private final TalonFX m_upperIntakeMotor = new TalonFX(kUpperIntakeMotorId, kUpperIntakeBusName);
+  private final TalonFX m_lowerIntakeMotor = new TalonFX(kLowerIntakeMotorId, kLowerIntakeBusName);
 
   public IntakeSubsystem() {
     super();
   }
-
 
   public Command runIntake() {
     return this.runOnce(() -> {
@@ -28,7 +26,6 @@ public class IntakeSubsystem extends SubsystemBase {
       m_upperIntakeMotor.set(0.00);
     });
   }
-
 
   @Override
   public void initSendable(SendableBuilder builder) {
