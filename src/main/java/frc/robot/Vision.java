@@ -103,6 +103,7 @@ public class Vision {
    * 
    * @return distance in meters
    */
+
   public double getDist3D() {
     // get the measured pose in the target coordinate system
     double[] measuredPoseArray =

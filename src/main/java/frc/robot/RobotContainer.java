@@ -7,9 +7,11 @@ package frc.robot;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -91,16 +93,15 @@ public class RobotContainer {
       else {
         return;
       }
-    }
-
-    else {
+    } else {
       return;
     }
 
-
-    drivetrain.UpdateVision(limelight1.getPos2D(), xystd, degstd,
-        limelight1.getLatestLatencyAdjustedTimeStamp());
-
+    // drivetrain.addVisionMeasurement(limelight1.getPos2D(), xystd, degstd,
+    // limelight1.getLatestLatencyAdjustedTimeStamp());
+    drivetrain.addVisionMeasurement(limelight1.getPos2D(),
+        limelight1.getLatestLatencyAdjustedTimeStamp(),
+        VecBuilder.fill(xystd, xystd, Units.degreesToRadians(degstd)));
   }
 
 
