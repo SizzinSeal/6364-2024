@@ -53,7 +53,7 @@ public class Vision {
   /**
    * TODO: add documentation
    */
-  private double detectMultitag() {
+  public double detectMultitag() {
     double[] Cornercount = m_table.getEntry("tcornxy").getDoubleArray(new double[16]);
 
     double TagCount = ((Cornercount.length) / 4);
@@ -68,25 +68,25 @@ public class Vision {
   /**
    * TODO: add documentation
    */
-  private double tagSize() {
+  public double tagSize() {
     return m_table.getEntry("ta").getDouble(0.0);
   }
 
   /**
    * TODO: add documentation
    */
-  public long tagDetector() {
-    long tagID = m_table.getEntry("tid").getInteger(-1);
+  public double[] tagDetector() {
+    double tagID = m_table.getEntry("tid").getInteger(-1);
 
-    // double[] internal = new double[3];
+    double[] internal = new double[3];
 
-    // internal[0] = tagID; // Tag ID
+    internal[0] = tagID; // Tag ID
 
-    // internal[1] = detectMultitag(); // Number of Tags in view
+    internal[1] = detectMultitag(); // Number of Tags in view
 
-    // internal[2] = tagSize(); // Size of tags in view
+    internal[2] = tagSize(); // Size of tags in view
 
-    return tagID;
+    return internal;
   }
 
   /**
