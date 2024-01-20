@@ -104,11 +104,9 @@ public class RobotContainer {
         VecBuilder.fill(xystd, xystd, Units.degreesToRadians(degstd)));
   }
 
-
   public RobotContainer() {
     drivetrain.StartOdomThread();
     configureBindings();
-    limelight1.init();
   }
 
   public Command getAutonomousCommand() {
