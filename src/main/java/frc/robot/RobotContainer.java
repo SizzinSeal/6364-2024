@@ -97,17 +97,14 @@ public class RobotContainer {
       return;
     }
 
-
     drivetrain.UpdateVision(limelight1.getPos2D(), xystd, degstd,
         limelight1.getLatestLatencyAdjustedTimeStamp());
 
   }
 
-
   public RobotContainer() {
     drivetrain.StartOdomThread();
     configureBindings();
-    limelight1.init();
   }
 
   public Command getAutonomousCommand() {
