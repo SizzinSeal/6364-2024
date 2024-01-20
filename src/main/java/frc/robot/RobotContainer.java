@@ -97,16 +97,16 @@ public class RobotContainer {
       return;
     }
 
-    // drivetrain.addVisionMeasurement(limelight1.getPos2D(), xystd, degstd,
-    // limelight1.getLatestLatencyAdjustedTimeStamp());
     drivetrain.addVisionMeasurement(limelight1.getPos2D(),
         limelight1.getLatestLatencyAdjustedTimeStamp(),
         VecBuilder.fill(xystd, xystd, Units.degreesToRadians(degstd)));
   }
 
+
   public RobotContainer() {
     drivetrain.StartOdomThread();
     configureBindings();
+    limelight1.init();
   }
 
   public Command getAutonomousCommand() {

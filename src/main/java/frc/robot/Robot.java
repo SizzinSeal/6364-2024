@@ -24,6 +24,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     m_robotContainer.updatePosEstimatorv1();
+    m_robotContainer.drivetrain.updateFieldVisualiser();
   }
 
   @Override
