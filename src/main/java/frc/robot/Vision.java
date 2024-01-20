@@ -17,10 +17,12 @@ import frc.robot.VisionMeasurement;
 /**
  * @brief LimeLight wrapper
  *
- *        We interact with the limelight through networktables. It posts data, and we need to read
+ *        We interact with the limelight through networktables. It posts data,
+ *        and we need to read
  *        that data from networktables.
  * 
- *        Using networktables all the time inflates code size, so we have this wrapper to simplify
+ *        Using networktables all the time inflates code size, so we have this
+ *        wrapper to simplify
  *        using limelights
  */
 public class Vision {
@@ -54,13 +56,15 @@ public class Vision {
    * TODO: add documentation
    */
   public double detectMultitag() {
-    double[] Cornercount = m_table.getEntry("tcornxy").getDoubleArray(new double[16]);
+    double[] Cornercount = m_table.getEntry("tcornxy").getDoubleArray(new double[32]);
 
-    double TagCount = ((Cornercount.length) / 4);
+    double TagCount = ((Cornercount.length) / 8);
 
     if (TagCount < 1 && TagCount != 0) {
       TagCount = 1;
     }
+
+    // System.out.println(TagCount);
 
     return TagCount;
   }
@@ -106,12 +110,10 @@ public class Vision {
 
   public double getDist3D() {
     // get the measured pose in the target coordinate system
-    double[] measuredPoseArray =
-        m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
+    double[] measuredPoseArray = m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
 
     // create the vector
-    Translation3d measuredPose =
-        new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
+    Translation3d measuredPose = new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
     // return the magnitude of the vector
     return measuredPose.getNorm();
   }
