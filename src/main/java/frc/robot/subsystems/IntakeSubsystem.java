@@ -113,7 +113,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * 
    * @return Command
    */
-  public Command stopIntake() {
+  public Command stop() {
     return this.runOnce(() -> {
       m_upperMotorVelocity.Velocity = 0;
       m_lowerMotorVelocity.Velocity = 0;

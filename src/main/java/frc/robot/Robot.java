@@ -7,20 +7,16 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.IntakeSubsystem;
+
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private IntakeSubsystem m_intakeSubsystem;
-  private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    m_intakeSubsystem = new IntakeSubsystem();
   }
 
   @Override
@@ -60,13 +56,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {
-    if (joystick.b().getAsBoolean() == true) {
-      m_intakeSubsystem.intake();
-    } else {
-      m_intakeSubsystem.stopIntake();
-    }
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void teleopExit() {}
