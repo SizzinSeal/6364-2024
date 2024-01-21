@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (joystick.b().getAsBoolean() == true) {
-      m_intakeSubsystem.runIntake();
+      m_intakeSubsystem.intake();
     } else {
       m_intakeSubsystem.stopIntake();
     }
