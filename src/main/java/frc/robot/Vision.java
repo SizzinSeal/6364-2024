@@ -12,17 +12,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.VisionMeasurement;
 
 /**
  * @brief LimeLight wrapper
  *
- *        We interact with the limelight through networktables. It posts data,
- *        and we need to read
+ *        We interact with the limelight through networktables. It posts data, and we need to read
  *        that data from networktables.
  * 
- *        Using networktables all the time inflates code size, so we have this
- *        wrapper to simplify
+ *        Using networktables all the time inflates code size, so we have this wrapper to simplify
  *        using limelights
  */
 public class Vision {
@@ -110,10 +107,12 @@ public class Vision {
 
   public double getDist3D() {
     // get the measured pose in the target coordinate system
-    double[] measuredPoseArray = m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
+    double[] measuredPoseArray =
+        m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
 
     // create the vector
-    Translation3d measuredPose = new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
+    Translation3d measuredPose =
+        new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
     // return the magnitude of the vector
     return measuredPose.getNorm();
   }
