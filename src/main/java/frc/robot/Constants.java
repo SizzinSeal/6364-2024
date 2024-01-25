@@ -6,8 +6,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 public class Constants {
 
   // intake
-  public static final int kUpperIntakeMotorId = 1;
-  public static final int kLowerIntakeMotorId = 2;
+  public static final int kUpperIntakeMotorId = 15;
+  public static final int kLowerIntakeMotorId = 16;
   public static final InvertedValue kUpperIntakeInverted = InvertedValue.Clockwise_Positive;
   public static final InvertedValue kLowerIntakeInverted = InvertedValue.CounterClockwise_Positive;
   public static final String kUpperIntakeBusName = "";

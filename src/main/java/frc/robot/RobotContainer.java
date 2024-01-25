@@ -11,6 +11,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -70,12 +71,13 @@ public class RobotContainer {
     m_drivetrain.registerTelemetry(logger::telemeterize);
 
     // intake subsystem
-    m_controller.x().toggleOnTrue(m_intake.intake());
-    m_controller.x().toggleOnFalse(m_intake.stop());
+    m_controller.leftBumper().toggleOnTrue(m_intake.intake());
+    m_controller.rightBumper().toggleOnFalse(m_intake.stop());
   }
 
   public RobotContainer() {
     configureBindings();
+    SmartDashboard.putData("Intake", m_intake);
   }
 
   public Command getAutonomousCommand() {
