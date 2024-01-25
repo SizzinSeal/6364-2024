@@ -121,9 +121,35 @@ public class IntakeSubsystem extends SubsystemBase {
     });
   }
 
+  /**
+   * @brief Send telemetry data to Shuffleboard
+   * 
+   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the motors. This
+   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   * 
+   * @param builder the SendableBuilder object
+   */
   @Override
   public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    builder.addDoubleProperty("speed", () -> m_upperMotor.getVelocity().getValueAsDouble(), null);
+    super.initSendable(builder); // call the superclass method
+    // add upper motor target velocity property
+    builder.addDoubleProperty("Upper Target Velocity", () -> m_upperMotorVelocity.Velocity,
+        (double target) -> {
+          m_upperMotorVelocity.Velocity = target;
+          this.updateMotorSpeeds();
+        });
+    // add upper motor measured velocity property
+    builder.addDoubleProperty("Upper Measured Velocity",
+        () -> m_upperMotor.getVelocity().getValueAsDouble(), null);
+    // add lower motor target velocity property
+    builder.addDoubleProperty("Lower Target Velocity", () -> m_lowerMotorVelocity.Velocity,
+        (double target) -> {
+          m_lowerMotorVelocity.Velocity = target;
+          this.updateMotorSpeeds();
+        });
+    // add lower motor measured velocity property
+    builder.addDoubleProperty("Lower Measured Velocity",
+        () -> m_lowerMotor.getVelocity().getValueAsDouble(), null);
   }
 }
