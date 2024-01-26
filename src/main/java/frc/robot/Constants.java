@@ -16,9 +16,9 @@ public class Constants {
     public static final InvertedValue kLowerInverted = InvertedValue.CounterClockwise_Positive;
     // controller constants
     public static final Slot0Configs kUpperControllerConstants =
-        new Slot0Configs().withKP(100).withKI(0).withKD(0.2).withKS(0).withKV(1.5).withKA(0);
+        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
     public static final Slot0Configs kLowerControllerConstants =
-        new Slot0Configs().withKP(100).withKI(0).withKD(0.2).withKS(0).withKV(1.5).withKA(0);
+        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
     // speeds
     public static final double kUpperSpeed = 1.00; // rotations per second
     public static final double kLowerSpeed = 1.00; // rotations per second

@@ -1,11 +1,16 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import static frc.robot.Constants.Intake.*;
 
 
@@ -14,11 +19,18 @@ import static frc.robot.Constants.Intake.*;
  * 
  */
 public class IntakeSubsystem extends SubsystemBase {
+  private static final double kSimLoopPeriod = 0.005; // 5 ms
   // init motors
   private final TalonFX m_upperMotor = new TalonFX(kUpperMotorId, kUpperBusName);
   private final TalonFX m_lowerMotor = new TalonFX(kLowerMotorId, kLowerBusName);
-  private final VelocityTorqueCurrentFOC m_upperMotorVelocity = new VelocityTorqueCurrentFOC(0);
-  private final VelocityTorqueCurrentFOC m_lowerMotorVelocity = new VelocityTorqueCurrentFOC(0);
+  // control output objects
+  private final VelocityDutyCycle m_upperMotorVelocity = new VelocityDutyCycle(0);
+  private final VelocityDutyCycle m_lowerMotorVelocity = new VelocityDutyCycle(0);
+  // simulation objects
+  private final TalonFXSimState m_upperMotorSimState = m_upperMotor.getSimState();
+  private final TalonFXSimState m_lowerMotorSimState = m_lowerMotor.getSimState();
+  private final DCMotorSim m_upperMotorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
+  private final DCMotorSim m_lowerMotorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
 
   /**
    * @brief IntakeSubsystem constructor
@@ -37,7 +49,6 @@ public class IntakeSubsystem extends SubsystemBase {
     // invert motors
     upperConfig.MotorOutput.Inverted = kUpperInverted;
     lowerConfig.MotorOutput.Inverted = kLowerInverted;
-    // set ClosedLoopOutput type (either Velocity or TorqueCurrentFOC)
     // apply configuration
     m_upperMotor.getConfigurator().apply((upperConfig));
     m_lowerMotor.getConfigurator().apply((lowerConfig));
@@ -91,6 +102,33 @@ public class IntakeSubsystem extends SubsystemBase {
       m_lowerMotorVelocity.Velocity = 0;
       this.updateMotorSpeeds();
     });
+  }
+
+  /**
+   * @brief periodic update method
+   * 
+   *        This method is called periodically by the scheduler. We use it to update the simulated
+   *        motors.
+   */
+  @Override
+  public void periodic() {
+    if (Utils.isSimulation()) {
+      // update simulated motors
+      // set supply voltage (voltage of the simulated battery)
+      m_upperMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+      m_lowerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+      // set motor sim input voltage
+      m_upperMotorSim.setInputVoltage(m_upperMotorSimState.getMotorVoltage());
+      m_lowerMotorSim.setInputVoltage(m_lowerMotorSimState.getMotorVoltage());
+      // update motor sim
+      m_upperMotorSim.update(kSimLoopPeriod);
+      m_lowerMotorSim.update(kSimLoopPeriod);
+      // update motor sim state
+      m_upperMotorSimState.setRawRotorPosition(m_upperMotorSim.getAngularPositionRotations());
+      m_upperMotorSimState.setRotorVelocity(m_upperMotorSim.getAngularVelocityRPM() / 60.0);
+      m_lowerMotorSimState.setRawRotorPosition(m_lowerMotorSim.getAngularPositionRotations());
+      m_lowerMotorSimState.setRotorVelocity(m_lowerMotorSim.getAngularVelocityRPM() / 60.0);
+    }
   }
 
   /**
