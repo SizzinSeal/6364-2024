@@ -23,25 +23,27 @@ public class RobotContainer {
   private static final double kMaxAngularRate = Math.PI; // Half a rotation per second max angular
                                                          // velocity
 
-  /* Setting up bindings for necessary control of the swerve drive platform */
-  private final CommandXboxController m_controller = new CommandXboxController(0); // controller
-  private final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain; // drivetrain
-  private final IntakeSubsystem m_intake = new IntakeSubsystem(); // intake subsystem
+  // intake
+  private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // Add a 20%
+  // Setting up bindings for necessary control of the swerve drive platform
+  private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
+  private final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain; // My drivetrain
+
+  private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
+      .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // Add a 10%
       // deadband
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
                                                                // driving in open loop
                                                                // TODO: change this to closed
                                                                // loop velocity
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-  private final Telemetry logger = new Telemetry(kMaxSpeed);
+  private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
+  private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        m_drivetrain.applyRequest(() -> drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed) // Drive
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed) // Drive
             // forward
             // with
             // negative
@@ -55,24 +57,22 @@ public class RobotContainer {
         // negative X
         // (left)
         ));
-    // intake subsystem
 
-
-    m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> brake));
-    m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> point
+    m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
+    m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
         .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
     m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));
 
+    // intake
+    m_controller.leftBumper().onTrue(m_intake.intake());
+    m_controller.rightBumper().onTrue(m_intake.stop());
+
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
-    m_drivetrain.registerTelemetry(logger::telemeterize);
-
-    // intake subsystem
-    m_controller.leftBumper().toggleOnTrue(m_intake.intake());
-    m_controller.rightBumper().toggleOnFalse(m_intake.stop());
+    m_drivetrain.registerTelemetry(m_logger::telemeterize);
   }
 
   public RobotContainer() {
