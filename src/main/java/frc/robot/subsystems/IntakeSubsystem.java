@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.Intake.*;
 
 
 /**
@@ -15,8 +15,8 @@ import static frc.robot.Constants.*;
  */
 public class IntakeSubsystem extends SubsystemBase {
   // init motors
-  private final TalonFX m_upperMotor = new TalonFX(kUpperIntakeMotorId, kUpperIntakeBusName);
-  private final TalonFX m_lowerMotor = new TalonFX(kLowerIntakeMotorId, kLowerIntakeBusName);
+  private final TalonFX m_upperMotor = new TalonFX(kUpperMotorId, kUpperBusName);
+  private final TalonFX m_lowerMotor = new TalonFX(kLowerMotorId, kLowerBusName);
   private final VelocityDutyCycle m_upperMotorVelocity = new VelocityDutyCycle(0);
   private final VelocityDutyCycle m_lowerMotorVelocity = new VelocityDutyCycle(0);
 
@@ -31,10 +31,15 @@ public class IntakeSubsystem extends SubsystemBase {
     // configure motors
     TalonFXConfiguration upperConfig = new TalonFXConfiguration();
     TalonFXConfiguration lowerConfig = new TalonFXConfiguration();
-    upperConfig.Slot0 = kUpperIntakeControllerConstats;
-    lowerConfig.Slot0 = kLowerIntakeControllerConstats;
-    upperConfig.MotorOutput.Inverted = kUpperIntakeInverted;
-    lowerConfig.MotorOutput.Inverted = kLowerIntakeInverted;
+    // set controller gains
+    upperConfig.Slot0 = kUpperControllerConstants;
+    lowerConfig.Slot0 = kLowerControllerConstants;
+    // invert motors
+    upperConfig.MotorOutput.Inverted = kUpperInverted;
+    lowerConfig.MotorOutput.Inverted = kLowerInverted;
+    // set ClosedLoopOutput type (either Velocity or TorqueCurrentFOC)
+
+    // apply configuration
     m_upperMotor.getConfigurator().apply((upperConfig));
     m_lowerMotor.getConfigurator().apply((lowerConfig));
   }
@@ -57,8 +62,8 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public Command outake() {
     return this.runOnce(() -> {
-      m_upperMotorVelocity.Velocity = -kUpperIntakeSpeed;
-      m_lowerMotorVelocity.Velocity = -kLowerIntakeSpeed;
+      m_upperMotorVelocity.Velocity = -kUpperSpeed;
+      m_lowerMotorVelocity.Velocity = -kLowerSpeed;
       this.updateMotorSpeeds();
     });
   }
@@ -70,8 +75,8 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public Command intake() {
     return this.runOnce(() -> {
-      m_upperMotorVelocity.Velocity = kUpperIntakeSpeed;
-      m_lowerMotorVelocity.Velocity = kLowerIntakeSpeed;
+      m_upperMotorVelocity.Velocity = kUpperSpeed;
+      m_lowerMotorVelocity.Velocity = kLowerSpeed;
       this.updateMotorSpeeds();
     });
   }
