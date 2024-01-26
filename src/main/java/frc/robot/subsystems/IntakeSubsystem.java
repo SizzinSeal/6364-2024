@@ -81,38 +81,6 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
-   * @brief Spin the intake motors at a specific velocity
-   * 
-   * @param speed the speed of the motors, revolutions per second
-   * 
-   * @return Command
-   */
-  public Command intake(double speed) {
-    return this.runOnce(() -> {
-      m_upperMotorVelocity.Velocity = speed;
-      m_lowerMotorVelocity.Velocity = speed;
-      this.updateMotorSpeeds();
-    });
-
-  }
-
-  /**
-   * @brief Spin the intake motors at specific velocities
-   * 
-   * @param upperSpeed the speed of the upper motor, revolutions per second
-   * @param lowerSpeed the speed of the lower motor, revolutions per second
-   * 
-   * @return Command
-   */
-  public Command intake(double upperSpeed, double lowerSpeed) {
-    return this.runOnce(() -> {
-      m_upperMotorVelocity.Velocity = upperSpeed;
-      m_lowerMotorVelocity.Velocity = lowerSpeed;
-      this.updateMotorSpeeds();
-    });
-  }
-
-  /**
    * @brief Stop the intake motors
    * 
    * @return Command
