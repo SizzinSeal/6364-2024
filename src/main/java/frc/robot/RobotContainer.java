@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
   private static final double kMaxSpeed = 0.75; // 6 meters per second desired top speed
@@ -24,7 +24,7 @@ public class RobotContainer {
                                                          // velocity
 
   // intake
-  private final IntakeSubsystem m_intake = new IntakeSubsystem();
+  private final Intake m_intake = new Intake();
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick

@@ -19,7 +19,7 @@ import static frc.robot.Constants.Indexer.*;
  * @brief Intake Subsystem
  * 
  */
-public class IndexerSubsystem extends SubsystemBase {
+public class Indexer extends SubsystemBase {
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   // init motors
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBusName);
@@ -35,7 +35,7 @@ public class IndexerSubsystem extends SubsystemBase {
    *        This is where the motors are configured. We configure them here so that we can swap
    *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
-  public IndexerSubsystem() {
+  public Indexer() {
     super();
     // configure motors
     TalonFXConfiguration upperConfig = new TalonFXConfiguration();

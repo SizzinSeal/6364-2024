@@ -8,18 +8,17 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
-import static frc.robot.Constants.Flywheel.*;
+import static frc.robot.Constants.Intake.*;
 
 
 /**
- * @brief Flywheel Subsystem
+ * @brief Intake Subsystem
  * 
  */
-public class FlywheelSubsystem extends SubsystemBase {
+public class Intake extends SubsystemBase {
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   // init motors
   private final TalonFX m_upperMotor = new TalonFX(kUpperMotorId, kUpperBusName);
@@ -34,12 +33,12 @@ public class FlywheelSubsystem extends SubsystemBase {
   private final DCMotorSim m_lowerMotorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
 
   /**
-   * @brief FlywheelSubsystem constructor
+   * @brief IntakeSubsystem constructor
    * 
    *        This is where the motors are configured. We configure them here so that we can swap
    *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
-  public FlywheelSubsystem() {
+  public Intake() {
     super();
     // configure motors
     TalonFXConfiguration upperConfig = new TalonFXConfiguration();
@@ -53,8 +52,6 @@ public class FlywheelSubsystem extends SubsystemBase {
     // apply configuration
     m_upperMotor.getConfigurator().apply((upperConfig));
     m_lowerMotor.getConfigurator().apply((lowerConfig));
-    m_upperMotor.setNeutralMode(NeutralModeValue.Brake);
-    m_lowerMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
   /**
@@ -73,7 +70,7 @@ public class FlywheelSubsystem extends SubsystemBase {
    * 
    * @return Command
    */
-  public Command reverse() {
+  public Command outake() {
     return this.runOnce(() -> {
       m_upperMotorVelocity.Output = -kUpperSpeed;
       m_lowerMotorVelocity.Output = -kLowerSpeed;
@@ -82,11 +79,11 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   /**
-   * @brief Spin up the flywheel motors
+   * @brief Spin the intake motors to intake notes
    * 
    * @return Command
    */
-  public Command forwards() {
+  public Command intake() {
     return this.runOnce(() -> {
       m_upperMotorVelocity.Output = kUpperSpeed;
       m_lowerMotorVelocity.Output = kLowerSpeed;
@@ -95,7 +92,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   /**
-   * @brief Stop the flywheel motors
+   * @brief Stop the intake motors
    * 
    * @return Command
    */
