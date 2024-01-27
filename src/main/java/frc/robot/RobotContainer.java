@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
@@ -23,8 +25,11 @@ public class RobotContainer {
   private static final double kMaxAngularRate = Math.PI; // Half a rotation per second max angular
                                                          // velocity
 
-  // intake
-  private final Intake m_intake = new Intake();
+  // subsystems
+  // private final Intake m_intake = new Intake();
+  public final Indexer m_indexer = new Indexer();
+  private final Flywheel m_shooter = new Flywheel();
+
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
@@ -66,8 +71,12 @@ public class RobotContainer {
     m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));
 
     // intake
-    m_controller.leftBumper().onTrue(m_intake.intake());
-    m_controller.rightBumper().onTrue(m_intake.stop());
+    // m_controller.rightBumper().onTrue(m_intake.intake().alongWith(m_indexer.load()));
+    // m_controller.rightBumper().onTrue(m_intake.stop().alongWith(m_indexer.stop()));
+    // shoot
+    m_controller.y().onTrue(m_indexer.load());
+    m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
+        m_indexer.eject(), Commands.waitSeconds(0.3), m_shooter.stop(), m_indexer.stop()));
 
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
@@ -77,7 +86,9 @@ public class RobotContainer {
 
   public RobotContainer() {
     configureBindings();
-    SmartDashboard.putData("Intake", m_intake);
+    // SmartDashboard.putData("Intake", m_intake);
+    SmartDashboard.putData("Indexer", m_indexer);
+    SmartDashboard.putData("Flywheel", m_shooter);
   }
 
   public Command getAutonomousCommand() {

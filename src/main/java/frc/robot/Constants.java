@@ -41,10 +41,14 @@ public class Constants {
     // speeds
     public static final double kUpperSpeed = .9 * 12; // rotations per second
     public static final double kLowerSpeed = .9 * 12; // rotations per second
+    // tolerances
+    public static final double kUpperTolerance = 5; // revolutions per second
+    public static final double kLowerTolerance = 5; // revolutions per second
   }
   public class Indexer {
-    // motor ids
+    // ids
     public static final int kMotorId = 18;
+    public static final int kNoteDetectorPort = 0;
     // motor CAN bus names
     public static final String kMotorBusName = "";
     // motor inversion

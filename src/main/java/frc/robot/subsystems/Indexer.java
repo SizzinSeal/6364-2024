@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import com.ctre.phoenix6.Utils;
@@ -21,7 +23,8 @@ import static frc.robot.Constants.Indexer.*;
  */
 public class Indexer extends SubsystemBase {
   private static final double kSimLoopPeriod = 0.005; // 5 ms
-  // init motors
+  // init devices
+  private final DigitalInput m_noteDetector = new DigitalInput(kNoteDetectorPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBusName);
   // control output objects
   private final VoltageOut m_motorVelocity = new VoltageOut(0);
@@ -64,10 +67,14 @@ public class Indexer extends SubsystemBase {
    * @return Command
    */
   public Command load() {
-    return this.runOnce(() -> {
-      m_motorVelocity.Output = -kSpeed;
+    return Commands.sequence(this.runOnce(() -> {
+      m_motorVelocity.Output = kSpeed * 0.2;
       this.updateMotorSpeeds();
-    });
+    }), Commands.waitUntil(() -> this.noteDetected()), this.stop());
+  }
+
+  public Boolean noteDetected() {
+    return m_noteDetector.get();
   }
 
   /**
@@ -77,7 +84,7 @@ public class Indexer extends SubsystemBase {
    */
   public Command eject() {
     return this.runOnce(() -> {
-      m_motorVelocity.Output = kSpeed * 0.2;
+      m_motorVelocity.Output = kSpeed;
       this.updateMotorSpeeds();
     });
   }

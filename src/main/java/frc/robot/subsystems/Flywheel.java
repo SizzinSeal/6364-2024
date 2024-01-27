@@ -20,7 +20,7 @@ import static frc.robot.Constants.Flywheel.*;
  * 
  */
 public class Flywheel extends SubsystemBase {
-  private static final double kSimLoopPeriod = 0.005; // 5 ms
+  private final double kSimLoopPeriod = 0.005; // 5 ms
   // init motors
   private final TalonFX m_upperMotor = new TalonFX(kUpperMotorId, kUpperBusName);
   private final TalonFX m_lowerMotor = new TalonFX(kLowerMotorId, kLowerBusName);
@@ -55,6 +55,34 @@ public class Flywheel extends SubsystemBase {
     m_lowerMotor.getConfigurator().apply((lowerConfig));
     m_upperMotor.setNeutralMode(NeutralModeValue.Brake);
     m_lowerMotor.setNeutralMode(NeutralModeValue.Brake);
+  }
+
+  /**
+   * @brief Get the upper motor velocity
+   * 
+   * @return double
+   */
+  public double getUpperVelocity() {
+    return m_upperMotor.getVelocity().getValueAsDouble();
+  }
+
+  /**
+   * @brief Get the lower motor velocity
+   * 
+   * @return double
+   */
+  public double getLowerVelocity() {
+    return m_lowerMotor.getVelocity().getValueAsDouble();
+  }
+
+  /**
+   * @brief Check if the flywheel is at speed
+   * 
+   * @return boolean
+   */
+  public Boolean isAtSpeed() {
+    return Math.abs(m_upperMotor.getVelocity().getValueAsDouble() - kUpperSpeed) < kUpperTolerance
+        && Math.abs(m_lowerMotor.getVelocity().getValueAsDouble() - kLowerSpeed) < kLowerTolerance;
   }
 
   /**
