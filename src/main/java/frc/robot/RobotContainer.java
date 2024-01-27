@@ -7,10 +7,11 @@ package frc.robot;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -23,7 +24,7 @@ public class RobotContainer {
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  public CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.2).withRotationalDeadband(MaxAngularRate * 0.2) // Add a 10%
@@ -34,6 +35,7 @@ public class RobotContainer {
                                                                // loop velocity
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+  private final SwerveRequest.FieldCentricFacingAngle face = new SwerveRequest.FieldCentricFacingAngle();
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   private void configureBindings() {
@@ -58,7 +60,13 @@ public class RobotContainer {
         .withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
-    joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+    joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative(drivetrain.getPos2D())));
+
+    joystick.rightBumper()
+        .whileTrue(drivetrain
+            .applyRequest(() -> face.withTargetDirection(drivetrain.calculateTurnTo(drivetrain.calculategoalpos()))
+                .withVelocityX(drivetrain.calculateMoveToPointvelocity(drivetrain.calculategoalpos())[0])
+                .withVelocityY(drivetrain.calculateMoveToPointvelocity(drivetrain.calculategoalpos())[1])));
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
@@ -66,8 +74,44 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
+  public void updatePosEstimatorv1() {
+    double xystd;
+    double degstd;
+    double[] internaltag = drivetrain.limelight1.tagDetector();
+    double posdiff = drivetrain.getPoseDifference(drivetrain.limelight1.getPos2D());
+
+    if (internaltag[0] != -1) {
+      if (internaltag[1] > 1) {
+        xystd = 0.5;
+        degstd = 6;
+      }
+      // 1 target with large area and close to estimated pose
+      else if (internaltag[2] > 0.8 && posdiff < 0.5) {
+        xystd = 1.0;
+        degstd = 12;
+      }
+      // 1 target farther away and estimated pose is close
+      else if (internaltag[2] > 0.1 && posdiff < 0.3) {
+        xystd = 2.0;
+        degstd = 30;
+      }
+      // conditions don't match to add a vision measurement
+      else {
+        return;
+      }
+    } else {
+      return;
+    }
+
+    drivetrain.addVisionMeasurement(drivetrain.limelight1.getPos2D(),
+        drivetrain.limelight1.getLatestLatencyAdjustedTimeStamp(),
+        VecBuilder.fill(xystd, xystd, Units.degreesToRadians(degstd)));
+  }
+
   public RobotContainer() {
+    drivetrain.StartOdomThread();
     configureBindings();
+    drivetrain.limelight1.init();
   }
 
   public Command getAutonomousCommand() {

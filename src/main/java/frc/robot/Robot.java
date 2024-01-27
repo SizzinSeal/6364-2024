@@ -4,7 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
+// import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -16,11 +19,17 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    m_robotContainer.drivetrain.limelight1.init();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    m_robotContainer.updatePosEstimatorv1();
+    m_robotContainer.drivetrain.updateFieldVisualiser();
+    // System.out.println("theta: " +
+    // m_robotContainer.drivetrain.calculateTurnTo(new Pose2d(2, 4, new
+    // Rotation2d(0))));
   }
 
   @Override
@@ -61,6 +70,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    // System.out.println(m_robotContainer.limelight1.tagDetector());
   }
 
   @Override
