@@ -26,7 +26,7 @@ public class RobotContainer {
                                                          // velocity
 
   // subsystems
-  // private final Intake m_intake = new Intake();
+  private final Intake m_intake = new Intake();
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_shooter = new Flywheel();
 
@@ -70,13 +70,17 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));
 
-    // intake
-    // m_controller.rightBumper().onTrue(m_intake.intake().alongWith(m_indexer.load()));
-    // m_controller.rightBumper().onTrue(m_intake.stop().alongWith(m_indexer.stop()));
-    // shoot
+    // intake a note
+    m_controller.rightBumper()
+        .onTrue(Commands.sequence(m_intake.intake(), m_indexer.load(), m_intake.stop()));
+    // indexer unstuck
+    m_controller.x()
+        .onTrue(Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5), m_indexer.load()));
+    // load a note into the indexer
     m_controller.y().onTrue(m_indexer.load());
+    // shoot a note
     m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
-        m_indexer.eject(), Commands.waitSeconds(0.3), m_shooter.stop(), m_indexer.stop()));
+        m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
 
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
