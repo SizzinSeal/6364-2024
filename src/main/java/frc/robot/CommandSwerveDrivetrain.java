@@ -1,7 +1,7 @@
 package frc.robot;
 
 import java.util.function.Supplier;
-
+import javax.sound.sampled.DataLine;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
@@ -12,6 +12,9 @@ import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleTopic;
@@ -24,8 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
- * Class that extends the Phoenix SwerveDrivetrain class and implements
- * subsystem so it can be used
+ * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
  * in command-based projects easily.
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
@@ -52,14 +54,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
-  public void StartOdomThread() {
-    if (m_odometryThread.odometryIsValid() == false) {
-      m_odometryThread.start();
-      m_odometryThread.run();
-      SmartDashboard.putData("Field", m_field);
-    }
-  }
-
   public double getPoseDifference(Pose2d pos) {
     return m_odometry.getEstimatedPosition().getTranslation().getDistance(pos.getTranslation());
   }
@@ -68,41 +62,67 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return (x - Math.floor((x / y)) * y);
   }
 
-  public Rotation2d calculateTurnTo(Pose2d targPos) {
+  public double calculateTurnToVelocity(double posx, double posy) {
+    double k_ki = 0;
+    double k_kd = 0.02;
+    double k_kp = 30;
+    double velocity = 0;
+
+
     Pose2d pos;
     pos = m_odometry.getEstimatedPosition();
+    double theta = pos.getRotation().getDegrees();
 
-    double targTheta = fmod(Math.toDegrees((k_pi) / 2 - Math.atan2(targPos.getY(), targPos.getX())), 360);
+    if (theta < 0) {
+      theta += 360;
+    }
 
-    System.out.println("theta" + targTheta);
+    System.out.println("theta" + theta);
 
-    return new Rotation2d(Math.toRadians(targTheta));
+    double targTheta = fmod(Math.toDegrees((k_pi) / 2 - Math.atan2(posy, posx)), 360);
+    double deltaTheta = Math.toRadians(Math.IEEEremainder(targTheta - theta, 360));
+
+    if (deltaTheta > Math.PI) {
+      deltaTheta -= 2 * Math.PI;
+    } else if (deltaTheta < -Math.PI) {
+      deltaTheta += 2 * Math.PI;
+    }
+
+    System.out.println("dtheta" + deltaTheta);
+
+    PhoenixPIDController velocityTheta = new PhoenixPIDController(k_kp, k_ki, k_kd);
+    if ((posx - pos.getX() < 1) && ((posy - pos.getY()) < 1)) {
+      velocity = velocityTheta.calculate(Math.toRadians(deltaTheta), 0, Timer.getFPGATimestamp());
+    }
+
+    return (velocity);
   }
 
-  public double[] calculateMoveToPointvelocity(Pose2d targPos) /* [1] is vy, [0] is vx */ {
+  public double[] calculateMoveToPointvelocity(double targX,
+      double targY) /* [1] is vy, [0] is vx */ {
     double[] internal = new double[2];
     Pose2d pos = m_odometry.getEstimatedPosition();
     double k_ki = 0;
     double k_kd = 0;
-    double k_kp = 0.1;
+    double k_kp = 0.5;
 
     PhoenixPIDController velocityX = new PhoenixPIDController(k_kp, k_ki, k_kd);
 
     PhoenixPIDController velocityY = new PhoenixPIDController(k_kp, k_ki, k_kd);
 
     // x velocity
-    internal[0] = velocityX.calculate(pos.getX(), targPos.getX(), Timer.getFPGATimestamp());
+    internal[0] = velocityX.calculate(pos.getX(), targX, Timer.getFPGATimestamp());
     // y velocity
-    internal[1] = velocityY.calculate(pos.getY(), targPos.getY(), Timer.getFPGATimestamp());
+    internal[1] = velocityY.calculate(pos.getY(), targY, Timer.getFPGATimestamp());
 
-    System.out.println("vx" + internal[0]);
-    System.out.println("vy:" + internal[1]);
+    // System.out.println("vx" + internal[0]);
+    // System.out.println("vy:" + internal[1]);
 
     return internal;
   }
 
   public Pose2d calculategoalpos() {
-    return new Pose2d(4, 3, new Rotation2d(0));
+    return new Pose2d(2.5, 5.5, new Rotation2d(0));
   }
 
   public void turnTo() {

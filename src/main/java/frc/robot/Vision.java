@@ -6,6 +6,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
+
 import java.util.Optional;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,10 +18,12 @@ import edu.wpi.first.math.util.Units;
 /**
  * @brief LimeLight wrapper
  *
- *        We interact with the limelight through networktables. It posts data, and we need to read
+ *        We interact with the limelight through networktables. It posts data,
+ *        and we need to read
  *        that data from networktables.
  * 
- *        Using networktables all the time inflates code size, so we have this wrapper to simplify
+ *        Using networktables all the time inflates code size, so we have this
+ *        wrapper to simplify
  *        using limelights
  */
 public class Vision {
@@ -41,11 +45,13 @@ public class Vision {
    */
   public void init() {
     // robot position is different if its on the Blue alliance or the Red alliance
-    m_allianceColour = DriverStation.getAlliance();
-    if (m_allianceColour.get() == Alliance.Blue) {
-      m_poseSubscriber = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[7]);
-    } else {
-      m_poseSubscriber = m_table.getDoubleArrayTopic("botpose_wpired").subscribe(new double[7]);
+    if (RobotBase.isReal()) {
+      m_allianceColour = DriverStation.getAlliance();
+      if (m_allianceColour.get() == Alliance.Blue) {
+        m_poseSubscriber = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[7]);
+      } else {
+        m_poseSubscriber = m_table.getDoubleArrayTopic("botpose_wpired").subscribe(new double[7]);
+      }
     }
   }
 
@@ -107,12 +113,10 @@ public class Vision {
 
   public double getDist3D() {
     // get the measured pose in the target coordinate system
-    double[] measuredPoseArray =
-        m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
+    double[] measuredPoseArray = m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
 
     // create the vector
-    Translation3d measuredPose =
-        new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
+    Translation3d measuredPose = new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
     // return the magnitude of the vector
     return measuredPose.getNorm();
   }

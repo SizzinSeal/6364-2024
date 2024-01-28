@@ -11,6 +11,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,10 +32,11 @@ public class RobotContainer {
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_shooter = new Flywheel();
 
-
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
-  private final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  public final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  private final SwerveRequest.RobotCentric m_autonomous =
+      new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.Velocity);
 
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // Add a 10%
@@ -43,10 +45,12 @@ public class RobotContainer {
                                                                // driving in open loop
                                                                // TODO: change this to closed
                                                                // loop velocity
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-  private final SwerveRequest.FieldCentricFacingAngle face = new SwerveRequest.FieldCentricFacingAngle();
-  private final Telemetry m_logger = new Telemetry(MaxSpeed);
+  private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
+  public final SwerveRequest.FieldCentricFacingAngle m_face =
+      new SwerveRequest.FieldCentricFacingAngle();
+
+  private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -65,19 +69,41 @@ public class RobotContainer {
         // (left)
         ));
 
-    m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
-    m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
-        .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
+    // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
+    // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
+    // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
-    joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative(drivetrain.getPos2D())));
+    m_controller.b().onTrue(
+        m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative(m_drivetrain.getPos2D())));
 
-    joystick.rightBumper()
-        .whileTrue(drivetrain
-            .applyRequest(() -> face.withTargetDirection(drivetrain.calculateTurnTo(drivetrain.calculategoalpos()))
-                .withVelocityX(drivetrain.calculateMoveToPointvelocity(drivetrain.calculategoalpos())[0])
-                .withVelocityY(drivetrain.calculateMoveToPointvelocity(drivetrain.calculategoalpos())[1])));
-                
+    // m_controller.a()
+    // .whileTrue(m_drivetrain
+    // .applyRequest(
+    // () -> m_face.withTargetDirection(new Rotation2d((180)))
+
+    // .withVelocityX(m_drivetrain.calculateMoveToPointvelocity(m_drivetrain.calculategoalpos())[0])
+
+    // .withVelocityY(m_drivetrain.calculateMoveToPointvelocity(m_drivetrain.calculategoalpos())[1])
+
+    // ));
+
+    m_controller.a().whileTrue(m_drivetrain.applyRequest(
+
+        () -> m_drive
+
+            .withVelocityX(m_drivetrain.calculateMoveToPointvelocity(
+                m_drivetrain.calculategoalpos().getX(), m_drivetrain.calculategoalpos().getY())[0])
+
+            .withVelocityY(m_drivetrain.calculateMoveToPointvelocity(
+                m_drivetrain.calculategoalpos().getX(), m_drivetrain.calculategoalpos().getY())[1])
+
+            .withRotationalRate(
+                m_drivetrain.calculateTurnToVelocity((m_drivetrain.calculategoalpos().getX() - 1),
+                    m_drivetrain.calculategoalpos().getY()))
+
+    ));
+
     m_controller.y().onTrue(m_indexer.load());
     m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
         m_indexer.eject(), Commands.waitSeconds(0.3), m_shooter.stop(), m_indexer.stop()));
@@ -91,8 +117,8 @@ public class RobotContainer {
   public void updatePosEstimatorv1() {
     double xystd;
     double degstd;
-    double[] internaltag = drivetrain.limelight1.tagDetector();
-    double posdiff = drivetrain.getPoseDifference(drivetrain.limelight1.getPos2D());
+    double[] internaltag = m_drivetrain.limelight1.tagDetector();
+    double posdiff = m_drivetrain.getPoseDifference(m_drivetrain.limelight1.getPos2D());
 
     if (internaltag[0] != -1) {
       if (internaltag[1] > 1) {
@@ -117,15 +143,14 @@ public class RobotContainer {
       return;
     }
 
-    drivetrain.addVisionMeasurement(drivetrain.limelight1.getPos2D(),
-        drivetrain.limelight1.getLatestLatencyAdjustedTimeStamp(),
+    m_drivetrain.addVisionMeasurement(m_drivetrain.limelight1.getPos2D(),
+        m_drivetrain.limelight1.getLatestLatencyAdjustedTimeStamp(),
         VecBuilder.fill(xystd, xystd, Units.degreesToRadians(degstd)));
   }
 
   public RobotContainer() {
-    drivetrain.StartOdomThread();
     configureBindings();
-    drivetrain.limelight1.init();
+    m_drivetrain.limelight1.init();
     // SmartDashboard.putData("Intake", m_intake);
     SmartDashboard.putData("Indexer", m_indexer);
     SmartDashboard.putData("Flywheel", m_shooter);
