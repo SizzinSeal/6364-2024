@@ -125,7 +125,6 @@ public class RobotContainer {
 
 
   public RobotContainer() {
-    drivetrain.StartOdomThread();
     configureBindings();
     limelight1.init();
     // SmartDashboard.putData("Intake", m_intake);

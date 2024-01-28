@@ -25,7 +25,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
-  private Field2d m_field = new Field2d();
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
       double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
@@ -40,14 +39,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     super(driveTrainConstants, modules);
     if (Utils.isSimulation()) {
       startSimThread();
-    }
-  }
-
-  public void StartOdomThread() {
-    if (m_odometryThread.odometryIsValid() == false) {
-      m_odometryThread.start();
-      m_odometryThread.run();
-      SmartDashboard.putData("Field", m_field);
     }
   }
 
@@ -81,13 +72,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   public void updateVision(Pose2d pos, double xyStds, double degStds, double timestamp) {
     m_odometry.addVisionMeasurement(pos, timestamp,
         VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
-  }
-
-  /**
-   * @brief update the odometry with a vision measurement
-   */
-  public void updateFieldVisualiser() {
-    m_field.setRobotPose(m_odometry.getEstimatedPosition());
   }
 
   private void startSimThread() {
