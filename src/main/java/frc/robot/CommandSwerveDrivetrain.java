@@ -27,8 +27,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private double m_lastSimTime;
   private Field2d m_field = new Field2d();
 
-
-
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
       double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
     super(driveTrainConstants, OdometryUpdateFrequency, modules);
@@ -53,28 +51,41 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
+  /**
+   * @brief get the scalar distance between the robot and a position
+   */
   public double getPoseDifference(Pose2d pos) {
     return m_odometry.getEstimatedPosition().getTranslation().getDistance(pos.getTranslation());
   }
 
-
+  /**
+   * @brief get the scalar speed of the robot in meters per second
+   * 
+   * @return double
+   */
   public double getspeed() {
-
     double vx = m_kinematics.toChassisSpeeds().vxMetersPerSecond;
     double vy = m_kinematics.toChassisSpeeds().vyMetersPerSecond;
-
     double vt = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
-
     return vt;
   }
 
+  /**
+   * @brief update the odometry with a vision measurement
+   * 
+   * @param pos the position of the robot
+   * @param xyStds the standard deviation of the x and y measurements
+   * @param degStds the standard deviation of the angle measurement
+   * @param timestamp the timestamp of the measurement
+   */
   public void updateVision(Pose2d pos, double xyStds, double degStds, double timestamp) {
-
     m_odometry.addVisionMeasurement(pos, timestamp,
         VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
-
   }
 
+  /**
+   * @brief update the odometry with a vision measurement
+   */
   public void updateFieldVisualiser() {
     m_field.setRobotPose(m_odometry.getEstimatedPosition());
   }
