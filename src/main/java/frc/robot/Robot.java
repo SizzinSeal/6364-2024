@@ -21,7 +21,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    System.out.println(m_robotContainer.m_indexer.noteDetected());
   }
 
   @Override
