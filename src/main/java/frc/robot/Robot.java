@@ -20,6 +20,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     m_robotContainer.drivetrain.limelight1.init();
+    m_robotContainer.drivetrain.seedFieldRelative(m_robotContainer.drivetrain.getPos2D());
   }
 
   @Override
@@ -27,9 +28,6 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     m_robotContainer.updatePosEstimatorv1();
     m_robotContainer.drivetrain.updateFieldVisualiser();
-    // System.out.println("theta: " +
-    // m_robotContainer.drivetrain.calculateTurnTo(new Pose2d(2, 4, new
-    // Rotation2d(0))));
   }
 
   @Override

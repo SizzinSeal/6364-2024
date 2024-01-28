@@ -84,7 +84,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     Pose2d pos = m_odometry.getEstimatedPosition();
     double k_ki = 0;
     double k_kd = 0;
-    double k_kp = 1;
+    double k_kp = 0.1;
 
     PhoenixPIDController velocityX = new PhoenixPIDController(k_kp, k_ki, k_kd);
 
