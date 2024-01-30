@@ -84,7 +84,7 @@ public class Indexer extends SubsystemBase {
    */
   public Command eject() {
     return this.runOnce(() -> {
-      m_motorVelocity.Output = kSpeed;
+      m_motorVelocity.Output = -kSpeed;
       this.updateMotorSpeeds();
     });
   }
