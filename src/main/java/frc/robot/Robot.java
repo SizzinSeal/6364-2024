@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    m_robotContainer.updatePosEstimatorv1();
+    m_robotContainer.updatePoseEstimator();
   }
 
   @Override

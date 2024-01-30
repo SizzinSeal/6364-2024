@@ -27,8 +27,6 @@ public class RobotContainer {
                                                          // velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
-  private final CommandXboxController controller = new CommandXboxController(0); // My joystick
-  public CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
   public final Vision limelight1 = new Vision("limelight");
 
   // subsystems
@@ -51,6 +49,9 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
+  /**
+   * @brief Configure the controller bindings for teleop
+   */
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
         m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed) // Drive
@@ -87,47 +88,52 @@ public class RobotContainer {
     m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
         m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
 
+    // reset position if in simulation
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
+    // register telemetry
     m_drivetrain.registerTelemetry(m_logger::telemeterize);
   }
 
-  public void updatePosEstimatorv1() {
-    double xystd;
-    double degstd;
-    double[] internaltag = limelight1.tagDetector();
-    double posdiff = drivetrain.getPoseDifference(limelight1.getPos2D());
-
-    if (internaltag[0] != -1) {
-      if (internaltag[1] > 1) {
-        xystd = 0.5;
-        degstd = 6;
-      }
-      // 1 target with large area and close to estimated pose
-      else if (internaltag[2] > 0.8 && posdiff < 0.5) {
-        xystd = 1.0;
-        degstd = 12;
-      }
-      // 1 target farther away and estimated pose is close
-      else if (internaltag[2] > 0.1 && posdiff < 0.3) {
-        xystd = 2.0;
-        degstd = 30;
-      }
-      // conditions don't match to add a vision measurement
-      else {
-        return;
-      }
-    } else {
+  /**
+   * @brief Update the pose estimator with vision measurements
+   */
+  public void updatePoseEstimator() {
+    double xystd; // standard deviation of the x and y measurements
+    double degstd; // standard deviation of the angle measurement
+    final double[] internaltag = limelight1.tagDetector();
+    final double posdiff = m_drivetrain.getPoseDifference(limelight1.getPos2D());
+    // return if no tag detected
+    if (internaltag[0] == -1)
       return;
+    // more than 1 tag in view
+    if (internaltag[1] > 1) {
+      xystd = 0.5;
+      degstd = 6;
     }
-
-    drivetrain.addVisionMeasurement(limelight1.getPos2D(),
+    // 1 target with large area and close to estimated pose
+    else if (internaltag[2] > 0.8 && posdiff < 0.5) {
+      xystd = 1.0;
+      degstd = 12;
+    }
+    // 1 target farther away and estimated pose is close
+    else if (internaltag[2] > 0.1 && posdiff < 0.3) {
+      xystd = 2.0;
+      degstd = 30;
+    }
+    // conditions don't match to add a vision measurement
+    else
+      return;
+    // update the pose estimator
+    m_drivetrain.addVisionMeasurement(limelight1.getPos2D(),
         limelight1.getLatestLatencyAdjustedTimeStamp(),
         VecBuilder.fill(xystd, xystd, Units.degreesToRadians(degstd)));
   }
 
-
+  /**
+   * @brief Construct the container for the robot. This will be called upon startup
+   */
   public RobotContainer() {
     configureBindings();
     limelight1.init();
@@ -136,6 +142,11 @@ public class RobotContainer {
     SmartDashboard.putData("Flywheel", m_shooter);
   }
 
+  /**
+   * @brief Get the autonomous command to run
+   * 
+   * @return Command
+   */
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
