@@ -90,7 +90,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     configureBindings();
-    // SmartDashboard.putData("Intake", m_intake);
+    SmartDashboard.putData("Intake", m_intake);
     SmartDashboard.putData("Indexer", m_indexer);
     SmartDashboard.putData("Flywheel", m_shooter);
   }
