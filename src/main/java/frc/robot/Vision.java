@@ -23,8 +23,20 @@ import edu.wpi.first.math.util.Units;
  *        using limelights
  */
 public class Vision {
+  public class MeasurementInfo {
+    public final Integer tagId;
+    public final Integer tagCount;
+    public final Double tagArea;
+
+    public MeasurementInfo(Integer tagId, Integer tagCount, Double tagArea) {
+      this.tagId = tagId;
+      this.tagCount = tagCount;
+      this.tagArea = tagArea;
+    }
+  }
+
   private DoubleArraySubscriber m_poseSubscriber; // limelight pose subscriber
-  private final NetworkTable m_table; //
+  private final NetworkTable m_table; // limelight network table instance
   private Optional<Alliance> m_allianceColour;
 
   /**
@@ -37,7 +49,10 @@ public class Vision {
   }
 
   /**
-   * TODO: explain why this logic is not just in the constructor
+   * @brief initialize the limelight
+   * 
+   *        This is not run in the constructor because it is not safe to run networktables during
+   *        program startup, as the networktables server may not be running yet.
    */
   public void init() {
     // robot position is different if its on the Blue alliance or the Red alliance
@@ -50,48 +65,38 @@ public class Vision {
   }
 
   /**
-   * TODO: add documentation
+   * @brief get the number of tags in view
+   * 
+   * @return double number of tags in view
    */
-  public double detectMultitag() {
-    double[] Cornercount = m_table.getEntry("tcornxy").getDoubleArray(new double[32]);
-
-    double TagCount = ((Cornercount.length) / 8);
-
-    if (TagCount < 1 && TagCount != 0) {
-      TagCount = 1;
-    }
-
-    // System.out.println(TagCount);
-
-    return TagCount;
+  public Integer numTags() {
+    final double[] cornerCount = m_table.getEntry("tcornxy").getDoubleArray(new double[32]);
+    return (int) Math.ceil(cornerCount.length / 8);
   }
 
   /**
-   * TODO: add documentation
+   * @brief get the area of the detected tag in mm^2
+   * 
+   * @return double area of the tag in mm^2
    */
-  public double tagSize() {
+  public double tagArea() {
     return m_table.getEntry("ta").getDouble(0.0);
   }
 
   /**
-   * TODO: add documentation
+   * @brief get information about the detected tag
+   * 
+   * @return MeasurementInfo information about the detected tag
    */
-  public double[] tagDetector() {
-    double tagID = m_table.getEntry("tid").getInteger(-1);
-
-    double[] internal = new double[3];
-
-    internal[0] = tagID; // Tag ID
-
-    internal[1] = detectMultitag(); // Number of Tags in view
-
-    internal[2] = tagSize(); // Size of tags in view
-
-    return internal;
+  public MeasurementInfo tagDetector() {
+    Integer tagID = Math.toIntExact(m_table.getEntry("tid").getInteger(-1));
+    return new MeasurementInfo(tagID, numTags(), tagArea());
   }
 
   /**
-   * TODO: add documentation
+   * @brief get the 2D position measured by the limelight
+   * 
+   * @return Pose2d 2D position measured by the limelight
    */
   public Pose2d getPos2D() {
     double[] DASubTpos = m_poseSubscriber.get();
@@ -104,12 +109,10 @@ public class Vision {
    * 
    * @return distance in meters
    */
-
   public double getDist3D() {
     // get the measured pose in the target coordinate system
     double[] measuredPoseArray =
         m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
-
     // create the vector
     Translation3d measuredPose =
         new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
@@ -118,38 +121,30 @@ public class Vision {
   }
 
   /**
-   * TODO: add documenation
+   * @brief get the timestamp of the latest measurement in milliseconds
+   * 
+   * @return long timestamp of the latest measurement in milliseconds
    */
-  public double getLatestTimestamp() {
+  public long getLatestTimestamp() {
     return m_poseSubscriber.getAtomic().timestamp;
   }
 
   /**
-   * TODO: add documentation
+   * @brief get the raw pose data
+   * 
+   * @return TimestampedDoubleArray raw pose data
    */
   public TimestampedDoubleArray getPoseRaw() {
     return m_poseSubscriber.getAtomic();
   }
 
   /**
-   * TODO: add documentation
-   */
-  public void telemetry() {
-
-    // TimestampedDoubleArray internal1 = DASub.getAtomic();
-
-  }
-
-  /**
-   * TODO: add documentation
+   * @brief get the latest latency adjusted timestamp in seconds
+   * 
+   * @return double latest latency adjusted timestamp in seconds
    */
   public double getLatestLatencyAdjustedTimeStamp() {
     TimestampedDoubleArray internal2 = m_poseSubscriber.getAtomic();
     return ((internal2.timestamp - internal2.value[6]) / 1000.0);
   }
-
-  // TODO: move this comment somewhere that makes more sense
-  // getLatestLatencyAdjustedTimeStamp() is in seconds
-  // .timestamp is in millis and .value[6] is in millis
-
 }

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
@@ -102,23 +103,23 @@ public class RobotContainer {
   public void updatePoseEstimator() {
     double xystd; // standard deviation of the x and y measurements
     double degstd; // standard deviation of the angle measurement
-    final double[] internaltag = limelight1.tagDetector();
+    final MeasurementInfo internalTag = limelight1.tagDetector();
     final double posdiff = m_drivetrain.getPoseDifference(limelight1.getPos2D());
     // return if no tag detected
-    if (internaltag[0] == -1)
+    if (internalTag.tagId == -1)
       return;
     // more than 1 tag in view
-    if (internaltag[1] > 1) {
+    if (internalTag.tagCount > 1) {
       xystd = 0.5;
       degstd = 6;
     }
     // 1 target with large area and close to estimated pose
-    else if (internaltag[2] > 0.8 && posdiff < 0.5) {
+    else if (internalTag.tagArea > 0.8 && posdiff < 0.5) {
       xystd = 1.0;
       degstd = 12;
     }
     // 1 target farther away and estimated pose is close
-    else if (internaltag[2] > 0.1 && posdiff < 0.3) {
+    else if (internalTag.tagArea > 0.1 && posdiff < 0.3) {
       xystd = 2.0;
       degstd = 30;
     }
