@@ -7,7 +7,9 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,6 +38,38 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     if (Utils.isSimulation()) {
       startSimThread();
     }
+  }
+
+  /**
+   * @brief get the scalar distance between the robot and a position
+   */
+  public double getPoseDifference(Pose2d pos) {
+    return m_odometry.getEstimatedPosition().getTranslation().getDistance(pos.getTranslation());
+  }
+
+  /**
+   * @brief get the scalar speed of the robot in meters per second
+   * 
+   * @return double
+   */
+  public double getspeed() {
+    double vx = m_kinematics.toChassisSpeeds().vxMetersPerSecond;
+    double vy = m_kinematics.toChassisSpeeds().vyMetersPerSecond;
+    double vt = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
+    return vt;
+  }
+
+  /**
+   * @brief update the odometry with a vision measurement
+   * 
+   * @param pos the position of the robot
+   * @param xyStds the standard deviation of the x and y measurements
+   * @param degStds the standard deviation of the angle measurement
+   * @param timestamp the timestamp of the measurement
+   */
+  public void updateVision(Pose2d pos, double xyStds, double degStds, double timestamp) {
+    m_odometry.addVisionMeasurement(pos, timestamp,
+        VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
   }
 
   private void startSimThread() {
