@@ -28,9 +28,10 @@ See [contributing.md](contributing.md) on how to contribute to the project. It c
 We use the Phoenix Pro vendordep for interacting with CTRE hardware, such as cancoders and TalonFX motors. It has several advantageous over Phoenix 6:
 
 1. FOC commutation. 15% more power on motors
-2. TalonFX - CanCoder sensor fusion. More accurate swerve module positioning without compromising on closed loop controller polling rate.
-3. Dynamic Motion Magic - change motion magic parameters while in motion. Runs on motor hardware, so it has a blazlingly fast polling rate
-4. Device timestamps - gives the ability to compensate for latency for more accurate odometry
+2. FOC commutation (again). Uses current instead of voltage to control velocity. The relationship is linear, unlike voltage which is only mostly linear.
+3. TalonFX - CanCoder sensor fusion. More accurate swerve module positioning without compromising on closed loop controller polling rate.
+4. Dynamic Motion Magic - change motion magic parameters while in motion. Runs on motor hardware, so it has a blazlingly fast polling rate
+5. Device timestamps - gives the ability to compensate for latency for more accurate odometry
 
 ## CANivores
 We use CANivores for all drive/steer motors and encoders. A swerve module cancoder will always be on the same CANivore bus as the drive and steer motors of that module, to minimize latency for sensor fusion.
