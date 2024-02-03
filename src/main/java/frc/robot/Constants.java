@@ -72,5 +72,8 @@ public class Constants {
     public static final double kMaxLateralAcceleration = 3.0; // meters per second squared
     public static final double kMaxAngularSpeed = 3.0; // radians per second
     public static final double kMaxAngularAcceleration = 3.0; // radians per second squared
+    // movement tolerances
+    public static final double kLateralTolerance = 3; // meters
+    public static final double kAngularTolerance = 3; // radians
   }
 }

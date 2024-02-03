@@ -47,16 +47,23 @@ public class MoveToPose extends Command {
     m_angleController = new ProfiledPIDController(Drivetrain.kAngularPositionP, 0.0,
         Drivetrain.kAngularPositionD, new TrapezoidProfile.Constraints(Drivetrain.kMaxAngularSpeed,
             Drivetrain.kMaxAngularAcceleration));
+    m_angleController.setTolerance(Drivetrain.kAngularTolerance);
     // x PID + Motion Profile
     m_xController = new ProfiledPIDController(Drivetrain.kLateralPositionP, 0.0,
         Drivetrain.kLateralPositionD, new TrapezoidProfile.Constraints(Drivetrain.kMaxLateralSpeed,
             Drivetrain.kMaxLateralAcceleration));
+    m_xController.setTolerance(Drivetrain.kLateralTolerance);
     // y PID + Motion Profile
     m_yController = new ProfiledPIDController(Drivetrain.kLateralPositionP, 0.0,
         Drivetrain.kLateralPositionD, new TrapezoidProfile.Constraints(Drivetrain.kMaxLateralSpeed,
             Drivetrain.kMaxLateralAcceleration));
+    m_yController.setTolerance(Drivetrain.kLateralTolerance);
   }
 
+  /**
+   * @brief runs periodically while the command is scheduled
+   * 
+   */
   @Override
   public void execute() {
     // get the current pose of the robot
@@ -73,5 +80,25 @@ public class MoveToPose extends Command {
         () -> m_drive.withVelocityX(xSpeed).withVelocityY(ySpeed).withRotationalRate(angleSpeed));
     m_drivetrain.setControl(
         m_drive.withVelocityX(xSpeed).withVelocityY(ySpeed).withRotationalRate(angleSpeed));
+  }
+
+  /**
+   * @brief checks if the command is finished
+   * 
+   * @return true if the robot is at the target pose, false otherwise
+   */
+  @Override
+  public boolean isFinished() {
+    return m_xController.atGoal() && m_yController.atGoal() && m_angleController.atGoal();
+  }
+
+  /**
+   * @brief ends the command
+   * 
+   */
+  @Override
+  public void end(boolean interrupted) {
+    m_drivetrain
+        .applyRequest(() -> m_drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0));
   }
 }
