@@ -21,6 +21,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.autonomous.MoveToPose;
 
 public class RobotContainer {
   private static final double kMaxSpeed = 0.75; // 6 meters per second desired top speed
@@ -149,6 +150,6 @@ public class RobotContainer {
    * @return Command
    */
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new MoveToPose(new Pose2d(5, 5, new Rotation2d(0)), m_drivetrain);
   }
 }

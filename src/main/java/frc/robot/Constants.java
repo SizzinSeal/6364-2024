@@ -59,6 +59,18 @@ public class Constants {
     // speeds
     public static final double kSpeed = .9 * 12; // rotations per second
   }
-
-
+  public class Drivetrain {
+    // Feedforward/feedforward gains
+    // lateral position controller
+    public static final double kLateralPositionP = 0.2;
+    public static final double kLateralPositionD = 0.2;
+    // angular position controller
+    public static final double kAngularPositionP = 0.1;
+    public static final double kAngularPositionD = 0.1;
+    // velocity/acceleration constraints
+    public static final double kMaxLateralSpeed = 3.0; // meters per second
+    public static final double kMaxLateralAcceleration = 3.0; // meters per second squared
+    public static final double kMaxAngularSpeed = 3.0; // radians per second
+    public static final double kMaxAngularAcceleration = 3.0; // radians per second squared
+  }
 }
