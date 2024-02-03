@@ -22,6 +22,7 @@ import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.autonomous.MoveToPose;
+import frc.robot.Constants.Field;
 
 public class RobotContainer {
   private static final double kMaxSpeed = 0.75; // 6 meters per second desired top speed
@@ -89,6 +90,8 @@ public class RobotContainer {
     // shoot a note
     m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
         m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
+    // move to the Amp
+    m_controller.leftTrigger().whileTrue(new MoveToPose(Field.getAmpLineupPose(), m_drivetrain));
 
     // reset position if in simulation
     if (Utils.isSimulation()) {

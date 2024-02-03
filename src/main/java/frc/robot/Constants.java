@@ -2,6 +2,11 @@ package frc.robot;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.InvertedValue;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class Constants {
   public class Intake {
@@ -75,5 +80,39 @@ public class Constants {
     // movement tolerances
     public static final double kLateralTolerance = 3; // meters
     public static final double kAngularTolerance = 3; // radians
+  }
+  public class Field {
+    // Blue Amp Pos
+    public static final double kBlueAmpX = 5;
+    public static final double kBlueAmpY = 5;
+    // Blue Amp Lineup Pos
+    public static final double kBlueAmpLineupX = 4;
+    public static final double kBlueAmpLineupY = 4;
+    public static final double kBlueAmpLineupTheta =
+        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
+    // Red Amp Pos
+    public static final double kRedAmpX = 5;
+    public static final double kRedAmpY = 5;
+    // Red Amp Lineup Pos
+    public static final double kRedAmpLineupX = 4;
+    public static final double kRedAmpLineupY = 4;
+    public static final double kRedAmpLineupTheta =
+        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
+
+    public static Translation2d getAmpPos() {
+      if (DriverStation.getAlliance().isPresent()
+          && DriverStation.getAlliance().get() == Alliance.Red)
+        return new Translation2d(kRedAmpX, kRedAmpY);
+      else
+        return new Translation2d(kBlueAmpX, kBlueAmpY);
+    }
+
+    public static Pose2d getAmpLineupPose() {
+      if (DriverStation.getAlliance().isPresent()
+          && DriverStation.getAlliance().get() == Alliance.Red)
+        return new Pose2d(kRedAmpLineupX, kRedAmpLineupY, new Rotation2d(kRedAmpLineupTheta));
+      else
+        return new Pose2d(kBlueAmpLineupX, kBlueAmpLineupY, new Rotation2d(kBlueAmpLineupTheta));
+    }
   }
 }

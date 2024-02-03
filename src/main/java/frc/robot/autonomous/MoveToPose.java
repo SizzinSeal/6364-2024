@@ -98,7 +98,8 @@ public class MoveToPose extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    m_drivetrain
-        .applyRequest(() -> m_drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0));
+    if (!interrupted)
+      m_drivetrain
+          .applyRequest(() -> m_drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0));
   }
 }
