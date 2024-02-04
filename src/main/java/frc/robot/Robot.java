@@ -24,7 +24,7 @@ public class Robot extends LoggedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     m_robotContainer.limelight1.init();
-    Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA); // sets a metadata value
 
     if (isReal()) {
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
@@ -46,7 +46,6 @@ public class Robot extends LoggedRobot {
     // "Understanding Data Flow" page
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
                     // be added.
-
   }
 
   @Override
