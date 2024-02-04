@@ -6,22 +6,23 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-
+import org.littletonrobotics.junction.AutoLogOutput;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 
 /**
  * @brief LimeLight wrapper
  *
- *        We interact with the limelight through networktables. It posts data,
- *        and we need to read
+ *        We interact with the limelight through networktables. It posts data, and we need to read
  *        that data from networktables.
  * 
- *        Using networktables all the time inflates code size, so we have this
- *        wrapper to simplify
+ *        Using networktables all the time inflates code size, so we have this wrapper to simplify
  *        using limelights
  */
 public class Vision {
@@ -37,7 +38,6 @@ public class Vision {
     }
   }
 
-  private DoubleArraySubscriber m_redPoseSubscriber; // red pose subscriber
   private DoubleArraySubscriber m_bluePoseSubscriber; // blue pose subscriber
   private final NetworkTable m_table; // limelight network table instance
 
@@ -53,27 +53,22 @@ public class Vision {
   /**
    * @brief initialize the limelight
    * 
-   *        This is not run in the constructor because it is not safe to run
-   *        networktables during
+   *        This is not run in the constructor because it is not safe to run networktables during
    *        program startup, as the networktables server may not be running yet.
    */
   public void init() {
     // robot position is different if its on the Blue alliance or the Red alliance
     m_bluePoseSubscriber = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[7]);
-    m_redPoseSubscriber = m_table.getDoubleArrayTopic("botpose_wpired").subscribe(new double[7]);
   }
 
   /**
-   * @brief get the pose subscriber to use. Will return either m_redPoseSubscriber
-   *        or m_bluePoseSubscriber
+   * @brief get the pose subscriber to use. Will return either m_redPoseSubscriber or
+   *        m_bluePoseSubscriber
    * 
    * @return DoubleArraySubscriber
    */
   private DoubleArraySubscriber getPoseSubscriber() {
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Red))
-      return m_redPoseSubscriber;
-    else
-      return m_bluePoseSubscriber;
+    return m_bluePoseSubscriber;
   }
 
   /**
@@ -81,6 +76,7 @@ public class Vision {
    * 
    * @return double number of tags in view
    */
+  @AutoLogOutput
   public Integer numTags() {
     final double[] cornerCount = m_table.getEntry("tcornxy").getDoubleArray(new double[32]);
     return (int) Math.ceil(cornerCount.length / 8);
@@ -91,6 +87,7 @@ public class Vision {
    * 
    * @return double area of the tag in mm^2
    */
+  @AutoLogOutput
   public double tagArea() {
     return m_table.getEntry("ta").getDouble(0.0);
   }
@@ -100,6 +97,7 @@ public class Vision {
    * 
    * @return MeasurementInfo information about the detected tag
    */
+  @AutoLogOutput
   public MeasurementInfo tagDetector() {
     final Integer tagID = Math.toIntExact(m_table.getEntry("tid").getInteger(-1));
     return new MeasurementInfo(tagID, numTags(), tagArea());
@@ -110,6 +108,8 @@ public class Vision {
    * 
    * @return Pose2d 2D position measured by the limelight
    */
+
+  @AutoLogOutput(key = "Vision/Pose/Robot")
   public Pose2d getPos2D() {
     final DoubleArraySubscriber poseSubscriber = getPoseSubscriber();
     final double[] raw = poseSubscriber.get();
@@ -122,12 +122,15 @@ public class Vision {
    * 
    * @return distance in meters
    */
+
+  @AutoLogOutput
   public double getDist3D() {
     // get the measured pose in the target coordinate system
-    final double[] measuredPoseArray = m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
+    final double[] measuredPoseArray =
+        m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
     // create the vector
-    final Translation3d measuredPose = new Translation3d(measuredPoseArray[0], measuredPoseArray[1],
-        measuredPoseArray[2]);
+    final Translation3d measuredPose =
+        new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
     // return the magnitude of the vector
     return measuredPose.getNorm();
   }
@@ -137,6 +140,7 @@ public class Vision {
    * 
    * @return long timestamp of the latest measurement in milliseconds
    */
+  @AutoLogOutput
   public long getLatestTimestamp() {
     final DoubleArraySubscriber poseSubscriber = getPoseSubscriber();
     return poseSubscriber.getAtomic().timestamp;
@@ -157,6 +161,7 @@ public class Vision {
    * 
    * @return double latest latency adjusted timestamp in seconds
    */
+  @AutoLogOutput
   public double getLatestLatencyAdjustedTimeStamp() {
     final DoubleArraySubscriber poseSubscriber = getPoseSubscriber();
     final TimestampedDoubleArray internal2 = poseSubscriber.getAtomic();
