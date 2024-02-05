@@ -1,7 +1,8 @@
 package frc.robot;
 
 import java.util.function.Supplier;
-
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
@@ -43,6 +44,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   /**
    * @brief get the scalar distance between the robot and a position
    */
+  @AutoLogOutput
   public double getPoseDifference(Pose2d pos) {
     return m_odometry.getEstimatedPosition().getTranslation().getDistance(pos.getTranslation());
   }
@@ -67,6 +69,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
    * @param degStds the standard deviation of the angle measurement
    * @param timestamp the timestamp of the measurement
    */
+  @AutoLogOutput
   public void updateVision(Pose2d pos, double xyStds, double degStds, double timestamp) {
     m_odometry.addVisionMeasurement(pos, timestamp,
         VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
@@ -87,6 +90,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     m_simNotifier.startPeriodic(kSimLoopPeriod);
   }
 
+  @AutoLogOutput
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
     return run(() -> this.setControl(requestSupplier.get()));
   }
