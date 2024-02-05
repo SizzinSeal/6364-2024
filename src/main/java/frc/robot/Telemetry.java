@@ -89,9 +89,10 @@ public class Telemetry {
 
     Translation2d velocities = distanceDiff.div(diffTime);
 
-    Logger.recordOutput("Swerve/Odometry", pose);
-    Logger.recordOutput("Swerve/ModuleStates", state.ModuleStates);
-    Logger.recordOutput("Swerve/ModuleTargets", state.ModuleTargets);
+    Logger.recordOutput("Robot/Swerve/Odometry", pose);
+    Logger.recordOutput("Robot/Swerve/ModuleStates", state.ModuleStates);
+    Logger.recordOutput("Robot/Swerve/ModuleTargets", state.ModuleTargets);
+    Logger.recordOutput("Robot/Velocity", velocities);
 
     speed.set(velocities.getNorm());
     velocityX.set(velocities.getX());
