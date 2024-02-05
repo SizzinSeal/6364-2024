@@ -22,7 +22,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
-    m_robotContainer.limelight1.init();
 
     // Logging
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -49,6 +48,7 @@ public class Robot extends LoggedRobot {
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
+        m_robotContainer.limelight1.init();
         break;
 
       case SIM:

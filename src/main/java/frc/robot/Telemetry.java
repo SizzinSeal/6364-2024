@@ -1,5 +1,6 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class Telemetry {
   private final double MaxSpeed;
@@ -86,6 +88,10 @@ public class Telemetry {
     m_lastPose = pose;
 
     Translation2d velocities = distanceDiff.div(diffTime);
+
+    Logger.recordOutput("Swerve/Odometry", pose);
+    Logger.recordOutput("Swerve/ModuleStates", state.ModuleStates);
+    Logger.recordOutput("Swerve/ModuleTargets", state.ModuleTargets);
 
     speed.set(velocities.getNorm());
     velocityX.set(velocities.getX());
