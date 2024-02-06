@@ -13,9 +13,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static frc.robot.Constants.Flywheel.*;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 
 
 /**
@@ -144,7 +141,6 @@ public class Flywheel extends SubsystemBase {
    *        This method is called periodically by the scheduler. We use it to update the simulated
    *        motors.
    */
-  @AutoLogOutput
   @Override
   public void periodic() {
     if (Utils.isSimulation()) {
@@ -163,10 +159,6 @@ public class Flywheel extends SubsystemBase {
       m_upperMotorSimState.setRotorVelocity(m_upperMotorSim.getAngularVelocityRPM() / 60.0);
       m_lowerMotorSimState.setRawRotorPosition(m_lowerMotorSim.getAngularPositionRotations());
       m_lowerMotorSimState.setRotorVelocity(m_lowerMotorSim.getAngularVelocityRPM() / 60.0);
-
-      Logger.recordOutput("Robot/Flywheel/Velocity",
-          new double[] {m_lowerMotorVelocity.Output, m_upperMotorVelocity.Output});
-
     }
   }
 

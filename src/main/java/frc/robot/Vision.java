@@ -66,7 +66,6 @@ public class Vision {
    * 
    * @return DoubleArraySubscriber
    */
-
   private DoubleArraySubscriber getPoseSubscriber() {
     if (DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get().equals(Alliance.Red))

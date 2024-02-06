@@ -1,9 +1,6 @@
 package frc.robot;
 
-import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggedDriverStation;
-import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 
@@ -92,11 +89,10 @@ public class Telemetry {
 
     Translation2d velocities = distanceDiff.div(diffTime);
 
-    Logger.recordOutput("Robot/Swerve/OdometryPose", pose);
-    Logger.recordOutput("Robot/Swerve/Velocity", velocities);
-
+    Logger.recordOutput("Robot/Swerve/Odometry", pose);
     Logger.recordOutput("Robot/Swerve/ModuleStates", state.ModuleStates);
     Logger.recordOutput("Robot/Swerve/ModuleTargets", state.ModuleTargets);
+    Logger.recordOutput("Robot/Velocity", velocities);
 
     speed.set(velocities.getNorm());
     velocityX.set(velocities.getX());
