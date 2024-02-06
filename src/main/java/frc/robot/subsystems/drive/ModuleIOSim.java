@@ -22,12 +22,13 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 /**
  * Physics sim implementation of module IO.
  *
- * <p>Uses two flywheel sims for the drive and turn motors, with the absolute position initialized
- * to a random value. The flywheel sims are not physically accurate, but provide a decent
- * approximation for the behavior of the module.
+ * <p>
+ * Uses two flywheel sims for the drive and turn motors, with the absolute position initialized to a
+ * random value. The flywheel sims are not physically accurate, but provide a decent approximation
+ * for the behavior of the module.
  */
 public class ModuleIOSim implements ModuleIO {
-  private static final double LOOP_PERIOD_SECS = 0.02;
+  private static final double LOOP_PERIOD_SECS = 0.005;
 
   private DCMotorSim driveSim = new DCMotorSim(DCMotor.getNEO(1), 6.75, 0.025);
   private DCMotorSim turnSim = new DCMotorSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004);
