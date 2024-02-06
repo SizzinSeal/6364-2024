@@ -1,6 +1,6 @@
 {
   "HALProvider": {
-    "Other Devices": {
+    "Timing": {
       "window": {
         "visible": false
       }
@@ -9,7 +9,14 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/Pose": "Field2d"
+      "/Pose": "Field2d",
+      "/SmartDashboard/Flywheel": "Subsystem",
+      "/SmartDashboard/Indexer": "Subsystem",
+      "/SmartDashboard/Intake": "Subsystem",
+      "/SmartDashboard/Module 0": "Mechanism2d",
+      "/SmartDashboard/Module 1": "Mechanism2d",
+      "/SmartDashboard/Module 2": "Mechanism2d",
+      "/SmartDashboard/Module 3": "Mechanism2d"
     },
     "windows": {
       "/Pose": {
@@ -28,26 +35,52 @@
   "NetworkTables": {
     "transitory": {
       "AdvantageKit": {
+        "DriverStation": {
+          "open": true
+        },
         "RealOutputs": {
+          "Logger": {
+            "open": true
+          },
           "Odometry": {
             "double[]##v_/AdvantageKit/RealOutputs/Odometry/Robot": {
-              "open": false
-            }
-          }
-        }
+              "open": true
+            },
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
       },
       "Drive": {
-        "open": false
+        "open": true
       },
       "Pose": {
         "double[]##v_/Pose/robotPose": {
           "open": true
-        },
-        "open": true
+        }
       }
     }
   },
   "NetworkTables Info": {
     "visible": true
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 332
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    }
   }
 }

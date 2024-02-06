@@ -13,7 +13,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,7 +30,6 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.drive.PhoenixOdometryThread;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -43,10 +41,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
  */
 public class RobotContainer {
   // Subsystems
-  public final Drive drive;
-
-  private static final double kMaxSpeed = 0.75; // 6 meters per second desired top speed
-  private static final double kMaxAngularRate = Math.PI; // Half a rotation per second max angular
+  private final Drive drive;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -92,8 +87,6 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(
             () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
             drive).ignoringDisable(true));
-
-
   }
 
   /**
@@ -101,9 +94,4 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-  }
-
 }

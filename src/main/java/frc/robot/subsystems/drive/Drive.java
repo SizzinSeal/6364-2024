@@ -30,10 +30,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -64,7 +60,7 @@ public class Drive extends SubsystemBase {
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {new SwerveModulePosition(), new SwerveModulePosition(),
           new SwerveModulePosition(), new SwerveModulePosition()};
-  public SwerveDrivePoseEstimator poseEstimator =
+  private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO,
@@ -159,22 +155,6 @@ public class Drive extends SubsystemBase {
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
-  }
-
-  public void updateTelemtry() {
-
-    /* What to publish over networktables for telemetry */
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-
-    /* Robot pose for field positioning */
-    NetworkTable table = inst.getTable("Pose");
-    DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
-    StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
-
-    Pose2d pose = poseEstimator.getEstimatedPosition();
-
-    fieldTypePub.set("Field2d");
-    fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
   }
 
   /**
