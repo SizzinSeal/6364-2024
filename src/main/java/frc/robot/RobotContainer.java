@@ -23,7 +23,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
-  private static final double kMaxSpeed = 0.75; // 6 meters per second desired top speed
+  private static final double kMaxSpeed = 2.0; // 6 meters per second desired top speed
   private static final double kMaxAngularRate = Math.PI; // Half a rotation per second max angular
                                                          // velocity
 
@@ -78,8 +78,8 @@ public class RobotContainer {
     m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));
 
     // intake a note
-    m_controller.rightBumper()
-        .onTrue(Commands.sequence(m_intake.intake(), m_indexer.load(), m_intake.stop()));
+    m_controller.rightBumper().whileTrue(m_intake.intake());
+    m_controller.rightBumper().whileFalse(m_intake.stop());
     // indexer unstuck
     m_controller.x()
         .onTrue(Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5), m_indexer.load()));
