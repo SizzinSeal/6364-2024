@@ -63,14 +63,12 @@ public interface Trajectories {
       UpdateTargpos(targPose2d2);
       try {
         genPath = m_pathfinder.generatePath(pos, targPose);
-        // currtraj = m_pathfinder.generateTrajectory(pos, targPose,
-        // Constants.Drivetrain.K_TRAJECTORY_CONFIG);
-        System.out.println("traj" + genPath);
+        System.out.println("trajnew" + genPath);
 
       } catch (ImpossiblePathException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
-        System.out.println("traj" + genPath);
+        System.out.println("trajold" + genPath);
       }
     }
 
@@ -78,6 +76,7 @@ public interface Trajectories {
       return genPath.asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
     }
   }
+
   public class TrajectoryFollower extends Command {
 
     private final Timer m_timer = new Timer();
@@ -86,16 +85,16 @@ public interface Trajectories {
     private final Rotation2d m_desiredRotation;
     private final CommandSwerveDrivetrain m_drivetrain;
 
-
-    private final SwerveRequest.FieldCentric m_drive =
-        new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric
+    private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric
 
     /*
      * @param trajectory The trajectory to follow.
      * 
      * @param controller The HolonomicDriveController for the drivetrain.
      * 
-     * @param desiredRotation The angle that the drivetrain should be facing. This is sampled at
+     * @param desiredRotation The angle that the drivetrain should be facing. This
+     * is sampled at
      * each time step.
      * 
      * @param driveSubsystem The subsystem to use to drive the robot.
@@ -128,10 +127,11 @@ public interface Trajectories {
       double curTime = m_timer.get();
       var desiredState = m_trajectory.sample(curTime);
       Rotation2d desiredRotation = m_desiredRotation;
-      ChassisSpeeds targetChassisSpeeds =
-          m_controller.calculate(m_drivetrain.getPose2d(), desiredState, desiredRotation);
+      ChassisSpeeds targetChassisSpeeds = m_controller.calculate(m_drivetrain.getPose2d(), desiredState,
+          desiredRotation);
       // This is done because the rotation is inverted.
-      // It may not be the same on your robot, so if the rotation does not function as expected,
+      // It may not be the same on your robot, so if the rotation does not function as
+      // expected,
       // remove this.
       targetChassisSpeeds.omegaRadiansPerSecond *= -1;
       m_drivetrain.applyRequest(() -> m_drive.withVelocityX(targetChassisSpeeds.vxMetersPerSecond)
@@ -154,5 +154,3 @@ public interface Trajectories {
   }
 
 }
-
-
