@@ -1,10 +1,14 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -15,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class Telemetry {
   private final double MaxSpeed;
@@ -77,6 +82,16 @@ public class Telemetry {
     Pose2d pose = state.Pose;
     fieldTypePub.set("Field2d");
     fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
+    PerspectiveProjection c1 = new PerspectiveProjection(0, 0, new Translation3d(0.5, 5, 2)); // lf
+    PerspectiveProjection c2 = new PerspectiveProjection(0, 0, new Translation3d(0.5, 6, 2)); // rf
+    PerspectiveProjection c3 = new PerspectiveProjection(0, 0, new Translation3d(0, 5, 2)); // lb
+    PerspectiveProjection c4 = new PerspectiveProjection(0, 0, new Translation3d(0, 6, 2)); // rb
+
+    // Pose3d c5 = c1.getpointpos().relativeTo(c2.getpointpos()).relativeTo(c3.getpointpos())
+    // .relativeTo(c4.getpointpos());
+
+    // Pose3d goalPose3d = new Pose3d (c1.Calculate(2.5, 5, 3, 45, 0.4)[0], 3,
+    // c1.Calculate(2.5, 5, 3, 45, 0.4)[1], new Rotation3d(0, 0, 0));
 
     /* Telemeterize the robot's general speeds */
     double currentTime = Utils.getCurrentTimeSeconds();
@@ -86,6 +101,15 @@ public class Telemetry {
     m_lastPose = pose;
 
     Translation2d velocities = distanceDiff.div(diffTime);
+
+    Logger.recordOutput("Robot/Swerve/Odometry", pose);
+    Logger.recordOutput("Robot/Swerve/ModuleStates", state.ModuleStates);
+    Logger.recordOutput("Robot/Swerve/ModuleTargets", state.ModuleTargets);
+    Logger.recordOutput("Robot/Velocity", velocities);
+    Logger.recordOutput("Goal/C1", c1.getpointpos());
+    Logger.recordOutput("Goal/C2", c2.getpointpos());
+    Logger.recordOutput("Goal/C3", c3.getpointpos());
+    Logger.recordOutput("Goal/C4", c4.getpointpos());
 
     speed.set(velocities.getNorm());
     velocityX.set(velocities.getX());

@@ -34,16 +34,63 @@
   },
   "NetworkTables": {
     "transitory": {
+      "AdvantageKit": {
+        "DriverStation": {
+          "open": true
+        },
+        "RealOutputs": {
+          "Logger": {
+            "open": true
+          },
+          "Odometry": {
+            "double[]##v_/AdvantageKit/RealOutputs/Odometry/Robot": {
+              "open": true
+            },
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      },
       "Drive": {
         "open": true
       },
       "Pose": {
         "double[]##v_/Pose/robotPose": {
           "open": true
-        },
-        "open": true
+        }
       }
     }
+  },
+  "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "visible": true
+  },
+  "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "visible": true
+  },
+  "NetworkTables Info": {
+    "visible": true
+  },
+  "NetworkTables Info": {
+    "visible": true
   },
   "NetworkTables Info": {
     "Connections": {
