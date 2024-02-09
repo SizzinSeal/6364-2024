@@ -58,7 +58,8 @@
       "Pose": {
         "double[]##v_/Pose/robotPose": {
           "open": true
-        }
+        },
+        "open": true
       }
     }
   },

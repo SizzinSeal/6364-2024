@@ -9,6 +9,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.proto.Kinematics;
 import edu.wpi.first.math.util.Units;
@@ -63,15 +64,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return m_kinematics;
   }
 
-  public double getspeed() {
-    double vx = m_kinematics.toChassisSpeeds().vxMetersPerSecond;
-    double vy = m_kinematics.toChassisSpeeds().vyMetersPerSecond;
-    double vt = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
-    return vt;
-  }
 
   public Pose2d getPose2d() {
     return m_odometry.getEstimatedPosition();
+  }
+
+  public Twist2d getTwist2d() {
+    return m_kinematics.toTwist2d();
   }
 
   /**

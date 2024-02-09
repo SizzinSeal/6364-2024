@@ -74,7 +74,7 @@ public class Constants {
     public static final double kAngularPositionP = 0.1;
     public static final double kAngularPositionD = 0.1;
     // velocity/acceleration constraints
-    public static final double kMaxLateralSpeed = 3.0; // meters per second
+    public static final double kMaxLateralSpeed = 1.0; // meters per second
     public static final double kMaxLateralAcceleration = 3.0; // meters per second squared
     public static final double kMaxAngularSpeed = 3.0; // radians per second
     public static final double kMaxAngularAcceleration = 3.0; // radians per second squared
@@ -86,7 +86,7 @@ public class Constants {
     public static final double kBotLength = 1; // meters
 
     public static TrajectoryConfig K_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration).setEndVelocity(0)
+        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
             .setKinematics(RobotContainer.m_drivetrain.getKinematics());
   }
   public class Field {
@@ -123,6 +123,7 @@ public class Constants {
         return new Pose2d(kBlueAmpLineupX, kBlueAmpLineupY, new Rotation2d(kBlueAmpLineupTheta));
     }
   }
+
   public static final Mode currentMode = Mode.SIM;
 
   public static enum Mode {

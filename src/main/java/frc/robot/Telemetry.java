@@ -6,9 +6,11 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.autonomous.Trajectories;
 
 public class Telemetry {
   private final double MaxSpeed;
@@ -77,6 +80,7 @@ public class Telemetry {
           .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),};
 
   /* Accept the swerve drive state and telemeterize it to smartdashboard */
+
   public void telemeterize(SwerveDriveState state) {
     /* Telemeterize the pose */
     Pose2d pose = state.Pose;
@@ -106,10 +110,10 @@ public class Telemetry {
     Logger.recordOutput("Robot/Swerve/ModuleStates", state.ModuleStates);
     Logger.recordOutput("Robot/Swerve/ModuleTargets", state.ModuleTargets);
     Logger.recordOutput("Robot/Velocity", velocities);
-    Logger.recordOutput("Goal/C1", c1.getpointpos());
-    Logger.recordOutput("Goal/C2", c2.getpointpos());
-    Logger.recordOutput("Goal/C3", c3.getpointpos());
-    Logger.recordOutput("Goal/C4", c4.getpointpos());
+    Logger.recordOutput("Robot/Goal/C1", c1.getpointpos());
+    Logger.recordOutput("Robot/Goal/C2", c2.getpointpos());
+    Logger.recordOutput("Robot/Goal/C3", c3.getpointpos());
+    Logger.recordOutput("Robot/Goal/C4", c4.getpointpos());
 
     speed.set(velocities.getNorm());
     velocityX.set(velocities.getX());
