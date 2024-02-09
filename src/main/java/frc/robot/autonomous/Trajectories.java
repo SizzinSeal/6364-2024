@@ -29,6 +29,10 @@ import me.nabdev.pathfinding.utilities.FieldLoader.Field;
 
 public interface Trajectories {
 
+  public record outerror() {
+    static boolean err = false;
+  }
+
   public class GenerateTrajectory {
     PathfinderBuilder m_pathbuilder =
         new PathfinderBuilder(Field.CRESCENDO_2024).setRobotLength(Constants.Drivetrain.kBotLength)
@@ -38,12 +42,14 @@ public interface Trajectories {
 
     public Trajectory newTrajectory(Pose2d targPose2d, CommandSwerveDrivetrain m_drivetrain) {
       try {
+        outerror.err = false;
         return m_pathfinder.generateTrajectory(m_drivetrain.getPose2d(), targPose2d,
             Constants.Drivetrain.K_TRAJECTORY_CONFIG);
       } catch (ImpossiblePathException e) {
         e.printStackTrace();
+        outerror.err = true;
+        return new Trajectory();
       }
-      return new Trajectory();
     }
 
   }
@@ -89,7 +95,6 @@ public interface Trajectories {
                   Drivetrain.kMaxAngularAcceleration)));
       m_drivetrain = driveSubsystem;
       m_desiredRotation = desiredRotation;
-
     }
 
     @Override
@@ -99,6 +104,9 @@ public interface Trajectories {
 
     @Override
     public void execute() {
+      if (outerror.err == true) {
+        return;
+      }
       double curTime = m_timer.get();
       var desiredState = m_trajectory.sample(curTime);
       Rotation2d desiredRotation = m_desiredRotation;

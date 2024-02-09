@@ -85,8 +85,9 @@ public class Constants {
     public static final double kBotWidth = 1; // meters
     public static final double kBotLength = 1; // meters
 
-    public static final TrajectoryConfig K_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
+        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration).setEndVelocity(0)
+            .setKinematics(RobotContainer.m_drivetrain.getKinematics());
   }
   public class Field {
     // Blue Amp Pos
