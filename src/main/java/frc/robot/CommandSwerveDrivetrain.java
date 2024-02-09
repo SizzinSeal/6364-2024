@@ -59,6 +59,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return vt;
   }
 
+  public Pose2d getPose2d() {
+    return m_odometry.getEstimatedPosition();
+  }
+
   /**
    * @brief update the odometry with a vision measurement
    * 

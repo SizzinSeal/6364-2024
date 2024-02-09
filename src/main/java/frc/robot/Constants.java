@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -80,6 +81,12 @@ public class Constants {
     // movement tolerances
     public static final double kLateralTolerance = 3; // meters
     public static final double kAngularTolerance = 3; // radians
+
+    public static final double kBotWidth = 1; // meters
+    public static final double kBotLength = 1; // meters
+
+    public static final TrajectoryConfig K_TRAJECTORY_CONFIG =
+        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration);
   }
   public class Field {
     // Blue Amp Pos
@@ -116,3 +123,4 @@ public class Constants {
     }
   }
 }
+

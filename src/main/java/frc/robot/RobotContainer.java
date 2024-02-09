@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.function.Supplier;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +24,7 @@ import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.autonomous.MoveToPose;
+import frc.robot.autonomous.Trajectories;
 import frc.robot.Constants.Field;
 
 public class RobotContainer {
@@ -152,7 +155,16 @@ public class RobotContainer {
    * 
    * @return Command
    */
+  // public Command getAutonomousCommand() {
+  // return new MoveToPose(new Pose2d(5, 5, new Rotation2d(0)), m_drivetrain);
+  // }
   public Command getAutonomousCommand() {
-    return new MoveToPose(new Pose2d(5, 5, new Rotation2d(0)), m_drivetrain);
+
+    Trajectories.GenerateTrajectory trajgen = new Trajectories.GenerateTrajectory();
+
+    return new Trajectories.TrajectoryFollower(new Trajectories.GenerateTrajectory().newTrajectory(
+        new Pose2d(2.5, 5, new Rotation2d(0)), m_drivetrain), new Rotation2d(0), m_drivetrain);
+
   }
+
 }
