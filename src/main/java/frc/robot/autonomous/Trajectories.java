@@ -1,6 +1,8 @@
 package frc.robot.autonomous;
 
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -34,16 +36,22 @@ public interface Trajectories {
   }
 
   public class GenerateTrajectory {
+
+    boolean hasrun = false;
+    Pose2d pos;
     PathfinderBuilder m_pathbuilder =
         new PathfinderBuilder(Field.CRESCENDO_2024).setRobotLength(Constants.Drivetrain.kBotLength)
             .setRobotWidth(Constants.Drivetrain.kBotWidth).setNormalizeCorners(false);
     Pathfinder m_pathfinder = m_pathbuilder.build();
 
-
     public Trajectory newTrajectory(Pose2d targPose2d, CommandSwerveDrivetrain m_drivetrain) {
+      if (hasrun = false) {
+        pos = m_drivetrain.getPose();
+        hasrun = true;
+      }
       try {
         outerror.err = false;
-        return m_pathfinder.generateTrajectory(m_drivetrain.getPose2d(), targPose2d,
+        return m_pathfinder.generateTrajectory(pos, targPose2d,
             Constants.Drivetrain.K_TRAJECTORY_CONFIG);
       } catch (ImpossiblePathException e) {
         e.printStackTrace();
@@ -51,7 +59,6 @@ public interface Trajectories {
         return new Trajectory();
       }
     }
-
   }
 
   public class TrajectoryFollower extends Command {

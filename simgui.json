@@ -69,38 +69,7 @@
     "Server": {
       "Publishers": {
         "open": true
-      },
-      "open": true
-    },
-    "visible": true
-  },
-  "NetworkTables Info": {
-    "Connections": {
-      "open": true
-    },
-    "Server": {
-      "Publishers": {
-        "open": true
-      },
-      "open": true
-    },
-    "visible": true
-  },
-  "NetworkTables Info": {
-    "visible": true
-  },
-  "NetworkTables Info": {
-    "visible": true
-  },
-  "NetworkTables Info": {
-    "Connections": {
-      "open": true
-    },
-    "Server": {
-      "Publishers": {
-        "open": true
-      },
-      "open": true
+      }
     },
     "visible": true
   },

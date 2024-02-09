@@ -161,8 +161,6 @@ public class RobotContainer {
   // }
   public Command getAutonomousCommand() {
 
-    Trajectories.GenerateTrajectory trajgen = new Trajectories.GenerateTrajectory();
-
     return new Trajectories.TrajectoryFollower(new Trajectories.GenerateTrajectory().newTrajectory(
         new Pose2d(2.5, 5, new Rotation2d(0)), m_drivetrain), new Rotation2d(0), m_drivetrain);
 
