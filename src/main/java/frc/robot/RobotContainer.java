@@ -65,9 +65,20 @@ public class RobotContainer {
    */
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed).withTargetDirection(
-                new Rotation2d(-m_controller.getRightX(), -m_controller.getRightY()))));
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed) // Drive
+            // forward
+            // with
+            // negative
+            // Y
+            // (forward)
+            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed) // Drive left with negative
+            // X (left)
+            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate) // Drive
+        // counterclockwise
+        // with
+        // negative X
+        // (left)
+        ));
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 

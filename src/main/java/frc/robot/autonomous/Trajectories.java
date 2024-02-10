@@ -44,7 +44,7 @@ public interface Trajectories {
           .setRobotWidth(Constants.Drivetrain.kBotWidth).setNormalizeCorners(false);
       m_pathfinder = m_pathbuilder.build();
       genPath = new Path(
-          new Vertex(RobotContainer.m_drivetrain.getPose().getX(), RobotContainer.m_drivetrain.getPose().getY()),
+          new Vertex(RobotContainer.m_drivetrain.getPose2d().getX(), RobotContainer.m_drivetrain.getPose2d().getY()),
           new Vertex(5, 5), m_pathfinder);
     }
 
@@ -60,7 +60,7 @@ public interface Trajectories {
     }
 
     private void GenerateTrajectory(Pose2d targPose2d2) {
-      pos = RobotContainer.m_drivetrain.getPose();
+      pos = RobotContainer.m_drivetrain.getPose2d();
       UpdateTargpos(targPose2d2);
       try {
         genPath = m_pathfinder.generatePath(pos, targPose);
@@ -145,7 +145,11 @@ public interface Trajectories {
 
     @Override
     public void end(boolean interrupted) {
+      if (!interrupted)
+        m_drivetrain
+            .applyRequest(() -> m_drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0));
       m_timer.stop();
+
     }
 
     @Override
