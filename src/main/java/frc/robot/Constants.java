@@ -21,14 +21,15 @@ public class Constants {
     public static final InvertedValue kUpperInverted = InvertedValue.Clockwise_Positive;
     public static final InvertedValue kLowerInverted = InvertedValue.CounterClockwise_Positive;
     // controller constants
-    public static final Slot0Configs kUpperControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
-    public static final Slot0Configs kLowerControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kUpperControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kLowerControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
     // speeds
     public static final double kUpperSpeed = .8 * 12; // rotations per second
     public static final double kLowerSpeed = .8 * 12; // rotations per second
   }
+
   public class Flywheel {
     // motor ids
     public static final int kUpperMotorId = 16;
@@ -40,10 +41,10 @@ public class Constants {
     public static final InvertedValue kUpperInverted = InvertedValue.Clockwise_Positive;
     public static final InvertedValue kLowerInverted = InvertedValue.CounterClockwise_Positive;
     // controller constants
-    public static final Slot0Configs kUpperControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
-    public static final Slot0Configs kLowerControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kUpperControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kLowerControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
     // speeds
     public static final double kUpperSpeed = .9 * 12; // rotations per second
     public static final double kLowerSpeed = .9 * 12; // rotations per second
@@ -51,6 +52,7 @@ public class Constants {
     public static final double kUpperTolerance = 5; // revolutions per second
     public static final double kLowerTolerance = 5; // revolutions per second
   }
+
   public class Indexer {
     // ids
     public static final int kMotorId = 18;
@@ -60,52 +62,53 @@ public class Constants {
     // motor inversion
     public static final InvertedValue kInverted = InvertedValue.Clockwise_Positive;
     // controller constants
-    public static final Slot0Configs kMotorControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kMotorControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
     // speeds
     public static final double kSpeed = .9 * 12; // rotations per second
   }
+
   public class Drivetrain {
     // Feedforward/feedforward gains
     // lateral position controller
-    public static final double kLateralPositionP = 0.2;
-    public static final double kLateralPositionD = 0.2;
+    public static final double kLateralPositionP = 0.6;
+    public static final double kLateralPositionD = 0.6;
     // angular position controller
     public static final double kAngularPositionP = 0.1;
     public static final double kAngularPositionD = 0.1;
     // velocity/acceleration constraints
-    public static final double kMaxLateralSpeed = 1.0; // meters per second
-    public static final double kMaxLateralAcceleration = 3.0; // meters per second squared
-    public static final double kMaxAngularSpeed = 3.0; // radians per second
-    public static final double kMaxAngularAcceleration = 3.0; // radians per second squared
+    public static final double kMaxLateralSpeed = 0.5; // meters per second
+    public static final double kMaxLateralAcceleration = 2; // meters per second squared
+    public static final double kMaxAngularSpeed = 3; // radians per second
+    public static final double kMaxAngularAcceleration = 3; // radians per second squared
     // movement tolerances
-    public static final double kLateralTolerance = 3; // meters
-    public static final double kAngularTolerance = 3; // radians
+    public static final double kLateralTolerance = 0.2; // meters
+    public static final double kAngularTolerance = 0.2; // radians
 
     public static final double kBotWidth = 1; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-            .setKinematics(RobotContainer.m_drivetrain.getKinematics());
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+        .setKinematics(RobotContainer.m_drivetrain.getKinematics());
   }
+
   public class Field {
     // Blue Amp Pos
     public static final double kBlueAmpX = 5;
     public static final double kBlueAmpY = 5;
     // Blue Amp Lineup Pos
-    public static final double kBlueAmpLineupX = 4;
-    public static final double kBlueAmpLineupY = 4;
-    public static final double kBlueAmpLineupTheta =
-        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupX = 3;
+    public static final double kBlueAmpLineupY = 5;
+    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
+        kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 4;
     public static final double kRedAmpLineupY = 4;
-    public static final double kRedAmpLineupTheta =
-        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
+    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
+        .getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()
@@ -137,7 +140,4 @@ public class Constants {
     REPLAY
   }
 
-
-
 }
-

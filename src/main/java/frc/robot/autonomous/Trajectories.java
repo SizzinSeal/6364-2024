@@ -43,8 +43,9 @@ public interface Trajectories {
           .setRobotLength(Constants.Drivetrain.kBotLength)
           .setRobotWidth(Constants.Drivetrain.kBotWidth).setNormalizeCorners(false);
       m_pathfinder = m_pathbuilder.build();
-      genPath = new Path(new Vertex(1, 1), new Vertex(5, 5), m_pathfinder);
-
+      genPath = new Path(
+          new Vertex(RobotContainer.m_drivetrain.getPose().getX(), RobotContainer.m_drivetrain.getPose().getY()),
+          new Vertex(5, 5), m_pathfinder);
     }
 
     public Command GenTrajectory(Pose2d targPose2d0) {
@@ -137,8 +138,8 @@ public interface Trajectories {
       m_drivetrain.applyRequest(() -> m_drive.withVelocityX(targetChassisSpeeds.vxMetersPerSecond)
           .withVelocityY(targetChassisSpeeds.vyMetersPerSecond)
           .withRotationalRate(targetChassisSpeeds.omegaRadiansPerSecond));
-      m_drivetrain.setControl(m_drive.withVelocityX(-targetChassisSpeeds.vxMetersPerSecond)
-          .withVelocityY(-targetChassisSpeeds.vyMetersPerSecond)
+      m_drivetrain.setControl(m_drive.withVelocityX(targetChassisSpeeds.vxMetersPerSecond)
+          .withVelocityY(targetChassisSpeeds.vyMetersPerSecond)
           .withRotationalRate(targetChassisSpeeds.omegaRadiansPerSecond));
     }
 

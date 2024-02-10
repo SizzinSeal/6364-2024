@@ -16,12 +16,24 @@ public class TunerConstants {
   // The steer motor uses any SwerveModule.SteerRequestType control request with
   // the
   // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
-  private static final Slot0Configs steerGains = new Slot0Configs().withKP(100).withKI(0).withKD(0.54).withKS(0)
-      .withKV(1.5).withKA(0);
+  private static final Slot0Configs steerGains = new Slot0Configs()
+      .withKP(5701.7)
+      .withKI(0)
+      .withKD(113.34)
+
+      .withKS(0.2209)
+      .withKV(0.11453)
+      .withKA(0.014937);
   // When using closed-loop control, the drive motor uses the control
   // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
-  private static final Slot0Configs driveGains = new Slot0Configs().withKP(3).withKI(0).withKD(0).withKS(0).withKV(0)
-      .withKA(0);
+  private static final Slot0Configs driveGains = new Slot0Configs()
+      .withKP(67.635)
+      .withKI(0)
+      .withKD(0)
+
+      .withKS(0.2209)
+      .withKV(0.11453)
+      .withKA(0.014937);
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
@@ -56,8 +68,8 @@ public class TunerConstants {
   private static final int kPigeonId = 13;
 
   // These are only used for simulation
-  private static final double kSteerInertia = 0.00001;
-  private static final double kDriveInertia = 0.001;
+  private static final double kSteerInertia = 0.1;
+  private static final double kDriveInertia = 1.0;
 
   private static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
       .withPigeon2Id(kPigeonId).withCANbusName(kCANbusName);
