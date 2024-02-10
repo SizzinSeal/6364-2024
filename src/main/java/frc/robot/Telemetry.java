@@ -1,6 +1,5 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 
@@ -11,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -21,8 +21,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.autonomous.Trajectories;
 
 public class Telemetry {
   private final double MaxSpeed;
@@ -56,8 +54,8 @@ public class Telemetry {
   double lastTime = Utils.getCurrentTimeSeconds();
 
   /* Mechanisms to represent the swerve module states */
-  Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {new Mechanism2d(1, 1),
-      new Mechanism2d(1, 1), new Mechanism2d(1, 1), new Mechanism2d(1, 1),};
+  Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] { new Mechanism2d(1, 1),
+      new Mechanism2d(1, 1), new Mechanism2d(1, 1), new Mechanism2d(1, 1), };
   /* A direction and length changing ligament for speed representation */
   MechanismLigament2d[] m_moduleSpeeds = new MechanismLigament2d[] {
       m_moduleMechanisms[0].getRoot("RootSpeed", 0.5, 0.5)
@@ -67,7 +65,7 @@ public class Telemetry {
       m_moduleMechanisms[2].getRoot("RootSpeed", 0.5, 0.5)
           .append(new MechanismLigament2d("Speed", 0.5, 0)),
       m_moduleMechanisms[3].getRoot("RootSpeed", 0.5, 0.5)
-          .append(new MechanismLigament2d("Speed", 0.5, 0)),};
+          .append(new MechanismLigament2d("Speed", 0.5, 0)), };
   /* A direction changing and length constant ligament for module direction */
   MechanismLigament2d[] m_moduleDirections = new MechanismLigament2d[] {
       m_moduleMechanisms[0].getRoot("RootDirection", 0.5, 0.5)
@@ -77,7 +75,7 @@ public class Telemetry {
       m_moduleMechanisms[2].getRoot("RootDirection", 0.5, 0.5)
           .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
       m_moduleMechanisms[3].getRoot("RootDirection", 0.5, 0.5)
-          .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),};
+          .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))), };
 
   /* Accept the swerve drive state and telemeterize it to smartdashboard */
 
@@ -85,17 +83,7 @@ public class Telemetry {
     /* Telemeterize the pose */
     Pose2d pose = state.Pose;
     fieldTypePub.set("Field2d");
-    fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
-    PerspectiveProjection c1 = new PerspectiveProjection(0, 0, new Translation3d(0.5, 5, 2)); // lf
-    PerspectiveProjection c2 = new PerspectiveProjection(0, 0, new Translation3d(0.5, 6, 2)); // rf
-    PerspectiveProjection c3 = new PerspectiveProjection(0, 0, new Translation3d(0, 5, 2)); // lb
-    PerspectiveProjection c4 = new PerspectiveProjection(0, 0, new Translation3d(0, 6, 2)); // rb
-
-    // Pose3d c5 = c1.getpointpos().relativeTo(c2.getpointpos()).relativeTo(c3.getpointpos())
-    // .relativeTo(c4.getpointpos());
-
-    // Pose3d goalPose3d = new Pose3d (c1.Calculate(2.5, 5, 3, 45, 0.4)[0], 3,
-    // c1.Calculate(2.5, 5, 3, 45, 0.4)[1], new Rotation3d(0, 0, 0));
+    fieldPub.set(new double[] { pose.getX(), pose.getY(), pose.getRotation().getDegrees() });
 
     /* Telemeterize the robot's general speeds */
     double currentTime = Utils.getCurrentTimeSeconds();
@@ -105,15 +93,6 @@ public class Telemetry {
     m_lastPose = pose;
 
     Translation2d velocities = distanceDiff.div(diffTime);
-
-    Logger.recordOutput("Robot/Swerve/Odometry", pose);
-    Logger.recordOutput("Robot/Swerve/ModuleStates", state.ModuleStates);
-    Logger.recordOutput("Robot/Swerve/ModuleTargets", state.ModuleTargets);
-    Logger.recordOutput("Robot/Velocity", velocities);
-    Logger.recordOutput("Robot/Goal/C1", c1.getpointpos());
-    Logger.recordOutput("Robot/Goal/C2", c2.getpointpos());
-    Logger.recordOutput("Robot/Goal/C3", c3.getpointpos());
-    Logger.recordOutput("Robot/Goal/C4", c4.getpointpos());
 
     speed.set(velocities.getNorm());
     velocityX.set(velocities.getX());

@@ -24,11 +24,6 @@ See [contributing.md](contributing.md) on how to contribute to the project. It c
 | BR CANcoder | 12          | RIO         |
 | Pigeon 2.0  | 13          | RIO         |
 
-## Coordinate System
-This program uses the "Always Blue" approach. The coordinate always has the blue alliance as the origin. We do this for several reasons:
-- April Tags. Using this method means we do not have to flip coordinates depending on what alliance we are on.
-- Compatibility. WPILib and Choreo use the "Always Blue" approach.
-
 ## Phoenix Pro
 We use the Phoenix Pro vendordep for interacting with CTRE hardware, such as cancoders and TalonFX motors. It has several advantageous over Phoenix 6:
 

@@ -4,7 +4,7 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
-import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,8 +14,7 @@ import edu.wpi.first.math.util.Units;
 /**
  * @brief LimeLight wrapper
  *
- *        We interact with the limelight through networktables. It posts data,
- *        and we need to read
+ *        We interact with the limelight through networktables. It posts data, and we need to read
  *        that data from networktables.
  * 
  *        Using networktables all the time inflates code size, so we have this wrapper to simplify
@@ -102,7 +101,6 @@ public class Vision {
    * 
    * @return distance in meters
    */
-  @AutoLogOutput
   public double getDist3D() {
     // get the measured pose in the target coordinate system
     final double[] measuredPoseArray =
