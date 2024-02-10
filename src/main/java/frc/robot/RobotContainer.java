@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -49,13 +50,14 @@ public class RobotContainer {
   // My
   // drivetrain
 
-  private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
-      .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // Add a 10%
-      // deadband
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
-                                                               // driving in open loop
-                                                               // TODO: change this to closed
-                                                               // loop velocity
+  private final SwerveRequest.FieldCentricFacingAngle m_drive =
+      new SwerveRequest.FieldCentricFacingAngle().withDeadband(kMaxSpeed * 0.2)
+          .withRotationalDeadband(kMaxAngularRate * 0.2) // Add a 10%
+          // deadband
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
+                                                                   // driving in open loop
+                                                                   // TODO: change this to closed
+                                                                   // loop velocity
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
@@ -65,20 +67,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed) // Drive
-            // forward
-            // with
-            // negative
-            // Y
-            // (forward)
-            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed) // Drive left with negative
-            // X (left)
-            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate) // Drive
-        // counterclockwise
-        // with
-        // negative X
-        // (left)
-        ));
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
+            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed).withTargetDirection(
+                new Rotation2d(-m_controller.getRightX(), -m_controller.getRightY()))));
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
     m_controller.a().onTrue(
