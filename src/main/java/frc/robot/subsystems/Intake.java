@@ -85,8 +85,8 @@ public class Intake extends SubsystemBase {
    */
   public Command intake() {
     return this.runOnce(() -> {
-      m_upperMotorVelocity.Output = kUpperSpeed;
-      m_lowerMotorVelocity.Output = kLowerSpeed;
+      m_upperMotorVelocity.Output = -kUpperSpeed;
+      m_lowerMotorVelocity.Output = -kLowerSpeed;
       this.updateMotorSpeeds();
     });
   }

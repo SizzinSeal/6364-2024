@@ -75,20 +75,17 @@ public class RobotContainer {
         .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
-    m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));
+
 
     // intake a note
-    m_controller.rightBumper()
-        .onTrue(Commands.sequence(m_intake.intake(), m_indexer.load(), m_intake.stop()));
+    m_controller.rightBumper().whileTrue(m_intake.intake());
+    m_controller.rightBumper().whileFalse(m_intake.stop());
     // indexer unstuck
-    m_controller.x()
-        .onTrue(Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5), m_indexer.load()));
-    // load a note into the indexer
-    m_controller.y().onTrue(m_indexer.load());
+    m_controller.x().whileTrue(m_indexer.load());
+    m_controller.x().whileFalse(m_indexer.stop());
     // shoot a note
-    m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
-        m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
-
+    m_controller.b().whileTrue(m_indexer.eject());
+    m_controller.b().whileFalse(m_indexer.eject());
     // reset position if in simulation
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
