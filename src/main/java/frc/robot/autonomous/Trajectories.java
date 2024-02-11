@@ -31,11 +31,13 @@ public interface Trajectories {
 
   public class TrajectoryGenerator {
     Pathfinder m_pathfinder;
-    Pose2d m_lastTargetPose;
-    Pose2d m_targetPose;
-    Pose2d m_pose;
     Path m_path;
 
+    /**
+     * @brief TrajectoryGenerator constructor
+     * 
+     *        This class is used to generate trajectories
+     */
     public TrajectoryGenerator() {
       PathfinderBuilder m_pathbuilder = new PathfinderBuilder(Field.CRESCENDO_2024)
           .setRobotLength(Constants.Drivetrain.kBotLength)
@@ -45,16 +47,15 @@ public interface Trajectories {
           RobotContainer.m_drivetrain.getPose2d().getY()), new Vertex(5, 5), m_pathfinder);
     }
 
-    private void updateTarget(Pose2d targetPose) {
-      m_lastTargetPose = m_targetPose;
-      m_targetPose = targetPose;
-    }
-
+    /**
+     * @brief regenerate the trajectory
+     * 
+     * @param targetPose
+     */
     public void generate(Pose2d targetPose) {
-      m_pose = RobotContainer.m_drivetrain.getPose2d();
-      updateTarget(targetPose);
+      final Pose2d pose = RobotContainer.m_drivetrain.getPose2d();
       try {
-        m_path = m_pathfinder.generatePath(m_pose, m_targetPose);
+        m_path = m_pathfinder.generatePath(pose, targetPose);
         System.out.println("trajnew" + m_path);
 
       } catch (ImpossiblePathException e) {
@@ -64,6 +65,11 @@ public interface Trajectories {
       }
     }
 
+    /**
+     * @brief get the generated trajectory
+     * 
+     * @return Trajectory
+     */
     public Trajectory getTrajectory() {
       return m_path.asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
     }
