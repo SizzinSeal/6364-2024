@@ -26,6 +26,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.autonomous.MoveToPose;
 import frc.robot.autonomous.Trajectories;
+import frc.robot.autonomous.TurnToPose;
 import frc.robot.autonomous.Trajectories.TrajectoryFollower;
 import frc.robot.Constants.Field;
 
@@ -41,11 +42,13 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_shooter = new Flywheel();
+  private final TurnToPose turnToPose = new TurnToPose(m_drivetrain);
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
-  public final Trajectories.TrajectoryGenerator m_trajectory = new Trajectories.TrajectoryGenerator();
+  public final Trajectories.TrajectoryGenerator m_trajectory =
+      new Trajectories.TrajectoryGenerator();
   // My
   // drivetrain
 
@@ -73,7 +76,7 @@ public class RobotContainer {
             // (forward)
             .withVelocityY(-m_controller.getLeftX() * kMaxSpeed) // Drive left with negative
             // X (left)
-            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate) // Drive
+            .withRotationalRate(-m_controller.getRightX()) // Drive
         // counterclockwise
         // with
         // negative X
@@ -82,14 +85,12 @@ public class RobotContainer {
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
-    m_controller.rightBumper().onTrue(
-        m_trajectory.GenTrajectory(new Pose2d(new Translation2d(1, 5), new Rotation2d(0))));
-    m_controller.rightBumper().whileTrue(
+    m_controller.a().onTrue(m_trajectory.GenTrajectory(Field.getAmpLineupPose()));
+    m_controller.a().whileTrue(
         new TrajectoryFollower(m_trajectory.getTrajectory(), new Rotation2d(0), m_drivetrain));
 
     m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
-        .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
-            -m_controller.getLeftX()))));
+        .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
     m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));
@@ -103,12 +104,10 @@ public class RobotContainer {
     // load a note into the indexer
     m_controller.y().onTrue(m_indexer.load());
     // shoot a note
-    m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(),
-        Commands.waitSeconds(3.0),
-        m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(),
-        m_indexer.stop()));
+    m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
+        m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
     // move to the Amp
-    m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(), m_drivetrain));
+    // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(), m_drivetrain));
 
     // reset position if in simulation
     if (Utils.isSimulation()) {
@@ -154,8 +153,7 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon
-   *        startup
+   * @brief Construct the container for the robot. This will be called upon startup
    */
   public RobotContainer() {
     configureBindings();

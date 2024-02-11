@@ -1,5 +1,10 @@
 {
   "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    },
     "Timing": {
       "window": {
         "visible": false
@@ -37,8 +42,32 @@
       "Drive": {
         "open": true
       },
+      "LiveWindow": {
+        "open": true
+      },
       "Pose": {
         "double[]##v_/Pose/robotPose": {
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "Module 0": {
+          "RootDirection": {
+            "open": true
+          },
+          "RootSpeed": {
+            "open": true
+          },
+          "open": true
+        },
+        "Module 1": {
+          "RootDirection": {
+            "Direction": {
+              "open": true
+            },
+            "open": true
+          },
           "open": true
         },
         "open": true
