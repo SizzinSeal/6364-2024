@@ -1,5 +1,6 @@
 package frc.robot.autonomous;
 
+import java.util.ArrayList;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -18,8 +19,11 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.util.PathfindingDebugUtils;
 import me.nabdev.pathfinding.Pathfinder;
 import me.nabdev.pathfinding.PathfinderBuilder;
+import me.nabdev.pathfinding.Pathfinder.PathfindSnapMode;
+import me.nabdev.pathfinding.structures.Edge;
 import me.nabdev.pathfinding.structures.ImpossiblePathException;
 import me.nabdev.pathfinding.structures.Path;
 import me.nabdev.pathfinding.structures.Vertex;
@@ -40,16 +44,26 @@ public interface Trajectories {
     Path genPath;
 
     public TrajectoryGenerator() {
-      PathfinderBuilder m_pathbuilder = new PathfinderBuilder(Field.CRESCENDO_2024)
-          .setRobotLength(Constants.Drivetrain.kBotLength)
-          .setRobotWidth(Constants.Drivetrain.kBotWidth).setNormalizeCorners(false);
-      m_pathfinder = m_pathbuilder.build();
+
+      m_pathfinder =
+          new PathfinderBuilder(Field.CRESCENDO_2024).setInjectPoints(true).setPointSpacing(0.5)
+              .setCornerPointSpacing(0.05).setRobotLength(Constants.Drivetrain.kBotLength)
+              .setRobotWidth(Constants.Drivetrain.kBotWidth).setCornerDist(0.3).build();
+
+      ArrayList<Edge> edges = m_pathfinder.visualizeEdges();
+      PathfindingDebugUtils.drawLines("Field Map", edges, m_pathfinder.visualizeVertices());
+      PathfindingDebugUtils.drawLines("Field Map Inflated", edges,
+          m_pathfinder.visualizeInflatedVertices());
+
       genPath = new Path(new Vertex(RobotContainer.m_drivetrain.getPose2d().getX(),
           RobotContainer.m_drivetrain.getPose2d().getY()), new Vertex(5, 5), m_pathfinder);
     }
 
     private void UpdateTargpos(Pose2d targPose2d1) {
       lastTargPose2d = targPose;
+      if (lastTargPose2d == targPose2d1) {
+        return;
+      }
       targPose = targPose2d1;
     }
 
@@ -58,6 +72,8 @@ public interface Trajectories {
       UpdateTargpos(targPose2d2);
       try {
         genPath = m_pathfinder.generatePath(pos, targPose);
+        genPath.processPath(PathfindSnapMode.SNAP_ALL);
+
         System.out.println("trajnew" + genPath);
 
       } catch (ImpossiblePathException e) {
