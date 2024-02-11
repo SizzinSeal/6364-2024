@@ -12,9 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.Drivetrain;
@@ -37,12 +35,13 @@ public interface Trajectories {
 
   public class TrajectoryGenerator {
     Pathfinder m_pathfinder;
-    Pose2d lastTargPose2d;
-    Trajectory currtraj;
-    Pose2d targPose;
-    Pose2d pos;
-    Path genPath;
+    Path m_path;
 
+    /**
+     * @brief TrajectoryGenerator constructor
+     * 
+     *        This class is used to generate trajectories
+     */
     public TrajectoryGenerator() {
 
       m_pathfinder =
@@ -59,32 +58,31 @@ public interface Trajectories {
           RobotContainer.m_drivetrain.getPose2d().getY()), new Vertex(5, 5), m_pathfinder);
     }
 
-    private void UpdateTargpos(Pose2d targPose2d1) {
-      lastTargPose2d = targPose;
-      if (lastTargPose2d == targPose2d1) {
-        return;
-      }
-      targPose = targPose2d1;
-    }
-
-    public void GenerateTrajectory(Pose2d targPose2d2) {
-      pos = RobotContainer.m_drivetrain.getPose2d();
-      UpdateTargpos(targPose2d2);
+    /**
+     * @brief regenerate the trajectory
+     * 
+     * @param targetPose
+     */
+    public void generate(Pose2d targetPose) {
+      final Pose2d pose = RobotContainer.m_drivetrain.getPose2d();
       try {
-        genPath = m_pathfinder.generatePath(pos, targPose);
-        genPath.processPath(PathfindSnapMode.SNAP_ALL);
-
-        System.out.println("trajnew" + genPath);
+        m_path = m_pathfinder.generatePath(pose, targetPose);
+        System.out.println("trajnew" + m_path);
 
       } catch (ImpossiblePathException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
-        System.out.println("trajold" + genPath);
+        System.out.println("trajold" + m_path);
       }
     }
 
+    /**
+     * @brief get the generated trajectory
+     * 
+     * @return Trajectory
+     */
     public Trajectory getTrajectory() {
-      return genPath.asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
+      return m_path.asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
     }
   }
 
