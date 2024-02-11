@@ -12,6 +12,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -36,6 +38,7 @@ public interface Trajectories {
   public class TrajectoryGenerator {
     Pathfinder m_pathfinder;
     Path m_path;
+    Field2d field = new Field2d();
 
     /**
      * @brief TrajectoryGenerator constructor
@@ -43,6 +46,8 @@ public interface Trajectories {
      *        This class is used to generate trajectories
      */
     public TrajectoryGenerator() {
+
+      Field2d field = new Field2d();
 
       m_pathfinder =
           new PathfinderBuilder(Field.CRESCENDO_2024).setInjectPoints(true).setPointSpacing(0.5)
@@ -54,8 +59,10 @@ public interface Trajectories {
       PathfindingDebugUtils.drawLines("Field Map Inflated", edges,
           m_pathfinder.visualizeInflatedVertices());
 
-      genPath = new Path(new Vertex(RobotContainer.m_drivetrain.getPose2d().getX(),
+      m_path = new Path(new Vertex(RobotContainer.m_drivetrain.getPose2d().getX(),
           RobotContainer.m_drivetrain.getPose2d().getY()), new Vertex(5, 5), m_pathfinder);
+
+
     }
 
     /**
@@ -74,7 +81,10 @@ public interface Trajectories {
         e.printStackTrace();
         System.out.println("trajold" + m_path);
       }
+      telemetry();
     }
+
+    private void telemetry() {}
 
     /**
      * @brief get the generated trajectory

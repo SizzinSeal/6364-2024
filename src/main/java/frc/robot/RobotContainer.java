@@ -44,7 +44,7 @@ public class RobotContainer {
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
-  public final Trajectories.TrajectoryGenerator m_trajectory =
+  public static final Trajectories.TrajectoryGenerator m_trajectory =
       new Trajectories.TrajectoryGenerator();
   // My
   // drivetrain
@@ -82,7 +82,8 @@ public class RobotContainer {
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
-    m_controller.a().onTrue(Commands.run(() -> m_trajectory.generate(Field.getAmpLineupPose())));
+    m_controller.a()
+        .onTrue(Commands.runOnce(() -> m_trajectory.generate(Field.getAmpLineupPose())));
     m_controller.a().whileTrue(
         new TrajectoryFollower(m_trajectory.getTrajectory(), new Rotation2d(0), m_drivetrain));
 
