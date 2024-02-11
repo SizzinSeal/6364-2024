@@ -71,11 +71,11 @@ public class Constants {
   public class Drivetrain {
     // Feedforward/feedforward gains
     // lateral position controller
-    public static final double kLateralPositionP = 0.6;
-    public static final double kLateralPositionD = 0.6;
+    public static final double kLateralPositionP = 10;
+    public static final double kLateralPositionD = 0;
     // angular position controller
-    public static final double kAngularPositionP = 1;
-    public static final double kAngularPositionD = 0.01;
+    public static final double kAngularPositionP = 0.5;
+    public static final double kAngularPositionD = 0;
     // velocity/acceleration constraints
     public static final double kMaxLateralSpeed = 0.5; // meters per second
     public static final double kMaxLateralAcceleration = 2; // meters per second squared

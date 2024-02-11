@@ -43,6 +43,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
   }
 
+  @Override
+  public SwerveDriveState getState() {
+    // TODO Auto-generated method stub
+    return super.getState();
+  }
+
   /**
    * @brief get the scalar distance between the robot and a position
    */

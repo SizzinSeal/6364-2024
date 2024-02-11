@@ -18,8 +18,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    m_robotContainer.m_drivetrain
-        .seedFieldRelative(new Pose2d(new Translation2d(5, 5), new Rotation2d(0)));
   }
 
   @Override

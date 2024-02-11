@@ -82,13 +82,13 @@ public class RobotContainer {
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
-    m_controller.a()
-        .onTrue(Commands.runOnce(() -> m_trajectory.generate(Field.getAmpLineupPose())));
-    m_controller.a().whileTrue(
+    m_controller.a().onTrue(Commands.runOnce(
+        () -> m_trajectory.generate(new Pose2d(new Translation2d(3, 5), new Rotation2d(0)))));
+    m_controller.b().whileTrue(
         new TrajectoryFollower(m_trajectory.getTrajectory(), new Rotation2d(0), m_drivetrain));
 
-    m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
-        .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
+    // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
+    // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
     m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));

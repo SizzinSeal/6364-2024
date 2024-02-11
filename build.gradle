@@ -67,7 +67,7 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
-    implementation 'me.nabdev.pathfinding:oxplorer:0.7.1'
+implementation 'me.nabdev.pathfinding:oxplorer:0.9.8'
 
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'

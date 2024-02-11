@@ -3,12 +3,14 @@ package frc.robot.autonomous;
 import java.util.ArrayList;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import java.util.Optional;
+import javax.swing.text.DefaultEditorKit.CutAction;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -27,6 +29,7 @@ import me.nabdev.pathfinding.Pathfinder.PathfindSnapMode;
 import me.nabdev.pathfinding.structures.Edge;
 import me.nabdev.pathfinding.structures.ImpossiblePathException;
 import me.nabdev.pathfinding.structures.Path;
+import me.nabdev.pathfinding.structures.Vertex;
 import me.nabdev.pathfinding.utilities.FieldLoader.Field;
 
 public interface Trajectories {
@@ -38,6 +41,8 @@ public interface Trajectories {
   public class TrajectoryGenerator {
     private final Pathfinder m_pathfinder;
     private Optional<Path> m_path = Optional.empty();
+    private Path m_lastpath;
+    private Pose2d m_targetPose;
 
     /**
      * @brief TrajectoryGenerator constructor
@@ -45,9 +50,6 @@ public interface Trajectories {
      *        This class is used to generate trajectories
      */
     public TrajectoryGenerator() {
-
-      Field2d field = new Field2d();
-
       m_pathfinder =
           new PathfinderBuilder(Field.CRESCENDO_2024).setInjectPoints(true).setPointSpacing(0.5)
               .setCornerPointSpacing(0.05).setRobotLength(Constants.Drivetrain.kBotLength)
@@ -57,9 +59,7 @@ public interface Trajectories {
       PathfindingDebugUtils.drawLines("Field Map", edges, m_pathfinder.visualizeVertices());
       PathfindingDebugUtils.drawLines("Field Map Inflated", edges,
           m_pathfinder.visualizeInflatedVertices());
-
-
-
+      generate(new Pose2d(new Translation2d(1, 0), new Rotation2d(1, 0)));
     }
 
     /**
@@ -71,19 +71,19 @@ public interface Trajectories {
      */
     public void generate(Pose2d targetPose) {
       final Pose2d pose = RobotContainer.m_drivetrain.getPose2d();
-      try {
-        m_path = Optional.of(m_pathfinder.generatePath(pose, targetPose));
-        System.out.println("trajnew" + m_path);
+      if (m_targetPose != targetPose) {
+        m_targetPose = targetPose;
+        try {
+          m_path = Optional.of(m_pathfinder.generatePath(pose, targetPose));
+          System.out.println("trajnew");
 
-      } catch (ImpossiblePathException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        System.out.println("trajold" + m_path);
+        } catch (ImpossiblePathException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+          // System.out.println("trajold" + m_path);
+        }
       }
-      telemetry();
     }
-
-    private void telemetry() {}
 
     /**
      * @brief get the generated trajectory
@@ -94,11 +94,23 @@ public interface Trajectories {
      * @return Trajectory
      */
     public Trajectory getTrajectory() {
-      if (m_path.isEmpty())
-        throw new RuntimeException("Tried to follow a path that has not been generated!");
-      return m_path.get().asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
+      // if (m_path.isEmpty())
+      // throw new RuntimeException("Tried to follow a path that has not been generated!");
+      try {
+        return m_path.get().asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
+      } catch (ImpossiblePathException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+        return new Trajectory();
+      }
     }
+
+    public Pose2d gettargetPose2d() {
+      return m_path.get().getTarget().asPose2d();
+    }
+
   }
+
 
   public class TrajectoryFollower extends Command {
 
@@ -109,7 +121,11 @@ public interface Trajectories {
     private final CommandSwerveDrivetrain m_drivetrain;
 
     private final SwerveRequest.FieldCentric m_drive =
-        new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric
+        new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage); //
+    // field-centric
+
+    // private final SwerveRequest.RobotCentric m_drive =
+    // new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.Velocity);
 
     /*
      * @param trajectory The trajectory to follow.
@@ -146,22 +162,31 @@ public interface Trajectories {
 
     @Override
     public void execute() {
+      if (this.m_trajectory == null) {
+        return;
+      }
       double curTime = m_timer.get();
       var desiredState = m_trajectory.sample(curTime);
       Rotation2d desiredRotation = m_desiredRotation;
+      System.out.println(curTime);
       ChassisSpeeds targetChassisSpeeds =
           m_controller.calculate(m_drivetrain.getPose2d(), desiredState, desiredRotation);
       // This is done because the rotation is inverted.
       // It may not be the same on your robot, so if the rotation does not function as
       // expected,
       // remove this.
-      targetChassisSpeeds.omegaRadiansPerSecond *= -1;
-      m_drivetrain.applyRequest(() -> m_drive.withVelocityX(targetChassisSpeeds.vxMetersPerSecond)
-          .withVelocityY(targetChassisSpeeds.vyMetersPerSecond)
-          .withRotationalRate(targetChassisSpeeds.omegaRadiansPerSecond));
-      m_drivetrain.setControl(m_drive.withVelocityX(targetChassisSpeeds.vxMetersPerSecond)
-          .withVelocityY(targetChassisSpeeds.vyMetersPerSecond)
-          .withRotationalRate(targetChassisSpeeds.omegaRadiansPerSecond));
+      // targetChassisSpeeds.omegaRadiansPerSecond *= -1;
+      m_drivetrain.applyRequest(
+          () -> new SwerveRequest.ApplyChassisSpeeds().withSpeeds(targetChassisSpeeds));
+      m_drivetrain
+          .setControl(new SwerveRequest.ApplyChassisSpeeds().withSpeeds(targetChassisSpeeds));
+      // m_drivetrain.applyRequest(() ->
+      // m_drive.withVelocityX(targetChassisSpeeds.vxMetersPerSecond)
+      // .withVelocityY(targetChassisSpeeds.vyMetersPerSecond)
+      // .withRotationalRate(targetChassisSpeeds.omegaRadiansPerSecond));
+      // m_drivetrain.setControl(m_drive.withVelocityX(-targetChassisSpeeds.vxMetersPerSecond)
+      // .withVelocityY(targetChassisSpeeds.vyMetersPerSecond)
+      // .withRotationalRate(targetChassisSpeeds.omegaRadiansPerSecond));
     }
 
     @Override
@@ -175,7 +200,10 @@ public interface Trajectories {
 
     @Override
     public boolean isFinished() {
-      return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+      if (this.m_trajectory != null) {
+        return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+      }
+      return true;
     }
   }
 

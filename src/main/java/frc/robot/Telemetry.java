@@ -80,16 +80,18 @@ public class Telemetry {
           .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),};
 
   /* Accept the swerve drive state and telemeterize it to smartdashboard */
+  Field2d field = new Field2d();
 
   public void telemeterize(SwerveDriveState state) {
     /* Telemeterize the pose */
     TrajectoryGenerator trajgen = RobotContainer.m_trajectory;
-    Pose2d pose = state.Pose;
+    Pose2d pose = RobotContainer.m_drivetrain.getState().Pose;
     fieldTypePub.set("Field2d");
     fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
 
-    Field2d field = new Field2d();
     field.getObject("Path").setTrajectory(trajgen.getTrajectory());
+    field.getObject("Path/Targetpose").setPose(trajgen.gettargetPose2d());
+
     SmartDashboard.putData("Field", field);
 
 
