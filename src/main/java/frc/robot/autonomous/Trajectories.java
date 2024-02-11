@@ -1,6 +1,7 @@
 package frc.robot.autonomous;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import java.util.Optional;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -20,7 +21,6 @@ import me.nabdev.pathfinding.Pathfinder;
 import me.nabdev.pathfinding.PathfinderBuilder;
 import me.nabdev.pathfinding.structures.ImpossiblePathException;
 import me.nabdev.pathfinding.structures.Path;
-import me.nabdev.pathfinding.structures.Vertex;
 import me.nabdev.pathfinding.utilities.FieldLoader.Field;
 
 public interface Trajectories {
@@ -30,8 +30,8 @@ public interface Trajectories {
   }
 
   public class TrajectoryGenerator {
-    Pathfinder m_pathfinder;
-    Path m_path;
+    private final Pathfinder m_pathfinder;
+    private Optional<Path> m_path = Optional.empty();
 
     /**
      * @brief TrajectoryGenerator constructor
@@ -43,19 +43,19 @@ public interface Trajectories {
           .setRobotLength(Constants.Drivetrain.kBotLength)
           .setRobotWidth(Constants.Drivetrain.kBotWidth).setNormalizeCorners(false);
       m_pathfinder = m_pathbuilder.build();
-      m_path = new Path(new Vertex(RobotContainer.m_drivetrain.getPose2d().getX(),
-          RobotContainer.m_drivetrain.getPose2d().getY()), new Vertex(5, 5), m_pathfinder);
     }
 
     /**
-     * @brief regenerate the trajectory
+     * @brief generate the trajectory
+     * 
+     *        This method needs to be called before calling the getTrajectory method
      * 
      * @param targetPose
      */
     public void generate(Pose2d targetPose) {
       final Pose2d pose = RobotContainer.m_drivetrain.getPose2d();
       try {
-        m_path = m_pathfinder.generatePath(pose, targetPose);
+        m_path = Optional.of(m_pathfinder.generatePath(pose, targetPose));
         System.out.println("trajnew" + m_path);
 
       } catch (ImpossiblePathException e) {
@@ -67,11 +67,16 @@ public interface Trajectories {
 
     /**
      * @brief get the generated trajectory
+     *
+     *        This method should not be called before the generate method has been called, otherwise
+     *        a runtime exception will be thrown
      * 
      * @return Trajectory
      */
     public Trajectory getTrajectory() {
-      return m_path.asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
+      if (m_path.isEmpty())
+        throw new RuntimeException("Tried to follow a path that has not been generated!");
+      return m_path.get().asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
     }
   }
 
