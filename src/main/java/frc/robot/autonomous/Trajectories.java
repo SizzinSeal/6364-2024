@@ -31,7 +31,7 @@ public interface Trajectories {
     static boolean err = false;
   }
 
-  public class TrajectoryGenerator implements Subsystem {
+  public class TrajectoryGenerator {
     Pathfinder m_pathfinder;
     Pose2d lastTargPose2d;
     Trajectory currtraj;
@@ -48,18 +48,12 @@ public interface Trajectories {
           RobotContainer.m_drivetrain.getPose2d().getY()), new Vertex(5, 5), m_pathfinder);
     }
 
-    public Command GenTrajectory(Pose2d targPose2d0) {
-      return runOnce(() -> {
-        GenerateTrajectory(targPose2d0);
-      });
-    }
-
     private void UpdateTargpos(Pose2d targPose2d1) {
       lastTargPose2d = targPose;
       targPose = targPose2d1;
     }
 
-    private void GenerateTrajectory(Pose2d targPose2d2) {
+    public void GenerateTrajectory(Pose2d targPose2d2) {
       pos = RobotContainer.m_drivetrain.getPose2d();
       UpdateTargpos(targPose2d2);
       try {

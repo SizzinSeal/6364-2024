@@ -85,7 +85,8 @@ public class RobotContainer {
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
-    m_controller.a().onTrue(m_trajectory.GenTrajectory(Field.getAmpLineupPose()));
+    m_controller.a()
+        .onTrue(Commands.run(() -> m_trajectory.GenerateTrajectory(Field.getAmpLineupPose())));
     m_controller.a().whileTrue(
         new TrajectoryFollower(m_trajectory.getTrajectory(), new Rotation2d(0), m_drivetrain));
 
