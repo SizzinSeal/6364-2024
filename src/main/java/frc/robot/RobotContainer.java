@@ -22,9 +22,9 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.autonomous.Trajectories;
+import frc.robot.autonomous.TrajectoryGen;
 import frc.robot.autonomous.TurnToPose;
-import frc.robot.autonomous.Trajectories.TrajectoryFollower;
+import frc.robot.autonomous.TrajectoryFollower;
 import frc.robot.Constants.Field;
 
 public class RobotContainer {
@@ -44,8 +44,7 @@ public class RobotContainer {
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
-  public static final Trajectories.TrajectoryGenerator m_trajectory =
-      new Trajectories.TrajectoryGenerator();
+  public static final TrajectoryGen m_trajectory = new TrajectoryGen();
   // My
   // drivetrain
 
