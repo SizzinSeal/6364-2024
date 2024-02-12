@@ -7,6 +7,8 @@ package frc.robot;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,7 +26,6 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.autonomous.TrajectoryGen;
 import frc.robot.autonomous.TurnToPose;
-import frc.robot.autonomous.TrajectoryFollower;
 import frc.robot.Constants.Field;
 
 public class RobotContainer {
@@ -81,18 +82,15 @@ public class RobotContainer {
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
-    m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
-        .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
+    // m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
+    // .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
+
     m_controller.a()
-        .whileTrue(new TrajectoryFollower(m_trajectory
-            .asPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))
-            .getTrajectory(
-                m_drivetrain.getKinematics().toChassisSpeeds(m_drivetrain.getState().ModuleStates),
-                m_drivetrain.getPose2d().getRotation()),
-            m_drivetrain));
+        .whileTrue(m_drivetrain.findandfollowPath((new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
 
     // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
-    // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
+    // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
+    // -m_controller.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
     m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));
@@ -109,7 +107,8 @@ public class RobotContainer {
     m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
         m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
     // move to the Amp
-    // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(), m_drivetrain));
+    // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
+    // m_drivetrain));
 
     // reset position if in simulation
     if (Utils.isSimulation()) {
@@ -155,7 +154,8 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon startup
+   * @brief Construct the container for the robot. This will be called upon
+   *        startup
    */
   public RobotContainer() {
     configureBindings();
@@ -174,12 +174,11 @@ public class RobotContainer {
   // return new MoveToPose(new Pose2d(5, 5, new Rotation2d(0)), m_drivetrain);
   // }
   public Command getAutonomousCommand() {
-    return new TrajectoryFollower(m_trajectory
-        .asPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))
-        .getTrajectory(
-            m_drivetrain.getKinematics().toChassisSpeeds(m_drivetrain.getState().ModuleStates),
-            m_drivetrain.getPose2d().getRotation()),
-        m_drivetrain);
+    PathPlannerPath path = m_trajectory
+        .getPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(180)));
+
+    return AutoBuilder.followPath(path);
+
   }
 
 }

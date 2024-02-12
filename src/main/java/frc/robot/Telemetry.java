@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.List;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.pathplanner.lib.util.PPLibTelemetry;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.autonomous.TrajectoryGen;
+import me.nabdev.pathfinding.structures.ImpossiblePathException;
 
 public class Telemetry {
   private final double MaxSpeed;
@@ -56,8 +58,8 @@ public class Telemetry {
   double lastTime = Utils.getCurrentTimeSeconds();
 
   /* Mechanisms to represent the swerve module states */
-  Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {new Mechanism2d(1, 1),
-      new Mechanism2d(1, 1), new Mechanism2d(1, 1), new Mechanism2d(1, 1),};
+  Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] { new Mechanism2d(1, 1),
+      new Mechanism2d(1, 1), new Mechanism2d(1, 1), new Mechanism2d(1, 1), };
   /* A direction and length changing ligament for speed representation */
   MechanismLigament2d[] m_moduleSpeeds = new MechanismLigament2d[] {
       m_moduleMechanisms[0].getRoot("RootSpeed", 0.5, 0.5)
@@ -67,7 +69,7 @@ public class Telemetry {
       m_moduleMechanisms[2].getRoot("RootSpeed", 0.5, 0.5)
           .append(new MechanismLigament2d("Speed", 0.5, 0)),
       m_moduleMechanisms[3].getRoot("RootSpeed", 0.5, 0.5)
-          .append(new MechanismLigament2d("Speed", 0.5, 0)),};
+          .append(new MechanismLigament2d("Speed", 0.5, 0)), };
   /* A direction changing and length constant ligament for module direction */
   MechanismLigament2d[] m_moduleDirections = new MechanismLigament2d[] {
       m_moduleMechanisms[0].getRoot("RootDirection", 0.5, 0.5)
@@ -77,7 +79,7 @@ public class Telemetry {
       m_moduleMechanisms[2].getRoot("RootDirection", 0.5, 0.5)
           .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
       m_moduleMechanisms[3].getRoot("RootDirection", 0.5, 0.5)
-          .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),};
+          .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))), };
 
   /* Accept the swerve drive state and telemeterize it to smartdashboard */
   Field2d field = new Field2d();
@@ -87,15 +89,24 @@ public class Telemetry {
     TrajectoryGen trajgen = RobotContainer.m_trajectory;
     Pose2d pose = RobotContainer.m_drivetrain.getState().Pose;
     fieldTypePub.set("Field2d");
-    fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
+    fieldPub.set(new double[] { pose.getX(), pose.getY(), pose.getRotation().getDegrees() });
 
-    field.getObject("Path").setTrajectory(trajgen.getTrajectory());
+    // try {
+    // field.getObject("Path")
+    // .setTrajectory(trajgen
+    // .generateandget(new Pose2d(new Translation2d(3, 5),
+    // Rotation2d.fromDegrees(90)))
+    // .asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG));
+    // } catch (ImpossiblePathException e) {
+    // // TODO Auto-generated catch block
+    // e.printStackTrace();
+    // }
+
     field.getObject("Path/Targetpose").setPose(trajgen.gettargetPose2d());
 
     field.getObject("Robot").setPose(pose);
 
     SmartDashboard.putData("Field", field);
-
 
     /* Telemeterize the robot's general speeds */
     double currentTime = Utils.getCurrentTimeSeconds();
