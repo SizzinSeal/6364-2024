@@ -85,8 +85,8 @@ public class Constants {
     public static final double kLateralTolerance = 0.2; // meters
     public static final double kAngularTolerance = 0.2; // radians
 
-    public static final double kBotWidth = 0.1; // meters
-    public static final double kBotLength = 0.1; // meters
+    public static final double kBotWidth = 0.7; // meters
+    public static final double kBotLength = 1; // meters
 
     public static TrajectoryConfig K_TRAJECTORY_CONFIG =
         new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)

@@ -81,10 +81,15 @@ public class RobotContainer {
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
-    m_controller.a().onTrue(Commands.runOnce(
-        () -> m_trajectory.generate(new Pose2d(new Translation2d(3, 5), new Rotation2d(0)))));
-    m_controller.b().whileTrue(
-        new TrajectoryFollower(m_trajectory.getTrajectory(), new Rotation2d(0), m_drivetrain));
+    m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
+        .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
+    m_controller.a()
+        .whileTrue(new TrajectoryFollower(m_trajectory
+            .asPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))
+            .getTrajectory(
+                m_drivetrain.getKinematics().toChassisSpeeds(m_drivetrain.getState().ModuleStates),
+                m_drivetrain.getPose2d().getRotation()),
+            m_drivetrain));
 
     // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
@@ -169,8 +174,12 @@ public class RobotContainer {
   // return new MoveToPose(new Pose2d(5, 5, new Rotation2d(0)), m_drivetrain);
   // }
   public Command getAutonomousCommand() {
-
-    return new TrajectoryFollower(m_trajectory.getTrajectory(), new Rotation2d(90), m_drivetrain);
+    return new TrajectoryFollower(m_trajectory
+        .asPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))
+        .getTrajectory(
+            m_drivetrain.getKinematics().toChassisSpeeds(m_drivetrain.getState().ModuleStates),
+            m_drivetrain.getPose2d().getRotation()),
+        m_drivetrain);
   }
 
 }

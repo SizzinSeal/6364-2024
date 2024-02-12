@@ -2,7 +2,8 @@ package frc.robot;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
-
+import com.pathplanner.lib.util.PPLibTelemetry;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -90,6 +91,8 @@ public class Telemetry {
 
     field.getObject("Path").setTrajectory(trajgen.getTrajectory());
     field.getObject("Path/Targetpose").setPose(trajgen.gettargetPose2d());
+
+    field.getObject("Robot").setPose(pose);
 
     SmartDashboard.putData("Field", field);
 
