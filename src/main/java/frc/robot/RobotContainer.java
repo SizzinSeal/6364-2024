@@ -47,12 +47,9 @@ public class RobotContainer {
   // drivetrain
 
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
-      .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // Add a 10%
-      // deadband
-      .withDriveRequestType(DriveRequestType.Velocity); // I want field-centric
-                                                        // driving in open loop
-                                                        // TODO: change this to closed
-                                                        // loop velocity
+      .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
+      .withDriveRequestType(DriveRequestType.Velocity); // closed loop velocity control
+
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
@@ -61,20 +58,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed) // Drive
-            // forward
-            // with
-            // negative
-            // Y
-            // (forward)
-            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed) // Drive left with negative
-            // X (left)
-            .withRotationalRate(-m_controller.getRightX()) // Drive
-        // counterclockwise
-        // with
-        // negative X
-        // (left)
-        ));
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
+            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
+            .withRotationalRate(-m_controller.getRightX())));
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
@@ -165,9 +151,6 @@ public class RobotContainer {
    * 
    * @return Command
    */
-  // public Command getAutonomousCommand() {
-  // return new MoveToPose(new Pose2d(5, 5, new Rotation2d(0)), m_drivetrain);
-  // }
   public Command getAutonomousCommand() {
     PathPlannerPath path = m_trajectoryGenerator
         .getPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(180)));
@@ -175,5 +158,4 @@ public class RobotContainer {
     return AutoBuilder.followPath(path);
 
   }
-
 }
