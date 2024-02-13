@@ -135,31 +135,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   }
 
   public PathPlannerPath GetPath(List<Translation2d> bezierPoints) {
-    PathPlannerPath Path =
-        new PathPlannerPath(bezierPoints, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The
-                                                                                                   // constraints
-                                                                                                   // for
-                                                                                                   // this
-                                                                                                   // path.
-                                                                                                   // If
-                                                                                                   // using
-                                                                                                   // a
-                                                                                                   // differential
-                                                                                                   // drivetrain,
-                                                                                                   // the
-                                                                                                   // angular
-                                                                                                   // constraints
-                                                                                                   // have
-                                                                                                   // no
-                                                                                                   // effect.
-            new GoalEndState(0.0, Rotation2d.fromDegrees(90)) // Goal end state. You can set a
-                                                              // holonomic rotation here. If using a
-                                                              // differential drivetrain, the
-                                                              // rotation
-                                                              // will have no effect.
+    final PathPlannerPath path =
+        new PathPlannerPath(bezierPoints, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
+            new GoalEndState(0.0, Rotation2d.fromDegrees(90)) // goal end state
         );
-    Path.preventFlipping = true;
-    return Path;
+    path.preventFlipping = true;
+    return path;
   }
 
   @Override
@@ -171,8 +152,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   /**
    * @brief get the scalar distance between the robot and a position
    */
-  public double getPoseDifference(Pose2d pos) {
-    return m_odometry.getEstimatedPosition().getTranslation().getDistance(pos.getTranslation());
+  public double getPoseDifference(final Pose2d pose) {
+    return m_odometry.getEstimatedPosition().getTranslation().getDistance(pose.getTranslation());
   }
 
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
@@ -219,11 +200,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
   }
 
-  public Command findandfollowPath(Pose2d targpos) {
-    return AutoBuilder.pathfindToPose(targpos, new PathConstraints(5, 2.5, 6.28, 3.14));
+  public Command findAndFollowPath(final Pose2d targetPose) {
+    return AutoBuilder.pathfindToPose(targetPose, new PathConstraints(5, 2.5, 6.28, 3.14));
   }
 
-  public Command followPath(PathPlannerPath path) {
+  public Command followPath(final PathPlannerPath path) {
     return AutoBuilder.followPath(path);
   }
 
