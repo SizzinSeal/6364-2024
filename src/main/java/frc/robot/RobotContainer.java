@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.Field;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -155,8 +156,8 @@ public class RobotContainer {
    * @return Command
    */
   public Command getAutonomousCommand() {
-    PathPlannerPath path = m_trajectoryGenerator
-        .getPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(180)));
+    PathPlannerPath path = m_trajectoryGenerator.getPath(Field.getAmpLineupPose());
+    System.out.println(Field.getAmpLineupPose());
 
     return AutoBuilder.followPath(path);
 
