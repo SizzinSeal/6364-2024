@@ -20,7 +20,10 @@ import me.nabdev.pathfinding.structures.ImpossiblePathException;
 import me.nabdev.pathfinding.utilities.FieldLoader.Field;
 
 public class TrajectoryGen {
-  private final Pathfinder m_pathfinder;
+  private final Pathfinder m_pathfinder = new PathfinderBuilder(Field.CRESCENDO_2024)
+      .setInjectPoints(true).setPointSpacing(0.5).setCornerPointSpacing(0.05)
+      .setRobotLength(Constants.Drivetrain.kBotLength).setRobotWidth(Constants.Drivetrain.kBotWidth)
+      .setCornerDist(0.3).setCornerCutDist(0.1).build();;
   private Optional<Path> m_pathfinderPath = Optional.empty();
   private Optional<PathPlannerPath> m_pathPlannerPath = Optional.empty();
   private Pose2d m_targetPose;
@@ -31,13 +34,7 @@ public class TrajectoryGen {
    *        This class is used to generate trajectories
    */
   public TrajectoryGen() {
-    m_pathfinder =
-        new PathfinderBuilder(Field.CRESCENDO_2024).setInjectPoints(true).setPointSpacing(0.5)
-            .setCornerPointSpacing(0.05).setRobotLength(Constants.Drivetrain.kBotLength)
-            .setRobotWidth(Constants.Drivetrain.kBotWidth).setCornerDist(0.3).setCornerCutDist(0.1)
-            .build();
-
-    ArrayList<Edge> edges = m_pathfinder.visualizeEdges();
+    final ArrayList<Edge> edges = m_pathfinder.visualizeEdges();
     PathfindingDebugUtils.drawLines("Field Map", edges, m_pathfinder.visualizeVertices());
     PathfindingDebugUtils.drawLines("Field Map Inflated", edges,
         m_pathfinder.visualizeInflatedVertices());
@@ -53,17 +50,13 @@ public class TrajectoryGen {
    */
   public void generate(final Pose2d targetPose) {
     final Pose2d pose = RobotContainer.m_drivetrain.getPose();
-    if (m_targetPose != targetPose) {
-      m_targetPose = targetPose;
-      try {
-        m_pathfinderPath = Optional.of(m_pathfinder.generatePath(pose, targetPose));
-        System.out.println("trajnew");
-
-      } catch (ImpossiblePathException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        // System.out.println("trajold" + m_path);
-      }
+    if (m_targetPose == targetPose)
+      return;
+    m_targetPose = targetPose;
+    try {
+      m_pathfinderPath = Optional.of(m_pathfinder.generatePath(pose, targetPose));
+    } catch (final ImpossiblePathException e) {
+      e.printStackTrace();
     }
   }
 
@@ -72,13 +65,13 @@ public class TrajectoryGen {
     return m_pathfinderPath.get().getTarget().asPose2d();
   }
 
-  public List<Pose2d> generatePosesFromBezierPoints(List<Translation2d> bezierPoints) {
+  public List<Pose2d> generatePosesFromBezierPoints(final List<Translation2d> bezierPoints) {
     final List<Pose2d> poses = new ArrayList<>();
     // Assuming you want to set a default orientation (facing in the x-direction)
-    Rotation2d defaultOrientation = new Rotation2d();
+    final Rotation2d defaultOrientation = new Rotation2d();
 
     // Convert each Translation2d point to a Pose2d with default orientation
-    for (Translation2d point : bezierPoints) {
+    for (final Translation2d point : bezierPoints) {
       poses.add(new Pose2d(point, defaultOrientation));
     }
 
@@ -93,7 +86,6 @@ public class TrajectoryGen {
         new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
         new GoalEndState(0.0, Rotation2d.fromDegrees(getTargetPose().getRotation().getDegrees())) // goal
     ));
-    System.out.println(m_pathPlannerPath.get().numPoints());
     m_pathPlannerPath.get().preventFlipping = true;
     m_pathPlannerPath.get().replan(RobotContainer.m_drivetrain.getPose(),
         RobotContainer.m_drivetrain.getChassisSpeeds());
