@@ -22,9 +22,9 @@ import me.nabdev.pathfinding.utilities.FieldLoader.Field;
 
 public class TrajectoryGen {
   private final Pathfinder m_pathfinder;
-  private Optional<Path> m_path = Optional.empty();
+  private Optional<Path> m_pathfinderPath = Optional.empty();
+  private Optional<PathPlannerPath> m_pathPlannerPath = Optional.empty();
   private Pose2d m_targetPose;
-  private PathPlannerPath path;
 
   /**
    * @brief TrajectoryGenerator constructor
@@ -52,12 +52,12 @@ public class TrajectoryGen {
    * 
    * @param targetPose
    */
-  public void generate(Pose2d targetPose) {
+  public void generate(final Pose2d targetPose) {
     final Pose2d pose = RobotContainer.m_drivetrain.getPose();
     if (m_targetPose != targetPose) {
       m_targetPose = targetPose;
       try {
-        m_path = Optional.of(m_pathfinder.generatePath(pose, targetPose));
+        m_pathfinderPath = Optional.of(m_pathfinder.generatePath(pose, targetPose));
         System.out.println("trajnew");
 
       } catch (ImpossiblePathException e) {
@@ -68,20 +68,20 @@ public class TrajectoryGen {
     }
   }
 
-  public Path getPath(Pose2d targetPose) {
+  public Path getPath(final Pose2d targetPose) {
     generate(targetPose);
-    return m_path.get();
+    return m_pathfinderPath.get();
   }
 
-  public Path generateandget(Pose2d targetPose) {
+  public Path generateandget(final Pose2d targetPose) {
     final Pose2d pose = RobotContainer.m_drivetrain.getPose();
     try {
-      m_path = Optional.of(m_pathfinder.generatePath(pose, targetPose));
-      return m_path.get();
+      m_pathfinderPath = Optional.of(m_pathfinder.generatePath(pose, targetPose));
+      return m_pathfinderPath.get();
     } catch (ImpossiblePathException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-      return m_path.get();
+      return m_pathfinderPath.get();
     }
   }
 
@@ -98,7 +98,7 @@ public class TrajectoryGen {
     // throw new RuntimeException("Tried to follow a path that has not been
     // generated!");
     try {
-      return m_path.get().asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
+      return m_pathfinderPath.get().asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
     } catch (ImpossiblePathException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -108,7 +108,7 @@ public class TrajectoryGen {
 
   public Pose2d gettargetPose2d() {
     generate(m_targetPose);
-    return m_path.get().getTarget().asPose2d();
+    return m_pathfinderPath.get().getTarget().asPose2d();
   }
 
   public List<Translation2d> generatebezierPoints(Path path) {
@@ -128,7 +128,7 @@ public class TrajectoryGen {
     return poses;
   }
 
-  public PathPlannerPath GetPath(List<Translation2d> points) {
+  public PathPlannerPath GetPath(final List<Translation2d> points) {
     PathPlannerPath Path =
         new PathPlannerPath(points, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
             new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state
@@ -138,31 +138,32 @@ public class TrajectoryGen {
     return Path;
   }
 
-  public void generatePathPlannerPath(Pose2d targetPose2d) {
+  public void generatePathPlannerPath(final Pose2d targetPose2d) {
     generate(targetPose2d);
-    List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(m_path.get().asPose2dList());
-    path = new PathPlannerPath(bezierPoints,
+    List<Translation2d> bezierPoints =
+        PathPlannerPath.bezierFromPoses(m_pathfinderPath.get().asPose2dList());
+    m_pathPlannerPath = Optional.of(new PathPlannerPath(bezierPoints,
         new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
         new GoalEndState(0.0, Rotation2d.fromDegrees(gettargetPose2d().getRotation().getDegrees())) // Goal
 
     // holonomic rotation here. If using
     // a differential drivetrain, the
     // rotation will have no effect.
-    );
-    System.out.println(path.numPoints());
-    path.preventFlipping = true;
-    path.replan(RobotContainer.m_drivetrain.getPose(),
+    ));
+    System.out.println(m_pathPlannerPath.get().numPoints());
+    m_pathPlannerPath.get().preventFlipping = true;
+    m_pathPlannerPath.get().replan(RobotContainer.m_drivetrain.getPose(),
         RobotContainer.m_drivetrain.getChassisSpeeds());
   }
 
   boolean firstrun = true;
 
-  public PathPlannerPath getPathPlannerPath(Pose2d targPose2d) {
-    generatePathPlannerPath(targPose2d);
+  public PathPlannerPath getPathPlannerPath(final Pose2d targetPose) {
+    generatePathPlannerPath(targetPose);
     if (firstrun) {
       generatePathPlannerPath(new Pose2d(new Translation2d(0, 1), Rotation2d.fromDegrees(0)));
       firstrun = false;
     }
-    return path;
+    return m_pathPlannerPath.get();
   }
 }

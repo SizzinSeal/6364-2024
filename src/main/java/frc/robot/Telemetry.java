@@ -77,7 +77,7 @@ public class Telemetry {
 
   public void telemeterize(SwerveDriveState state) {
     /* Telemeterize the pose */
-    TrajectoryGen trajgen = RobotContainer.m_trajectory;
+    TrajectoryGen trajgen = RobotContainer.m_trajectoryGenerator;
     Pose2d pose = RobotContainer.m_drivetrain.getState().Pose;
     fieldTypePub.set("Field2d");
     fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});

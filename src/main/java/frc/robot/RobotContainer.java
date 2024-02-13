@@ -42,7 +42,7 @@ public class RobotContainer {
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
-  public static final TrajectoryGen m_trajectory = new TrajectoryGen();
+  public static final TrajectoryGen m_trajectoryGenerator = new TrajectoryGen();
   // My
   // drivetrain
 
@@ -169,7 +169,7 @@ public class RobotContainer {
   // return new MoveToPose(new Pose2d(5, 5, new Rotation2d(0)), m_drivetrain);
   // }
   public Command getAutonomousCommand() {
-    PathPlannerPath path = m_trajectory
+    PathPlannerPath path = m_trajectoryGenerator
         .getPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(180)));
 
     return AutoBuilder.followPath(path);
