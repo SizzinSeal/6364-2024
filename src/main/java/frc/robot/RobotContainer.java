@@ -40,11 +40,9 @@ public class RobotContainer {
   private final Flywheel m_shooter = new Flywheel();
 
   // Setting up bindings for necessary control of the swerve drive platform
-  private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
+  private final CommandXboxController m_controller = new CommandXboxController(0);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   public static final TrajectoryGen m_trajectoryGenerator = new TrajectoryGen();
-  // My
-  // drivetrain
 
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
@@ -80,14 +78,18 @@ public class RobotContainer {
     // intake a note
     m_controller.rightBumper()
         .onTrue(Commands.sequence(m_intake.intake(), m_indexer.load(), m_intake.stop()));
+
     // indexer unstuck
     m_controller.x()
         .onTrue(Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5), m_indexer.load()));
+
     // load a note into the indexer
     m_controller.y().onTrue(m_indexer.load());
+
     // shoot a note
     m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
         m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
+
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
     // m_drivetrain));
@@ -96,6 +98,7 @@ public class RobotContainer {
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
+
     // register telemetry
     m_drivetrain.registerTelemetry(m_logger::telemeterize);
   }
@@ -153,7 +156,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     PathPlannerPath path = m_trajectoryGenerator
-        .getPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(180)));
+        .getPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(180)));
 
     return AutoBuilder.followPath(path);
 
