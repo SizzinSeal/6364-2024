@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.util.PathfindingDebugUtils;
@@ -68,36 +67,9 @@ public class TrajectoryGen {
     }
   }
 
-  public Path getPath(final Pose2d targetPose) {
-    generate(targetPose);
-    return m_pathfinderPath.get();
-  }
-
-  /**
-   * @brief get the generated trajectory
-   *
-   *        This method should not be called before the generate method has been called, otherwise a
-   *        runtime exception will be thrown
-   * 
-   * @return Trajectory
-   */
-  public Trajectory getTrajectory() {
-    try {
-      return m_pathfinderPath.get().asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
-    } catch (ImpossiblePathException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      return new Trajectory();
-    }
-  }
-
   public Pose2d getTargetPose() {
     generate(m_targetPose);
     return m_pathfinderPath.get().getTarget().asPose2d();
-  }
-
-  public List<Translation2d> generateBezierPoints(Path path) {
-    return PathPlannerPath.bezierFromPoses(path.asPose2dList());
   }
 
   public List<Pose2d> generatePosesFromBezierPoints(List<Translation2d> bezierPoints) {
@@ -111,16 +83,6 @@ public class TrajectoryGen {
     }
 
     return poses;
-  }
-
-  public PathPlannerPath getPath(final List<Translation2d> points) {
-    final PathPlannerPath path =
-        new PathPlannerPath(points, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
-            new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state
-        );
-
-    path.preventFlipping = true;
-    return path;
   }
 
   public void generatePathPlannerPath(final Pose2d targetPose2d) {
