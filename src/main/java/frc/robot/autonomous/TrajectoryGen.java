@@ -6,7 +6,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import me.nabdev.pathfinding.structures.Path;
-import me.nabdev.pathfinding.structures.Vertex;
 import me.nabdev.pathfinding.Pathfinder;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +13,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.util.PathfindingDebugUtils;
 import me.nabdev.pathfinding.PathfinderBuilder;
-import me.nabdev.pathfinding.Pathfinder.PathfindSnapMode;
 import me.nabdev.pathfinding.structures.Edge;
 import me.nabdev.pathfinding.structures.ImpossiblePathException;
 import me.nabdev.pathfinding.utilities.FieldLoader.Field;
@@ -35,10 +32,11 @@ public class TrajectoryGen {
    *        This class is used to generate trajectories
    */
   public TrajectoryGen() {
-    m_pathfinder = new PathfinderBuilder(Field.CRESCENDO_2024).setInjectPoints(true).setPointSpacing(0.5)
-        .setCornerPointSpacing(0.05).setRobotLength(Constants.Drivetrain.kBotLength)
-        .setRobotWidth(Constants.Drivetrain.kBotWidth).setCornerDist(0.3).setCornerCutDist(0.1)
-        .build();
+    m_pathfinder =
+        new PathfinderBuilder(Field.CRESCENDO_2024).setInjectPoints(true).setPointSpacing(0.5)
+            .setCornerPointSpacing(0.05).setRobotLength(Constants.Drivetrain.kBotLength)
+            .setRobotWidth(Constants.Drivetrain.kBotWidth).setCornerDist(0.3).setCornerCutDist(0.1)
+            .build();
 
     ArrayList<Edge> edges = m_pathfinder.visualizeEdges();
     PathfindingDebugUtils.drawLines("Field Map", edges, m_pathfinder.visualizeVertices());
@@ -90,8 +88,7 @@ public class TrajectoryGen {
   /**
    * @brief get the generated trajectory
    *
-   *        This method should not be called before the generate method has been
-   *        called, otherwise a
+   *        This method should not be called before the generate method has been called, otherwise a
    *        runtime exception will be thrown
    * 
    * @return Trajectory
@@ -132,16 +129,10 @@ public class TrajectoryGen {
   }
 
   public PathPlannerPath GetPath(List<Translation2d> points) {
-    PathPlannerPath Path = new PathPlannerPath(points,
-        new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The constraints for this path.
-                                                                 // If using a differential
-                                                                 // drivetrain, the angular
-                                                                 // constraints have no effect.
-        new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a
-                                                           // holonomic rotation here. If using a
-                                                           // differential drivetrain, the rotation
-                                                           // will have no effect.
-    );
+    PathPlannerPath Path =
+        new PathPlannerPath(points, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
+            new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state
+        );
 
     Path.preventFlipping = true;
     return Path;
@@ -151,29 +142,9 @@ public class TrajectoryGen {
     generate(targetPose2d);
     List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(m_path.get().asPose2dList());
     path = new PathPlannerPath(bezierPoints,
-        new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The
-                                                                 // constraints
-                                                                 // for
-                                                                 // this
-                                                                 // path.
-                                                                 // If
-                                                                 // using
-                                                                 // a
-                                                                 // differential
-                                                                 // drivetrain,
-                                                                 // the
-                                                                 // angular
-                                                                 // constraints
-                                                                 // have
-                                                                 // no
-                                                                 // effect.
+        new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
         new GoalEndState(0.0, Rotation2d.fromDegrees(gettargetPose2d().getRotation().getDegrees())) // Goal
-                                                                                                    // end
-                                                                                                    // state.
-                                                                                                    // You
-                                                                                                    // can
-                                                                                                    // set
-                                                                                                    // a
+
     // holonomic rotation here. If using
     // a differential drivetrain, the
     // rotation will have no effect.

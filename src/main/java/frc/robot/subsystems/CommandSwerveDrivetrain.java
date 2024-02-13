@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
@@ -13,7 +12,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -27,22 +25,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.proto.Kinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.autonomous.TrajectoryGen;
 import me.nabdev.pathfinding.structures.Path;
 
 /**
- * Class that extends the Phoenix SwerveDrivetrain class and implements
- * subsystem so it can be used
+ * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
  * in command-based projects easily.
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
@@ -66,20 +58,22 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     if (Utils.isSimulation()) {
       startSimThread();
       // Configure AutoBuilder last
-      AutoBuilder.configureHolonomic(
-          this::getPose, // Robot pose supplier
-          this::seedFieldRelative, // Method to reset odometry (will be called if your auto has a starting pose)
+      AutoBuilder.configureHolonomic(this::getPose, // Robot pose supplier
+          this::seedFieldRelative, // Method to reset odometry (will be called if your auto has a
+                                   // starting pose)
           this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-          this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-          new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants
+          this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE
+                                    // ChassisSpeeds
+          new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live
+                                           // in your Constants
                                            // class
               new PIDConstants(4.0, 0.0, 0.5), // Translation PID constants
               new PIDConstants(4.0, 0.0, 0.5), // Rotation PID constants
               4.5, // Max module speed, in m/s
               0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-              new ReplanningConfig(true, true) // Default path replanning config. See the API for the options here
-          ),
-          () -> {
+              new ReplanningConfig(true, true) // Default path replanning config. See the API for
+                                               // the options here
+          ), () -> {
             // Boolean supplier that controls when the path will be mirrored for the red
             // alliance
             // This will flip the path being followed to the red side of the field.
@@ -90,25 +84,26 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
               return alliance.get() == DriverStation.Alliance.Red;
             }
             return false;
-          },
-          this // Reference to this subsystem to set requirements
+          }, this // Reference to this subsystem to set requirements
       );
     }
 
     // Configure AutoBuilder last
-    AutoBuilder.configureHolonomic(
-        this::getPose, // Robot pose supplier
-        this::seedFieldRelative, // Method to reset odometry (will be called if your auto has a starting pose)
+    AutoBuilder.configureHolonomic(this::getPose, // Robot pose supplier
+        this::seedFieldRelative, // Method to reset odometry (will be called if your auto has a
+                                 // starting pose)
         this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE
+                                  // ChassisSpeeds
+        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in
+                                         // your Constants class
             new PIDConstants(3.0, 0.0, 0.0), // Translation PID constants
             new PIDConstants(3.0, 0.0, 0.0), // Rotation PID constants
             4.5, // Max module speed, in m/s
             0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-            new ReplanningConfig() // Default path replanning config. See the API for the options here
-        ),
-        () -> {
+            new ReplanningConfig() // Default path replanning config. See the API for the options
+                                   // here
+        ), () -> {
           // Boolean supplier that controls when the path will be mirrored for the red
           // alliance
           // This will flip the path being followed to the red side of the field.
@@ -119,8 +114,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             return alliance.get() == DriverStation.Alliance.Red;
           }
           return false;
-        },
-        this // Reference to this subsystem to set requirements
+        }, this // Reference to this subsystem to set requirements
     );
   }
 
@@ -142,16 +136,29 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   }
 
   public PathPlannerPath GetPath(List<Translation2d> bezierPoints) {
-    PathPlannerPath Path = new PathPlannerPath(bezierPoints,
-        new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The constraints for this path.
-                                                                 // If using a differential
-                                                                 // drivetrain, the angular
-                                                                 // constraints have no effect.
-        new GoalEndState(0.0, Rotation2d.fromDegrees(90)) // Goal end state. You can set a
-                                                          // holonomic rotation here. If using a
-                                                          // differential drivetrain, the rotation
-                                                          // will have no effect.
-    );
+    PathPlannerPath Path =
+        new PathPlannerPath(bezierPoints, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The
+                                                                                                   // constraints
+                                                                                                   // for
+                                                                                                   // this
+                                                                                                   // path.
+                                                                                                   // If
+                                                                                                   // using
+                                                                                                   // a
+                                                                                                   // differential
+                                                                                                   // drivetrain,
+                                                                                                   // the
+                                                                                                   // angular
+                                                                                                   // constraints
+                                                                                                   // have
+                                                                                                   // no
+                                                                                                   // effect.
+            new GoalEndState(0.0, Rotation2d.fromDegrees(90)) // Goal end state. You can set a
+                                                              // holonomic rotation here. If using a
+                                                              // differential drivetrain, the
+                                                              // rotation
+                                                              // will have no effect.
+        );
     Path.preventFlipping = true;
     return Path;
   }
@@ -170,11 +177,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   }
 
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
-    applyRequest(
-        () -> new SwerveRequest.FieldCentric.ApplyChassisSpeeds().withSpeeds(chassisSpeeds)
-            .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagic));
+    applyRequest(() -> new SwerveRequest.FieldCentric.ApplyChassisSpeeds().withSpeeds(chassisSpeeds)
+        .withDriveRequestType(DriveRequestType.Velocity)
+        .withSteerRequestType(SteerRequestType.MotionMagic));
     setControl(new SwerveRequest.FieldCentric.ApplyChassisSpeeds().withSpeeds(chassisSpeeds)
-        .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagic));
+        .withDriveRequestType(DriveRequestType.Velocity)
+        .withSteerRequestType(SteerRequestType.MotionMagic));
   }
 
   /**
@@ -202,9 +210,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   /**
    * @brief update the odometry with a vision measurement
    * 
-   * @param pos       the position of the robot
-   * @param xyStds    the standard deviation of the x and y measurements
-   * @param degStds   the standard deviation of the angle measurement
+   * @param pos the position of the robot
+   * @param xyStds the standard deviation of the x and y measurements
+   * @param degStds the standard deviation of the angle measurement
    * @param timestamp the timestamp of the measurement
    */
   public void updateVision(Pose2d pos, double xyStds, double degStds, double timestamp) {

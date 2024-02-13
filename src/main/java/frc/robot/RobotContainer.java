@@ -25,8 +25,6 @@ import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.autonomous.TrajectoryGen;
-import frc.robot.autonomous.TurnToPose;
-import frc.robot.Constants.Field;
 
 public class RobotContainer {
   private static final double kMaxSpeed = 0.75; // 6 meters per second desired top speed
@@ -40,7 +38,6 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_shooter = new Flywheel();
-  private final TurnToPose turnToPose = new TurnToPose(m_drivetrain);
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
@@ -57,7 +54,6 @@ public class RobotContainer {
                                                         // TODO: change this to closed
                                                         // loop velocity
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   /**
@@ -85,8 +81,8 @@ public class RobotContainer {
     // m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
     // .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
 
-    m_controller.a()
-        .whileTrue(m_drivetrain.findandfollowPath((new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
+    m_controller.a().whileTrue(m_drivetrain
+        .findandfollowPath((new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
 
     // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
@@ -154,8 +150,7 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon
-   *        startup
+   * @brief Construct the container for the robot. This will be called upon startup
    */
   public RobotContainer() {
     configureBindings();
