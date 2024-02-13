@@ -82,7 +82,7 @@ public class Telemetry {
     fieldTypePub.set("Field2d");
     fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
 
-    field.getObject("Path/Targetpose").setPose(trajgen.gettargetPose2d());
+    field.getObject("Path/Targetpose").setPose(trajgen.getTargetPose());
 
     field.getObject("Robot").setPose(pose);
 

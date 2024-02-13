@@ -73,18 +73,6 @@ public class TrajectoryGen {
     return m_pathfinderPath.get();
   }
 
-  public Path generateandget(final Pose2d targetPose) {
-    final Pose2d pose = RobotContainer.m_drivetrain.getPose();
-    try {
-      m_pathfinderPath = Optional.of(m_pathfinder.generatePath(pose, targetPose));
-      return m_pathfinderPath.get();
-    } catch (ImpossiblePathException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      return m_pathfinderPath.get();
-    }
-  }
-
   /**
    * @brief get the generated trajectory
    *
@@ -94,9 +82,6 @@ public class TrajectoryGen {
    * @return Trajectory
    */
   public Trajectory getTrajectory() {
-    // if (m_path.isEmpty())
-    // throw new RuntimeException("Tried to follow a path that has not been
-    // generated!");
     try {
       return m_pathfinderPath.get().asTrajectory(Constants.Drivetrain.K_TRAJECTORY_CONFIG);
     } catch (ImpossiblePathException e) {
@@ -106,17 +91,17 @@ public class TrajectoryGen {
     }
   }
 
-  public Pose2d gettargetPose2d() {
+  public Pose2d getTargetPose() {
     generate(m_targetPose);
     return m_pathfinderPath.get().getTarget().asPose2d();
   }
 
-  public List<Translation2d> generatebezierPoints(Path path) {
+  public List<Translation2d> generateBezierPoints(Path path) {
     return PathPlannerPath.bezierFromPoses(path.asPose2dList());
   }
 
   public List<Pose2d> generatePosesFromBezierPoints(List<Translation2d> bezierPoints) {
-    List<Pose2d> poses = new ArrayList<>();
+    final List<Pose2d> poses = new ArrayList<>();
     // Assuming you want to set a default orientation (facing in the x-direction)
     Rotation2d defaultOrientation = new Rotation2d();
 
@@ -128,27 +113,23 @@ public class TrajectoryGen {
     return poses;
   }
 
-  public PathPlannerPath GetPath(final List<Translation2d> points) {
-    PathPlannerPath Path =
+  public PathPlannerPath getPath(final List<Translation2d> points) {
+    final PathPlannerPath path =
         new PathPlannerPath(points, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
             new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state
         );
 
-    Path.preventFlipping = true;
-    return Path;
+    path.preventFlipping = true;
+    return path;
   }
 
   public void generatePathPlannerPath(final Pose2d targetPose2d) {
     generate(targetPose2d);
-    List<Translation2d> bezierPoints =
+    final List<Translation2d> bezierPoints =
         PathPlannerPath.bezierFromPoses(m_pathfinderPath.get().asPose2dList());
     m_pathPlannerPath = Optional.of(new PathPlannerPath(bezierPoints,
         new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
-        new GoalEndState(0.0, Rotation2d.fromDegrees(gettargetPose2d().getRotation().getDegrees())) // Goal
-
-    // holonomic rotation here. If using
-    // a differential drivetrain, the
-    // rotation will have no effect.
+        new GoalEndState(0.0, Rotation2d.fromDegrees(getTargetPose().getRotation().getDegrees())) // goal
     ));
     System.out.println(m_pathPlannerPath.get().numPoints());
     m_pathPlannerPath.get().preventFlipping = true;
@@ -156,14 +137,11 @@ public class TrajectoryGen {
         RobotContainer.m_drivetrain.getChassisSpeeds());
   }
 
-  boolean firstrun = true;
-
   public PathPlannerPath getPathPlannerPath(final Pose2d targetPose) {
-    generatePathPlannerPath(targetPose);
-    if (firstrun) {
+    if (m_pathPlannerPath.isEmpty())
       generatePathPlannerPath(new Pose2d(new Translation2d(0, 1), Rotation2d.fromDegrees(0)));
-      firstrun = false;
-    }
+    else
+      generatePathPlannerPath(targetPose);
     return m_pathPlannerPath.get();
   }
 }
