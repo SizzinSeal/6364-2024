@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.Field;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -41,7 +42,7 @@ public class RobotContainer {
   private final Flywheel m_shooter = new Flywheel();
 
   // Setting up bindings for necessary control of the swerve drive platform
-  private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
+  private final CommandXboxController m_controller = new CommandXboxController(0);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   public static final TrajectoryGen m_trajectoryGenerator = new TrajectoryGen();
   private final SendableChooser<Command> autoChooser;
@@ -83,14 +84,18 @@ public class RobotContainer {
     // intake a note
     m_controller.rightBumper()
         .onTrue(Commands.sequence(m_intake.intake(), m_indexer.load(), m_intake.stop()));
+
     // indexer unstuck
     m_controller.x()
         .onTrue(Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5), m_indexer.load()));
+
     // load a note into the indexer
     m_controller.y().onTrue(m_indexer.load());
+
     // shoot a note
     m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
         m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
+
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
     // m_drivetrain));
@@ -99,6 +104,7 @@ public class RobotContainer {
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
+
     // register telemetry
     m_drivetrain.registerTelemetry(m_logger::telemeterize);
   }

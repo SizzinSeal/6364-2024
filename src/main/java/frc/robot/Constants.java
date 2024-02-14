@@ -107,8 +107,8 @@ public class Constants {
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
-    public static final double kRedAmpLineupX = 4;
-    public static final double kRedAmpLineupY = 4;
+    public static final double kRedAmpLineupX = 14;
+    public static final double kRedAmpLineupY = 5;
     public static final double kRedAmpLineupTheta =
         new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
 
