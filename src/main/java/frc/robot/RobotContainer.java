@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,6 +44,8 @@ public class RobotContainer {
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   public static final TrajectoryGen m_trajectoryGenerator = new TrajectoryGen();
+  private final SendableChooser<Command> autoChooser;
+
   // My
   // drivetrain
 
@@ -68,7 +71,7 @@ public class RobotContainer {
     // .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
 
     m_controller.a().whileTrue(m_drivetrain
-        .findAndFollowPath((new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
+        .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5), Rotation2d.fromDegrees(180)))));
 
     // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
@@ -139,8 +142,10 @@ public class RobotContainer {
    * @brief Construct the container for the robot. This will be called upon startup
    */
   public RobotContainer() {
+    autoChooser = AutoBuilder.buildAutoChooser();
     configureBindings();
     limelight1.init();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     SmartDashboard.putData("Intake", m_intake);
     SmartDashboard.putData("Indexer", m_indexer);
     SmartDashboard.putData("Flywheel", m_shooter);
@@ -152,10 +157,6 @@ public class RobotContainer {
    * @return Command
    */
   public Command getAutonomousCommand() {
-    PathPlannerPath path = m_trajectoryGenerator
-        .getPathPlannerPath(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(180)));
-
-    return AutoBuilder.followPath(path);
-
+    return autoChooser.getSelected();
   }
 }

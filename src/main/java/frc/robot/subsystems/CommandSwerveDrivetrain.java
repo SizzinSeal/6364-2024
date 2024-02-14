@@ -29,8 +29,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants;
 import me.nabdev.pathfinding.structures.Path;
 
 /**
@@ -48,6 +50,37 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     if (Utils.isSimulation()) {
       startSimThread();
     }
+
+    // Configure AutoBuilder last
+    AutoBuilder.configureHolonomic(this::getPose, // Robot pose supplier
+        this::seedFieldRelative, // Method to reset odometry (will be called if your auto has a
+                                 // starting pose)
+        this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE
+                                  // ChassisSpeeds
+        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in
+                                         // your Constants class
+            new PIDConstants(3.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(3.0, 0.0, 0.0), // Rotation PID constants
+            4.5, // Max module speed, in m/s
+            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+            new ReplanningConfig(true, true) // Default path replanning config. See the API for the
+                                             // options
+        // here
+        ), () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        }, this // Reference to this subsystem to set requirements
+    );
+
 
   }
 
@@ -86,35 +119,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
           }, this // Reference to this subsystem to set requirements
       );
     }
-
-    // Configure AutoBuilder last
-    AutoBuilder.configureHolonomic(this::getPose, // Robot pose supplier
-        this::seedFieldRelative, // Method to reset odometry (will be called if your auto has a
-                                 // starting pose)
-        this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE
-                                  // ChassisSpeeds
-        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in
-                                         // your Constants class
-            new PIDConstants(3.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(3.0, 0.0, 0.0), // Rotation PID constants
-            4.5, // Max module speed, in m/s
-            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-            new ReplanningConfig() // Default path replanning config. See the API for the options
-                                   // here
-        ), () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        }, this // Reference to this subsystem to set requirements
-    );
   }
 
   public List<Translation2d> generatebezierPoints(Path path) {
@@ -139,7 +143,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         new PathPlannerPath(bezierPoints, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
             new GoalEndState(0.0, Rotation2d.fromDegrees(90)) // goal end state
         );
-    path.preventFlipping = true;
     return path;
   }
 
@@ -201,12 +204,42 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   }
 
   public Command findAndFollowPath(final Pose2d targetPose) {
-    return AutoBuilder.pathfindToPose(targetPose, new PathConstraints(5, 2.5, 6.28, 3.14));
+
+    PathConstraints pathConstraints = new PathConstraints(Constants.Drivetrain.kMaxLateralSpeed,
+        Constants.Drivetrain.kMaxLateralAcceleration, Constants.Drivetrain.kMaxAngularSpeed,
+        Constants.Drivetrain.kMaxAngularAcceleration);
+
+
+    if (DriverStation.getAlliance().equals(Alliance.Blue))
+      return AutoBuilder.pathfindToPose(targetPose, pathConstraints);
+    else
+      return AutoBuilder.pathfindToPoseFlipped(targetPose, pathConstraints);
   }
 
-  public Command followPath(final PathPlannerPath path) {
-    return AutoBuilder.followPath(path);
+  public Command followPath(final PathPlannerPath path, boolean fromfile) {
+
+    if (DriverStation.getAlliance().isPresent() == false)
+      return new Command() {};
+
+    if (DriverStation.getAlliance().equals(Alliance.Blue))
+      return AutoBuilder.followPath(path);
+    else
+      return AutoBuilder.followPath(path.flipPath());
+
   }
+
+  public Command followChoreoPath(final PathPlannerPath path) {
+
+    if (DriverStation.getAlliance().isPresent() == false)
+      return new Command() {};
+
+    if (DriverStation.getAlliance().equals(Alliance.Blue))
+      return AutoBuilder.followPath(path);
+    else
+      return AutoBuilder.followPath(path.flipPath());
+
+  }
+
 
   private void startSimThread() {
     m_lastSimTime = Utils.getCurrentTimeSeconds();

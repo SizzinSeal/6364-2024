@@ -77,10 +77,11 @@ public class Constants {
     public static final double kAngularPositionP = 0.5;
     public static final double kAngularPositionD = 0;
     // velocity/acceleration constraints
-    public static final double kMaxLateralSpeed = 0.5; // meters per second
+    public static final double kMaxLateralSpeed = 5; // meters per second
     public static final double kMaxLateralAcceleration = 2; // meters per second squared
-    public static final double kMaxAngularSpeed = 5; // radians per second
-    public static final double kMaxAngularAcceleration = 3; // radians per second squared
+    public static final double kMaxAngularSpeed = 9.42477796077; // radians per second
+    public static final double kMaxAngularAcceleration = 3.06998012384; // radians per second
+                                                                        // squared
     // movement tolerances
     public static final double kLateralTolerance = 0.2; // meters
     public static final double kAngularTolerance = 0.2; // radians
