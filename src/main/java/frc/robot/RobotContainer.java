@@ -8,6 +8,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,10 +58,21 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
+  private void ConfigureCommands() {
+    NamedCommands.registerCommand("Shooter.forwards", m_shooter.forwards());
+    NamedCommands.registerCommand("Shooter.backwards", m_shooter.reverse());
+    NamedCommands.registerCommand("Intake.in", m_intake.intake());
+    NamedCommands.registerCommand("Intake.out", m_intake.outake());
+    NamedCommands.registerCommand("Indexer.in", m_indexer.load());
+    NamedCommands.registerCommand("Indexer.out", m_indexer.eject());
+
+  }
+
   /**
    * @brief Configure the controller bindings for teleop
    */
   private void configureBindings() {
+    ConfigureCommands();
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
         m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
             .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
