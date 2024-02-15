@@ -228,19 +228,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   }
 
-  public Command followChoreoPath(final PathPlannerPath path) {
-
-    if (DriverStation.getAlliance().isPresent() == false)
-      return new Command() {};
-
-    if (DriverStation.getAlliance().equals(Alliance.Blue))
-      return AutoBuilder.followPath(path);
-    else
-      return AutoBuilder.followPath(path.flipPath());
-
-  }
-
-
   private void startSimThread() {
     m_lastSimTime = Utils.getCurrentTimeSeconds();
 

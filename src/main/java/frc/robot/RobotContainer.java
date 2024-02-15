@@ -59,13 +59,16 @@ public class RobotContainer {
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   private void ConfigureCommands() {
-    NamedCommands.registerCommand("Shooter.forwards", m_shooter.forwards());
-    NamedCommands.registerCommand("Shooter.backwards", m_shooter.reverse());
-    NamedCommands.registerCommand("Intake.in", m_intake.intake());
-    NamedCommands.registerCommand("Intake.out", m_intake.outake());
-    NamedCommands.registerCommand("Indexer.in", m_indexer.load());
-    NamedCommands.registerCommand("Indexer.out", m_indexer.eject());
+    NamedCommands.registerCommand("ShooterForwards", m_shooter.forwards());
+    NamedCommands.registerCommand("ShooterBackwards", m_shooter.reverse());
 
+    NamedCommands.registerCommand("IntakeIn", m_intake.intake());
+    NamedCommands.registerCommand("IntakeOut", m_intake.outake());
+    NamedCommands.registerCommand("IntakeStop", m_indexer.stop());
+
+    NamedCommands.registerCommand("IndexerIn", m_indexer.load());
+    NamedCommands.registerCommand("IndexerOut", m_indexer.eject());
+    NamedCommands.registerCommand("IndexerStop", m_indexer.stop());
   }
 
   /**
