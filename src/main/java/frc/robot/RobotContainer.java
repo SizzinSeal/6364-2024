@@ -67,46 +67,43 @@ public class RobotContainer {
    * @brief Configure the controller bindings for teleop
    */
   private void configureBindings() {
+
     // Set the default command for the drivetrain.
     // Executes command periodically.
     m_drivetrain.setDefaultCommand(
+        // Apply the swerve drive request.
+        m_drivetrain.applyRequest(() -> m_drive
+            // Set the desired velocity based on the y-axis left joystick.
+            .withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
+            // Set the desired velocity based on the x-axis left joystick.
+            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
+            // Input for field centric rotation. Refer to Swerve Request.
+            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-            // Drive
-            // forward
-            // with
-            // negative
-            // Y
-            // (forward)
-            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed) // Drive left with negative
-            // X (left)
-            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate) // Drive
-        // counterclockwise
-        // with
-        // negative X
-        // (left)
-        ));
-
+    // Brake.
     m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
+
+    // Point wheels.
     m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
         .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
-
-    // reset the field-centric heading on left bumper press
-
 
     // intake a note
     m_controller.rightBumper().whileTrue(m_intake.intake());
     m_controller.rightBumper().whileFalse(m_intake.stop());
+
     // indexer unstuck
     m_controller.x().whileTrue(m_indexer.load());
     m_controller.x().whileFalse(m_indexer.stop());
+
     // shoot a note
     m_controller.b().whileTrue(m_indexer.eject());
     m_controller.b().whileFalse(m_indexer.eject());
+
     // reset position if in simulation
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
+
     // register telemetry
     m_drivetrain.registerTelemetry(m_logger::telemeterize);
   }
