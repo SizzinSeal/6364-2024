@@ -8,15 +8,26 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
+  SendableChooser<Integer> autoChooser = new SendableChooser<>();
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     m_robotContainer.limelight1.init();
+
+    autoChooser.addOption("Auto1", 1);
+    autoChooser.addOption("Auto2", 2);
+    // etc.
+    SmartDashboard.putData("Autonomous routine", autoChooser);
+
   }
 
   @Override
@@ -41,6 +52,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    CommandScheduler.getInstance().schedule(m_robotContainer.getAutonomousCommand());
+
+    int autoMode = autoChooser.getSelected();
+    // Run the appropriate command
   }
 
   @Override
