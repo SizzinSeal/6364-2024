@@ -23,39 +23,56 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
-  private static final double kMaxSpeed = 2.0; // 6 meters per second desired top speed
-  private static final double kMaxAngularRate = Math.PI; // Half a rotation per second max angular
-                                                         // velocity
 
-  /* Setting up bindings for necessary control of the swerve drive platform */
+  // 6 meters per second desired top speed.
+  private static final double kMaxSpeed = 2.0;
+
+  // Half a rotation per second max angular velocity.
+  private static final double kMaxAngularRate = Math.PI;
+
+  // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
 
-  // subsystems
+  // Subsystems initialization.
   private final Intake m_intake = new Intake();
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_shooter = new Flywheel();
 
-  // Setting up bindings for necessary control of the swerve drive platform
+  // Controller initialization.
   private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
+
+  // Drivetrain initialization.
   private final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain; // My drivetrain
 
+  // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
-      .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // Add a 10%
-      // deadband
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
-                                                               // driving in open loop
-                                                               // TODO: change this to closed
-                                                               // loop velocity
+      // 10% drive deadband.
+      .withDeadband(kMaxSpeed * 0.2)
+      // 10% rotational deadband.
+      .withRotationalDeadband(kMaxAngularRate * 0.2)
+      // Using a velocity closed-loop request.
+      // Closed loop output type is set in the module constants in TunerConstants.
+      .withDriveRequestType(DriveRequestType.Velocity);
+
+  // Swerve brake request initialization.
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
+
+  // Swerve point wheels at request initialization.
   private final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
+
+  // Telemetry - logger - initialization.
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   /**
    * @brief Configure the controller bindings for teleop
    */
   private void configureBindings() {
-    m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed) // Drive
+    // Set the default command for the drivetrain.
+    // Executes command periodically.
+    m_drivetrain.setDefaultCommand(
+
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
+            // Drive
             // forward
             // with
             // negative
