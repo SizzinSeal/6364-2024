@@ -27,7 +27,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.autonomous.TrajectoryGen;
 
 public class RobotContainer {
   private static final double kMaxSpeed = 0.75; // 6 meters per second desired top speed
@@ -45,11 +44,7 @@ public class RobotContainer {
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
-  public static final TrajectoryGen m_trajectoryGenerator = new TrajectoryGen();
   private final SendableChooser<Command> autoChooser;
-
-  // My
-  // drivetrain
 
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
@@ -58,24 +53,23 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
-  private void ConfigureCommands() {
-    NamedCommands.registerCommand("ShooterForwards", m_shooter.forwards());
-    NamedCommands.registerCommand("ShooterBackwards", m_shooter.reverse());
+  // private void ConfigureCommands() {
+  // NamedCommands.registerCommand("ShooterForwards", m_shooter.forwards());
+  // NamedCommands.registerCommand("ShooterBackwards", m_shooter.reverse());
 
-    NamedCommands.registerCommand("IntakeIn", m_intake.intake());
-    NamedCommands.registerCommand("IntakeOut", m_intake.outake());
-    NamedCommands.registerCommand("IntakeStop", m_indexer.stop());
+  // NamedCommands.registerCommand("IntakeIn", m_intake.intake());
+  // NamedCommands.registerCommand("IntakeOut", m_intake.outake());
+  // NamedCommands.registerCommand("IntakeStop", m_indexer.stop());
 
-    NamedCommands.registerCommand("IndexerIn", m_indexer.load());
-    NamedCommands.registerCommand("IndexerOut", m_indexer.eject());
-    NamedCommands.registerCommand("IndexerStop", m_indexer.stop());
-  }
+  // NamedCommands.registerCommand("IndexerIn", m_indexer.load());
+  // NamedCommands.registerCommand("IndexerOut", m_indexer.eject());
+  // NamedCommands.registerCommand("IndexerStop", m_indexer.stop());
+  // }
 
   /**
    * @brief Configure the controller bindings for teleop
    */
   private void configureBindings() {
-    ConfigureCommands();
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
         m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
             .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)

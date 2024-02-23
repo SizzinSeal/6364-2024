@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.autonomous.TrajectoryGen;
 
 public class Telemetry {
   private final double MaxSpeed;
@@ -77,12 +76,9 @@ public class Telemetry {
 
   public void telemeterize(SwerveDriveState state) {
     /* Telemeterize the pose */
-    TrajectoryGen trajgen = RobotContainer.m_trajectoryGenerator;
     Pose2d pose = RobotContainer.m_drivetrain.getState().Pose;
     fieldTypePub.set("Field2d");
     fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
-
-    field.getObject("Path/Targetpose").setPose(trajgen.getTargetPose());
 
     field.getObject("Robot").setPose(pose);
 
