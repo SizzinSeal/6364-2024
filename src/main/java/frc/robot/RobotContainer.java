@@ -32,14 +32,17 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
-  private static final double kMaxSpeed = 0.75; // 6 meters per second desired top speed
-  private static final double kMaxAngularRate = Math.PI; // Half a rotation per second max angular
-                                                         // velocity
 
-  /* Setting up bindings for necessary control of the swerve drive platform */
+  // 6 meters per second desired top speed.
+  private static final double kMaxSpeed = 2.0;
+
+  // Half a rotation per second max angular velocity.
+  private static final double kMaxAngularRate = Math.PI;
+
+  // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
 
-  // subsystems
+  // Subsystems initialization.
   private final Intake m_intake = new Intake();
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_shooter = new Flywheel();
@@ -51,11 +54,13 @@ public class RobotContainer {
   private BooleanSupplier shooterStateSupplier = () -> m_shooter.isAtSpeed();
   private BooleanSupplier noteStateSupplier = () -> m_indexer.noteDetected();
 
+  // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
       .withDriveRequestType(DriveRequestType.Velocity); // closed loop velocity control
 
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
+
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   private void ConfigureCommands() {
@@ -86,9 +91,6 @@ public class RobotContainer {
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
     // -m_controller.getLeftX()))));
 
-    // reset the field-centric heading on left bumper press
-    m_controller.leftBumper().onTrue(m_drivetrain.runOnce(() -> m_drivetrain.seedFieldRelative()));
-
     // intake a note
     m_controller.rightBumper()
         .onTrue(Commands.sequence(m_intake.intake(), m_indexer.load(), m_intake.stop()));
@@ -101,8 +103,8 @@ public class RobotContainer {
     m_controller.y().onTrue(m_indexer.load());
 
     // shoot a note
-    m_controller.b().onTrue(Commands.sequence(m_shooter.forwards(), Commands.waitSeconds(3.0),
-        m_indexer.eject(), Commands.waitSeconds(0.8), m_shooter.stop(), m_indexer.stop()));
+    m_controller.b().whileTrue(m_indexer.eject());
+    m_controller.b().whileFalse(m_indexer.eject());
 
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
