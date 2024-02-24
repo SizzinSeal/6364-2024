@@ -1,6 +1,6 @@
 {
   "HALProvider": {
-    "Timing": {
+    "Other Devices": {
       "window": {
         "visible": false
       }
@@ -10,6 +10,11 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Pose": "Field2d",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Flywheel": "Subsystem",
+      "/SmartDashboard/Indexer": "Subsystem",
+      "/SmartDashboard/Intake": "Subsystem",
       "/SmartDashboard/Module 0": "Mechanism2d",
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
@@ -17,13 +22,43 @@
     },
     "windows": {
       "/Pose": {
-        "bottom": 544,
-        "builtin": "2024 Crescendo",
-        "height": 8.013679504394531,
-        "left": 46,
-        "right": 1088,
-        "top": 36,
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
         "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Auto Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Flywheel": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Indexer": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Intake": {
         "window": {
           "visible": true
         }
@@ -35,13 +70,55 @@
       "Drive": {
         "open": true
       },
+      "LiveWindow": {
+        "open": true
+      },
       "Pose": {
         "double[]##v_/Pose/robotPose": {
           "open": true
         },
         "open": true
+      },
+      "SmartDashboard": {
+        "Auto Chooser": {
+          "open": true,
+          "string[]##v_/SmartDashboard/Auto Chooser/options": {
+            "open": true
+          }
+        },
+        "Field": {
+          "open": true
+        },
+        "Module 0": {
+          "RootDirection": {
+            "open": true
+          },
+          "RootSpeed": {
+            "open": true
+          },
+          "open": true
+        },
+        "Module 1": {
+          "RootDirection": {
+            "Direction": {
+              "open": true
+            },
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
       }
     }
+  },
+  "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Server": {
+      "open": true
+    },
+    "visible": true
   },
   "Plot": {
     "Plot <0>": {

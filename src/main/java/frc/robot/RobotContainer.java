@@ -4,20 +4,29 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.Field;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -38,66 +47,68 @@ public class RobotContainer {
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_shooter = new Flywheel();
 
-  // Controller initialization.
-  private final CommandXboxController m_controller = new CommandXboxController(0); // My joystick
-
-  // Drivetrain initialization.
-  private final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  // Setting up bindings for necessary control of the swerve drive platform
+  private final CommandXboxController m_controller = new CommandXboxController(0);
+  public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
+  private final SendableChooser<Command> autoChooser;
+  private BooleanSupplier shooterStateSupplier = () -> m_shooter.isAtSpeed();
+  private BooleanSupplier noteStateSupplier = () -> m_indexer.noteDetected();
 
   // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
-      // 10% drive deadband.
-      .withDeadband(kMaxSpeed * 0.2)
-      // 10% rotational deadband.
-      .withRotationalDeadband(kMaxAngularRate * 0.2)
-      // Using a velocity closed-loop request.
-      // Closed loop output type is set in the module constants in TunerConstants.
-      .withDriveRequestType(DriveRequestType.Velocity);
+      .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
+      .withDriveRequestType(DriveRequestType.Velocity); // closed loop velocity control
 
-  // Swerve brake request initialization.
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
 
-  // Swerve point wheels at request initialization.
-  private final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
-
-  // Telemetry - logger - initialization.
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
+
+  private void ConfigureCommands() {
+    NamedCommands.registerCommand("Shoot",
+        (m_shooter.forwards().andThen(m_indexer.eject())).until(shooterStateSupplier));
+    NamedCommands.registerCommand("IntakeNote",
+        m_intake.intake().alongWith(m_indexer.load()).until(noteStateSupplier));
+  }
 
   /**
    * @brief Configure the controller bindings for teleop
    */
   private void configureBindings() {
-
-    // Set the default command for the drivetrain.
-    // Executes command periodically.
-    m_drivetrain.setDefaultCommand(
-        // Apply the swerve drive request.
-        m_drivetrain.applyRequest(() -> m_drive
-            // Set the desired velocity based on the y-axis left joystick.
-            .withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-            // Set the desired velocity based on the x-axis left joystick.
+    m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
             .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
-            // Input for field centric rotation. Refer to Swerve Request.
-            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
+            .withRotationalRate(-m_controller.getRightX())));
 
-    // Brake.
-    m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
+    // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
-    // Point wheels.
-    m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
-        .withModuleDirection(new Rotation2d(-m_controller.getLeftY(), -m_controller.getLeftX()))));
+    // m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
+    // .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
+
+    m_controller.a().whileTrue(m_drivetrain
+        .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5), Rotation2d.fromDegrees(180)))));
+
+    // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
+    // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
+    // -m_controller.getLeftX()))));
 
     // intake a note
-    m_controller.rightBumper().whileTrue(m_intake.intake());
-    m_controller.rightBumper().whileFalse(m_intake.stop());
+    m_controller.rightBumper()
+        .onTrue(Commands.sequence(m_intake.intake(), m_indexer.load(), m_intake.stop()));
 
     // indexer unstuck
-    m_controller.x().whileTrue(m_indexer.load());
-    m_controller.x().whileFalse(m_indexer.stop());
+    m_controller.x()
+        .onTrue(Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5), m_indexer.load()));
+
+    // load a note into the indexer
+    m_controller.y().onTrue(m_indexer.load());
 
     // shoot a note
     m_controller.b().whileTrue(m_indexer.eject());
     m_controller.b().whileFalse(m_indexer.eject());
+
+    // move to the Amp
+    // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
+    // m_drivetrain));
 
     // reset position if in simulation
     if (Utils.isSimulation()) {
@@ -144,11 +155,15 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon startup
+   * @brief Construct the container for the robot. This will be called upon
+   *        startup
    */
   public RobotContainer() {
+    ConfigureCommands();
+    autoChooser = AutoBuilder.buildAutoChooser();
     configureBindings();
     limelight1.init();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     SmartDashboard.putData("Intake", m_intake);
     SmartDashboard.putData("Indexer", m_indexer);
     SmartDashboard.putData("Flywheel", m_shooter);
@@ -160,6 +175,6 @@ public class RobotContainer {
    * @return Command
    */
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autoChooser.getSelected();
   }
 }

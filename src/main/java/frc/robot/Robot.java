@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
   private RobotContainer m_robotContainer;
 
   SendableChooser<Integer> autoChooser = new SendableChooser<>();
@@ -27,7 +26,6 @@ public class Robot extends TimedRobot {
     autoChooser.addOption("Auto2", 2);
     // etc.
     SmartDashboard.putData("Autonomous routine", autoChooser);
-
   }
 
   @Override
@@ -35,9 +33,6 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     m_robotContainer.updatePoseEstimator();
   }
-
-  @Override
-  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {}

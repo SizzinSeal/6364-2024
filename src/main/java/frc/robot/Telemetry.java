@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
@@ -10,6 +9,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +28,7 @@ public class Telemetry {
     MaxSpeed = maxSpeed;
   }
 
-  /* What to publish over networktables for telemetry */
+  /* What to publish over Network Tables for telemetry */
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
   /* Robot pose for field positioning */
@@ -71,12 +71,18 @@ public class Telemetry {
       m_moduleMechanisms[3].getRoot("RootDirection", 0.5, 0.5)
           .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),};
 
-  /* Accept the swerve drive state and telemeterize it to smartdashboard */
+  /* Accept the swerve drive state and telemeterize it to SmartDashboard */
+  Field2d field = new Field2d();
+
   public void telemeterize(SwerveDriveState state) {
     /* Telemeterize the pose */
-    Pose2d pose = state.Pose;
+    Pose2d pose = RobotContainer.m_drivetrain.getState().Pose;
     fieldTypePub.set("Field2d");
     fieldPub.set(new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
+
+    field.getObject("Robot").setPose(pose);
+
+    SmartDashboard.putData("Field", field);
 
     /* Telemeterize the robot's general speeds */
     double currentTime = Utils.getCurrentTimeSeconds();
