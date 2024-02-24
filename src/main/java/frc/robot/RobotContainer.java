@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Field;
 import frc.robot.Vision.MeasurementInfo;
@@ -45,6 +48,8 @@ public class RobotContainer {
   private final CommandXboxController m_controller = new CommandXboxController(0);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   private final SendableChooser<Command> autoChooser;
+  private BooleanSupplier shooterStateSupplier = () -> m_shooter.isAtSpeed();
+  private BooleanSupplier noteStateSupplier = () -> m_indexer.noteDetected();
 
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
@@ -53,18 +58,12 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
-  // private void ConfigureCommands() {
-  // NamedCommands.registerCommand("ShooterForwards", m_shooter.forwards());
-  // NamedCommands.registerCommand("ShooterBackwards", m_shooter.reverse());
-
-  // NamedCommands.registerCommand("IntakeIn", m_intake.intake());
-  // NamedCommands.registerCommand("IntakeOut", m_intake.outake());
-  // NamedCommands.registerCommand("IntakeStop", m_indexer.stop());
-
-  // NamedCommands.registerCommand("IndexerIn", m_indexer.load());
-  // NamedCommands.registerCommand("IndexerOut", m_indexer.eject());
-  // NamedCommands.registerCommand("IndexerStop", m_indexer.stop());
-  // }
+  private void ConfigureCommands() {
+    NamedCommands.registerCommand("Shoot",
+        (m_shooter.forwards().andThen(m_indexer.eject())).until(shooterStateSupplier));
+    NamedCommands.registerCommand("IntakeNote",
+        m_intake.intake().alongWith(m_indexer.load()).until(noteStateSupplier));
+  }
 
   /**
    * @brief Configure the controller bindings for teleop
@@ -154,9 +153,11 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon startup
+   * @brief Construct the container for the robot. This will be called upon
+   *        startup
    */
   public RobotContainer() {
+    ConfigureCommands();
     autoChooser = AutoBuilder.buildAutoChooser();
     configureBindings();
     limelight1.init();
