@@ -14,12 +14,10 @@ import edu.wpi.first.math.util.Units;
 /**
  * @brief LimeLight wrapper
  *
- *        We interact with the limelight through networktables. It posts data,
- *        and we need to read
+ *        We interact with the limelight through networktables. It posts data, and we need to read
  *        that data from networktables.
  * 
- *        Using networktables all the time inflates code size, so we have this
- *        wrapper to simplify
+ *        Using networktables all the time inflates code size, so we have this wrapper to simplify
  *        using limelights
  */
 public class Vision {
@@ -54,8 +52,7 @@ public class Vision {
   /**
    * @brief initialize the limelight
    * 
-   *        This is not run in the constructor because it is not safe to run
-   *        networktables during
+   *        This is not run in the constructor because it is not safe to run networktables during
    *        program startup, as the networktables server may not be running yet.
    */
   public void init() {
@@ -100,9 +97,14 @@ public class Vision {
    * @return Pose2d 2D position measured by the limelight
    */
   public Pose2d getPos2D() {
-    final double[] raw = m_poseSubscriber.get();
-    return new Pose2d(new Translation2d(raw[0], raw[1]),
-        new Rotation2d(Units.degreesToRadians(raw[5])));
+    try {
+      final double[] raw = m_poseSubscriber.get();
+      return new Pose2d(new Translation2d(raw[0], raw[1]),
+          new Rotation2d(Units.degreesToRadians(raw[5])));
+    } catch (NullPointerException e) {
+      System.out.println(e.toString());
+      return null;
+    }
   }
 
   /**
@@ -112,10 +114,11 @@ public class Vision {
    */
   public double getDist3D() {
     // get the measured pose in the target coordinate system
-    final double[] measuredPoseArray = m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
+    final double[] measuredPoseArray =
+        m_table.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
     // create the vector
-    final Translation3d measuredPose = new Translation3d(measuredPoseArray[0], measuredPoseArray[1],
-        measuredPoseArray[2]);
+    final Translation3d measuredPose =
+        new Translation3d(measuredPoseArray[0], measuredPoseArray[1], measuredPoseArray[2]);
     // return the magnitude of the vector
     return measuredPose.getNorm();
   }

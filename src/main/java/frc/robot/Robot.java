@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    m_robotContainer.updatePoseEstimator();
+    // m_robotContainer.updatePoseEstimator();
   }
 
   @Override
@@ -49,8 +49,11 @@ public class Robot extends TimedRobot {
     }
     CommandScheduler.getInstance().schedule(m_robotContainer.getAutonomousCommand());
 
-    int autoMode = autoChooser.getSelected();
-    // Run the appropriate command
+    try {
+      int autoMode = autoChooser.getSelected();
+    } catch (Exception e) {
+      System.out.println(e.toString());
+    }
   }
 
   @Override

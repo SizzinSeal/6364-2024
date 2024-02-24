@@ -157,7 +157,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
    * @brief get the scalar distance between the robot and a position
    */
   public double getPoseDifference(final Pose2d pose) {
-    return m_odometry.getEstimatedPosition().getTranslation().getDistance(pose.getTranslation());
+    try {
+      return m_odometry.getEstimatedPosition().getTranslation().getDistance(pose.getTranslation());
+    } catch (NullPointerException e) {
+      System.out.println(e.toString());
+      return 0.0;
+    }
   }
 
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
