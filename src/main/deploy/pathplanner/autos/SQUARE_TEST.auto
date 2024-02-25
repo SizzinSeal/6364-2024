@@ -5,7 +5,7 @@
       "x": 1,
       "y": 2
     },
-    "rotation": -1.6443398414444439e-29
+    "rotation": 89.95437383553926
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SQUARE"
+            "pathName": "TESTSQUARE"
           }
         }
       ]

@@ -43,5 +43,6 @@
       "Odometry",
       "Pathfinding",
       "telemeterize"
-    ]
+    ],
+    "editor.guides.indentation": false
 }

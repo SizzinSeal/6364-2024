@@ -33,94 +33,47 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.SimConstants;
 import me.nabdev.pathfinding.structures.Path;
 
 /**
- * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem so it can be used
- * in command-based projects easily.
+ * Drivetrain Subsystem
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
-  private static final double kSimLoopPeriod = 0.005; // 5 ms
+
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
-      double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
-    super(driveTrainConstants, OdometryUpdateFrequency, modules);
-    if (Utils.isSimulation()) {
-      startSimThread();
-    }
-
-    // Configure AutoBuilder last
-    AutoBuilder.configureHolonomic(this::getPose, // Robot pose supplier
-        this::seedFieldRelative, // Method to reset odometry (will be called if your auto has a
-                                 // starting pose)
-        this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE
-                                  // ChassisSpeeds
-        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in
-                                         // your Constants class
-            new PIDConstants(3.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(3.0, 0.0, 0.0), // Rotation PID constants
-            4.5, // Max module speed, in m/s
-            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-            new ReplanningConfig(true, true) // Default path replanning config. See the API for the
-                                             // options
-        // here
-        ), () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        }, this // Reference to this subsystem to set requirements
-    );
-
-
-  }
-
-  public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
       SwerveModuleConstants... modules) {
     super(driveTrainConstants, modules);
+
     if (Utils.isSimulation()) {
       startSimThread();
     }
-    // Configure AutoBuilder last
-    AutoBuilder.configureHolonomic(this::getPose, // Robot pose supplier
-        this::seedFieldRelative, // Method to reset odometry (will be called if your auto has a
-                                 // starting pose)
-        this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE
-                                  // ChassisSpeeds
-        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live
-                                         // in your Constants
-                                         // class
-            new PIDConstants(4.0, 0.0, 0.5), // Translation PID constants
-            new PIDConstants(4.0, 0.0, 0.5), // Rotation PID constants
-            4.5, // Max module speed, in m/s
-            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-            new ReplanningConfig(true, true) // Default path replanning config. See the API for
-                                             // the options here
-        ), () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
+    AutoBuilder.configureHolonomic(this::getPose, // Supply robot pose. See SwerveDrivetrain
+                                                  // superclass.
+        this::seedFieldRelative, // Reset odometry (only called if auto has a set starting
+                                 // pose).
+        this::getChassisSpeeds, // Supply robot relative chassis speed.
+        this::driveRobotRelative, // Drive the robot given robot relative chassis speeds.
+        new HolonomicPathFollowerConfig(Constants.PathPlanner.kTranslationalPIDConstants,
+            Constants.PathPlanner.kRotationalPIDConstants, Constants.PathPlanner.kMaxModuleSpeed,
+            Constants.PathPlanner.kDriveBaseRadius, Constants.PathPlanner.kReplanningConfig),
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance.
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE.
           var alliance = DriverStation.getAlliance();
           if (alliance.isPresent()) {
             return alliance.get() == DriverStation.Alliance.Red;
           }
           return false;
-        }, this // Reference to this subsystem to set requirements
+        }, this // Reference to this subsystem to set requirements.
     );
   }
-
 
   public List<Translation2d> generatebezierPoints(Path path) {
     return PathPlannerPath.bezierFromPoses(path.asPose2dList());
@@ -154,13 +107,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   }
 
   /**
-   * @brief get the scalar distance between the robot and a position
+   * Calculate the scalar distance between the robot position and a given position.
    */
   public double getPoseDifference(final Pose2d pose) {
     try {
       return m_odometry.getEstimatedPosition().getTranslation().getDistance(pose.getTranslation());
     } catch (NullPointerException e) {
-      System.out.println(e.toString());
+      System.out.println(e);
       return 0.0;
     }
   }
@@ -173,12 +126,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         .withDriveRequestType(DriveRequestType.Velocity)
         .withSteerRequestType(SteerRequestType.MotionMagic));
   }
-
-  /**
-   * @brief get the scalar speed of the robot in meters per second
-   * 
-   * @return double
-   */
 
   public SwerveDriveKinematics getKinematics() {
     return m_kinematics;
@@ -246,7 +193,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       /* use the measured time delta, get battery voltage from WPILib */
       updateSimState(deltaTime, RobotController.getBatteryVoltage());
     });
-    m_simNotifier.startPeriodic(kSimLoopPeriod);
+    m_simNotifier.startPeriodic(SimConstants.kSimLoopPeriod);
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
