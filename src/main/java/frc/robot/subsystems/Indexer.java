@@ -28,8 +28,8 @@ public class Indexer extends SubsystemBase {
   // control output objects
   private final VoltageOut m_motorVelocity = new VoltageOut(0);
   // simulation objects
-  private final TalonFXSimState m_upperMotorSimState = m_motor.getSimState();
-  private final DCMotorSim m_upperMotorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
+  private final TalonFXSimState m_motorSimState = m_motor.getSimState();
+  private final DCMotorSim m_motorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
 
   /**
    * @brief IndexerSubsystem constructor
@@ -40,13 +40,15 @@ public class Indexer extends SubsystemBase {
   public Indexer() {
     super();
     // configure motors
-    TalonFXConfiguration upperConfig = new TalonFXConfiguration();
+    final TalonFXConfiguration motorConfig = new TalonFXConfiguration();
     // set controller gains
-    upperConfig.Slot0 = kMotorControllerConstants;
+    motorConfig.Slot0 = kMotorControllerConstants;
     // invert motors
-    upperConfig.MotorOutput.Inverted = kInverted;
+    motorConfig.MotorOutput.Inverted = kInverted;
+    // set gear ratio
+    motorConfig.Feedback.SensorToMechanismRatio = kRatio;
     // apply configuration
-    m_motor.getConfigurator().apply((upperConfig));
+    m_motor.getConfigurator().apply((motorConfig));
     m_motor.setNeutralMode(NeutralModeValue.Brake);
   }
 
@@ -111,14 +113,14 @@ public class Indexer extends SubsystemBase {
     if (Utils.isSimulation()) {
       // update simulated motors
       // set supply voltage (voltage of the simulated battery)
-      m_upperMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+      m_motorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
       // set motor sim input voltage
-      m_upperMotorSim.setInputVoltage(m_upperMotorSimState.getMotorVoltage());
+      m_motorSim.setInputVoltage(m_motorSimState.getMotorVoltage());
       // update motor sim
-      m_upperMotorSim.update(kSimLoopPeriod);
+      m_motorSim.update(kSimLoopPeriod);
       // update motor sim state
-      m_upperMotorSimState.setRawRotorPosition(m_upperMotorSim.getAngularPositionRotations());
-      m_upperMotorSimState.setRotorVelocity(m_upperMotorSim.getAngularVelocityRPM() / 60.0);
+      m_motorSimState.setRawRotorPosition(m_motorSim.getAngularPositionRotations());
+      m_motorSimState.setRotorVelocity(m_motorSim.getAngularVelocityRPM() / 60.0);
     }
   }
 

@@ -42,6 +42,7 @@
       "holonomic",
       "Odometry",
       "Pathfinding",
+      "Quasistatic",
       "telemeterize"
     ],
     "editor.guides.indentation": false
