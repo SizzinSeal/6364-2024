@@ -142,5 +142,6 @@ public class Indexer extends SubsystemBase {
     // add measured velocity property
     builder.addDoubleProperty("Measured Velocity", () -> m_motor.getVelocity().getValueAsDouble(),
         null);
+    builder.addBooleanProperty("Note Detected", () -> this.noteDetected(), null);
   }
 }
