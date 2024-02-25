@@ -79,8 +79,8 @@ public class RobotContainer {
     // m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
     // .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
 
-    m_controller.a().whileTrue(m_drivetrain
-        .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5), Rotation2d.fromDegrees(180)))));
+    // m_controller.a().whileTrue(m_drivetrain
+    // .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5), Rotation2d.fromDegrees(180)))));
 
     // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
