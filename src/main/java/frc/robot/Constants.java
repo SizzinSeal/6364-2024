@@ -21,15 +21,17 @@ public class Constants {
     public static final String kDeployerBus = "rio";
     // motor inversion
     public static final InvertedValue kIntakeInverted = InvertedValue.Clockwise_Positive;
-    public static final InvertedValue kDeployerInverted = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue kDeployerInverted = InvertedValue.CounterClockwise_Positive;
     // controller constants
-    public static final Slot0Configs kIntakeControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
-    public static final Slot0Configs kDeployerControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kIntakeControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kDeployerControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
     // speed
     public static final double kIntakeSpeed = .8 * 12; // rotations per second
-    public static final double kDeployerSpeed = .8 * 12; // rotations per second
+    // position
+    public static final double kUpPosition = 0;
+    public static final double kDownPosition = 18;
   }
 
   public class Shooter {
@@ -46,12 +48,12 @@ public class Constants {
     public static final InvertedValue kLowerInverted = InvertedValue.CounterClockwise_Positive;
     public static final InvertedValue kAnglerInverted = InvertedValue.Clockwise_Positive;
     // controller constants
-    public static final Slot0Configs kUpperControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
-    public static final Slot0Configs kLowerControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
-    public static final Slot0Configs kAnglerControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kUpperControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kLowerControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kAnglerControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
     // speeds
     public static final double kUpperSpeed = .9 * 12; // rotations per second
     public static final double kLowerSpeed = .9 * 12; // rotations per second
@@ -71,8 +73,8 @@ public class Constants {
     // motor inversion
     public static final InvertedValue kInverted = InvertedValue.Clockwise_Positive;
     // controller constants
-    public static final Slot0Configs kMotorControllerConstants =
-        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kMotorControllerConstants = new Slot0Configs().withKP(0.01).withKI(0).withKD(0)
+        .withKS(0).withKV(0).withKA(0);
     // speeds
     public static final double kSpeed = .9 * 12; // rotations per second
   }
@@ -98,9 +100,8 @@ public class Constants {
     public static final double kBotWidth = 0.7; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-            .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+        .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
   }
 
   public class PathPlanner {
@@ -119,16 +120,16 @@ public class Constants {
     // Blue Amp Lineup Pos
     public static final double kBlueAmpLineupX = 3;
     public static final double kBlueAmpLineupY = 5;
-    public static final double kBlueAmpLineupTheta =
-        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
+        kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 14;
     public static final double kRedAmpLineupY = 5;
-    public static final double kRedAmpLineupTheta =
-        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
+    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
+        .getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()

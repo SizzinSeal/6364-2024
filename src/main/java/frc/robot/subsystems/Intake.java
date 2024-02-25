@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -13,7 +14,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static frc.robot.Constants.Intake.*;
 
-
 /**
  * @brief Intake Subsystem
  * 
@@ -22,34 +22,45 @@ public class Intake extends SubsystemBase {
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   // init motors
   private final TalonFX m_intakeMotor = new TalonFX(kIntakeId, kIntakeBus);
+  private final TalonFX m_deployerMotor = new TalonFX(kDeployerId, kDeployerBus);
   // control output objects
   private final VoltageOut m_intakeVelocity = new VoltageOut(0);
   // simulation objects
   private final TalonFXSimState m_intakeMotorSimState = m_intakeMotor.getSimState();
   private final DCMotorSim m_intakeMotorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
+  // sysid routines
 
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Intake() {
     super();
     // configure motors
     TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
+    TalonFXConfiguration deployerConfig = new TalonFXConfiguration();
     // set controller gains
     intakeConfig.Slot0 = kIntakeControllerConstants;
+    deployerConfig.Slot0 = kDeployerControllerConstants;
     // invert motors
     intakeConfig.MotorOutput.Inverted = kIntakeInverted;
+    deployerConfig.MotorOutput.Inverted = kDeployerInverted;
     // apply configuration
-    m_intakeMotor.getConfigurator().apply((intakeConfig));
+    m_intakeMotor.getConfigurator().apply(intakeConfig);
+    m_deployerMotor.getConfigurator().apply(deployerConfig);
+    // set deployer position to 0
+    m_deployerMotor.setPosition(0);
   }
 
   /**
    * @brief Update motor speeds
    * 
-   *        This is where we actually set the motor speeds. We do this in a seperate method to
+   *        This is where we actually set the motor speeds. We do this in a
+   *        seperate method to
    *        simplify the commands that change the target velocity.
    */
   private void updateMotorSpeeds() {
@@ -95,7 +106,8 @@ public class Intake extends SubsystemBase {
   /**
    * @brief periodic update method
    * 
-   *        This method is called periodically by the scheduler. We use it to update the simulated
+   *        This method is called periodically by the scheduler. We use it to
+   *        update the simulated
    *        motors.
    */
   @Override
@@ -117,9 +129,12 @@ public class Intake extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */
@@ -135,5 +150,7 @@ public class Intake extends SubsystemBase {
     // add upper motor measured velocity property
     builder.addDoubleProperty("Upper Measured Velocity",
         () -> m_intakeMotor.getVelocity().getValueAsDouble(), null);
+    // add deployer position property
+    builder.addDoubleProperty("Deployer Position", () -> m_deployerMotor.getPosition().getValueAsDouble(), null);
   }
 }
