@@ -87,8 +87,8 @@ public class RobotContainer {
     // -m_controller.getLeftX()))));
 
     // intake a note
-    m_controller.rightBumper()
-        .onTrue(Commands.sequence(m_intake.intake(), m_indexer.load(), m_intake.stop()));
+    m_controller.rightBumper().onTrue(m_intake.intake());
+    m_controller.rightBumper().onFalse(m_intake.stop());
 
     // indexer unstuck
     m_controller.x()
@@ -98,8 +98,8 @@ public class RobotContainer {
     m_controller.y().onTrue(m_indexer.load());
 
     // shoot a note
-    m_controller.b().whileTrue(m_indexer.eject());
-    m_controller.b().whileFalse(m_indexer.eject());
+    m_controller.b().onTrue(m_shooter.forwards());
+    m_controller.b().onFalse(m_shooter.stop());
 
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),

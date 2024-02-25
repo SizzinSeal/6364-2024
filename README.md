@@ -7,6 +7,21 @@ If you have been granted access to this repo, do not share any of the source unl
 ## Contributing
 See [contributing.md](contributing.md) on how to contribute to the project. It contains instructions on how to download all the necessary software
 
+## Automation
+
+No Note Detected in Indexer - angler down
+Note Detected in Indexer - angler up
+
+## Controls
+| Button      | Action    | Command                                          |
+| ----------- | --------- | ------------------------------------------------ |
+| RT          | whileTrue | Intake Deploy & Intake & indexer load            |
+| RT          | onFalse   | Intake Stop & Indexer Stop & deployer stays down |
+| RB          | onTrue    | deployer Up                                      |
+| LB          | onTrue    | Shoot                                            |
+| D-Up        | onTrue    | climber up                                       |
+| D-Down      | onTrue    | climber down                                     |
+
 ## CAN IDs
 | Device      | CAN ID      | Bus         |
 | ----------- | ----------- | ----------- |
