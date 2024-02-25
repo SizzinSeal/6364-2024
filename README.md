@@ -10,19 +10,30 @@ See [contributing.md](contributing.md) on how to contribute to the project. It c
 ## CAN IDs
 | Device      | CAN ID      | Bus         |
 | ----------- | ----------- | ----------- |
-| FL Drive    | 3           | RIO         |
-| FL Steering | 7           | RIO         |
-| FL CANcoder | 11          | RIO         |
-| FR Drive    | 1           | RIO         |
-| FR Steering | 5           | RIO         |
-| FR CANcoder | 9           | RIO         |
-| BL Drive    | 2           | RIO         |
-| BL Steering | 6           | RIO         |
-| BL CANcoder | 10          | RIO         |
-| BR Drive    | 4           | RIO         |
-| BR Steering | 8           | RIO         |
-| BR CANcoder | 12          | RIO         |
-| Pigeon 2.0  | 13          | RIO         |
+| FL Drive    | 3           | drivecan    |
+| FL Steering | 7           | drivecan    |
+| FL CANcoder | 11          | drivecan    |
+| FR Drive    | 1           | drivecan    |
+| FR Steering | 5           | drivecan    |
+| FR CANcoder | 9           | drivecan    |
+| BL Drive    | 2           | drivecan    |
+| BL Steering | 6           | drivecan    |
+| BL CANcoder | 10          | drivecan    |
+| BR Drive    | 4           | drivecan    |
+| BR Steering | 8           | drivecan    |
+| BR CANcoder | 12          | drivecan    |
+| Pigeon 2.0  | 13          | drivecan    |
+
+#### Subsystems
+| Device        | CAN ID      | Bus         |
+| ------------- | ----------- | ----------- |
+| Upper Shooter | 14          | rio         |
+| Lower Shooter | 15          | rio         |
+| Indexer       | 19          | rio         |
+| Climber       | 16          | rio         |
+| Angler        | 17          | rio         |
+| Deployer      | 18          | rio         |
+| Intake        | 20          | rio         |
 
 ## Phoenix Pro
 We use the Phoenix Pro vendordep for interacting with CTRE hardware, such as cancoders and TalonFX motors. It has several advantageous over Phoenix 6:
