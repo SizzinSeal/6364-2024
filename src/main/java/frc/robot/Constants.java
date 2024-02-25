@@ -14,53 +14,60 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class Constants {
   public class Intake {
     // motor ids
-    public static final int kUpperMotorId = 14;
-    public static final int kLowerMotorId = 15;
-    // motor CAN bus names
-    public static final String kUpperBusName = "";
-    public static final String kLowerBusName = "";
+    public static final int kIntakeId = 20;
+    public static final int kDeployerId = 18;
+    // CAN bus name
+    public static final String kIntakeBus = "rio";
+    public static final String kDeployerBus = "rio";
     // motor inversion
-    public static final InvertedValue kUpperInverted = InvertedValue.Clockwise_Positive;
-    public static final InvertedValue kLowerInverted = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue kIntakeInverted = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue kDeployerInverted = InvertedValue.Clockwise_Positive;
     // controller constants
-    public static final Slot0Configs kUpperControllerConstants =
+    public static final Slot0Configs kIntakeControllerConstants =
         new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
-    public static final Slot0Configs kLowerControllerConstants =
+    public static final Slot0Configs kDeployerControllerConstants =
         new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
-    // speeds
-    public static final double kUpperSpeed = .8 * 12; // rotations per second
-    public static final double kLowerSpeed = .8 * 12; // rotations per second
+    // speed
+    public static final double kIntakeSpeed = .8 * 12; // rotations per second
+    public static final double kDeployerSpeed = .8 * 12; // rotations per second
   }
 
-  public class Flywheel {
+  public class Shooter {
     // motor ids
-    public static final int kUpperMotorId = 16;
-    public static final int kLowerMotorId = 17;
+    public static final int kUpperId = 14;
+    public static final int kLowerId = 15;
+    public static final int kAnglerId = 17;
     // motor CAN bus names
-    public static final String kUpperBusName = "";
-    public static final String kLowerBusName = "";
+    public static final String kUpperBus = "rio";
+    public static final String kLowerBus = "rio";
+    public static final String kAnglerBus = "rio";
     // motor inversion
     public static final InvertedValue kUpperInverted = InvertedValue.Clockwise_Positive;
     public static final InvertedValue kLowerInverted = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue kAnglerInverted = InvertedValue.Clockwise_Positive;
     // controller constants
     public static final Slot0Configs kUpperControllerConstants =
         new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
     public static final Slot0Configs kLowerControllerConstants =
+        new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+    public static final Slot0Configs kAnglerControllerConstants =
         new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
     // speeds
     public static final double kUpperSpeed = .9 * 12; // rotations per second
     public static final double kLowerSpeed = .9 * 12; // rotations per second
+    public static final double kAnglerSpeed = .9 * 12; // rotations per second
     // tolerances
-    public static final double kUpperTolerance = 5; // revolutions per second
-    public static final double kLowerTolerance = 5; // revolutions per second
+    public static final double kUpperTolerance = 5; // rotations per second
+    public static final double kLowerTolerance = 5; // rotations per second
+    public static final double kAnglerTolerance = 5; // rotations per second
   }
 
   public class Indexer {
-    // ids
-    public static final int kMotorId = 18;
+    // motor ids
+    public static final int kMotorId = 19;
     public static final int kNoteDetectorPort = 0;
     // motor CAN bus names
-    public static final String kMotorBusName = "";
+    public static final String kMotorBus = "rio";
     // motor inversion
     public static final InvertedValue kInverted = InvertedValue.Clockwise_Positive;
     // controller constants

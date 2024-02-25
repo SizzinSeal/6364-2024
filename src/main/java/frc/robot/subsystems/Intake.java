@@ -21,16 +21,12 @@ import static frc.robot.Constants.Intake.*;
 public class Intake extends SubsystemBase {
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   // init motors
-  private final TalonFX m_upperMotor = new TalonFX(kUpperMotorId, kUpperBusName);
-  private final TalonFX m_lowerMotor = new TalonFX(kLowerMotorId, kLowerBusName);
+  private final TalonFX m_intakeMotor = new TalonFX(kIntakeId, kIntakeBus);
   // control output objects
-  private final VoltageOut m_upperMotorVelocity = new VoltageOut(0);
-  private final VoltageOut m_lowerMotorVelocity = new VoltageOut(0);
+  private final VoltageOut m_intakeVelocity = new VoltageOut(0);
   // simulation objects
-  private final TalonFXSimState m_upperMotorSimState = m_upperMotor.getSimState();
-  private final TalonFXSimState m_lowerMotorSimState = m_lowerMotor.getSimState();
-  private final DCMotorSim m_upperMotorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
-  private final DCMotorSim m_lowerMotorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
+  private final TalonFXSimState m_intakeMotorSimState = m_intakeMotor.getSimState();
+  private final DCMotorSim m_intakeMotorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
 
   /**
    * @brief IntakeSubsystem constructor
@@ -41,17 +37,13 @@ public class Intake extends SubsystemBase {
   public Intake() {
     super();
     // configure motors
-    TalonFXConfiguration upperConfig = new TalonFXConfiguration();
-    TalonFXConfiguration lowerConfig = new TalonFXConfiguration();
+    TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
     // set controller gains
-    upperConfig.Slot0 = kUpperControllerConstants;
-    lowerConfig.Slot0 = kLowerControllerConstants;
+    intakeConfig.Slot0 = kIntakeControllerConstants;
     // invert motors
-    upperConfig.MotorOutput.Inverted = kUpperInverted;
-    lowerConfig.MotorOutput.Inverted = kLowerInverted;
+    intakeConfig.MotorOutput.Inverted = kIntakeInverted;
     // apply configuration
-    m_upperMotor.getConfigurator().apply((upperConfig));
-    m_lowerMotor.getConfigurator().apply((lowerConfig));
+    m_intakeMotor.getConfigurator().apply((intakeConfig));
   }
 
   /**
@@ -61,8 +53,7 @@ public class Intake extends SubsystemBase {
    *        simplify the commands that change the target velocity.
    */
   private void updateMotorSpeeds() {
-    m_upperMotor.setControl(m_upperMotorVelocity);
-    m_lowerMotor.setControl(m_lowerMotorVelocity);
+    m_intakeMotor.setControl(m_intakeVelocity);
   }
 
   /**
@@ -72,8 +63,7 @@ public class Intake extends SubsystemBase {
    */
   public Command outake() {
     return this.runOnce(() -> {
-      m_upperMotorVelocity.Output = -kUpperSpeed;
-      m_lowerMotorVelocity.Output = -kLowerSpeed;
+      m_intakeVelocity.Output = -kIntakeSpeed;
       this.updateMotorSpeeds();
     });
   }
@@ -85,8 +75,7 @@ public class Intake extends SubsystemBase {
    */
   public Command intake() {
     return this.runOnce(() -> {
-      m_upperMotorVelocity.Output = -kUpperSpeed;
-      m_lowerMotorVelocity.Output = -kLowerSpeed;
+      m_intakeVelocity.Output = -kIntakeSpeed;
       this.updateMotorSpeeds();
     });
   }
@@ -98,8 +87,7 @@ public class Intake extends SubsystemBase {
    */
   public Command stop() {
     return this.runOnce(() -> {
-      m_upperMotorVelocity.Output = 0;
-      m_lowerMotorVelocity.Output = 0;
+      m_intakeVelocity.Output = 0;
       this.updateMotorSpeeds();
     });
   }
@@ -115,19 +103,14 @@ public class Intake extends SubsystemBase {
     if (Utils.isSimulation()) {
       // update simulated motors
       // set supply voltage (voltage of the simulated battery)
-      m_upperMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
-      m_lowerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+      m_intakeMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
       // set motor sim input voltage
-      m_upperMotorSim.setInputVoltage(m_upperMotorSimState.getMotorVoltage());
-      m_lowerMotorSim.setInputVoltage(m_lowerMotorSimState.getMotorVoltage());
+      m_intakeMotorSim.setInputVoltage(m_intakeMotorSimState.getMotorVoltage());
       // update motor sim
-      m_upperMotorSim.update(kSimLoopPeriod);
-      m_lowerMotorSim.update(kSimLoopPeriod);
+      m_intakeMotorSim.update(kSimLoopPeriod);
       // update motor sim state
-      m_upperMotorSimState.setRawRotorPosition(m_upperMotorSim.getAngularPositionRotations());
-      m_upperMotorSimState.setRotorVelocity(m_upperMotorSim.getAngularVelocityRPM() / 60.0);
-      m_lowerMotorSimState.setRawRotorPosition(m_lowerMotorSim.getAngularPositionRotations());
-      m_lowerMotorSimState.setRotorVelocity(m_lowerMotorSim.getAngularVelocityRPM() / 60.0);
+      m_intakeMotorSimState.setRawRotorPosition(m_intakeMotorSim.getAngularPositionRotations());
+      m_intakeMotorSimState.setRotorVelocity(m_intakeMotorSim.getAngularVelocityRPM() / 60.0);
     }
   }
 
@@ -144,22 +127,13 @@ public class Intake extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder); // call the superclass method
     // add upper motor target velocity property
-    builder.addDoubleProperty("Upper Target Velocity", () -> m_upperMotorVelocity.Output,
+    builder.addDoubleProperty("Upper Target Velocity", () -> m_intakeVelocity.Output,
         (double target) -> {
-          m_upperMotorVelocity.Output = target;
+          m_intakeVelocity.Output = target;
           this.updateMotorSpeeds();
         });
     // add upper motor measured velocity property
     builder.addDoubleProperty("Upper Measured Velocity",
-        () -> m_upperMotor.getVelocity().getValueAsDouble(), null);
-    // add lower motor target velocity property
-    builder.addDoubleProperty("Lower Target Velocity", () -> m_lowerMotorVelocity.Output,
-        (double target) -> {
-          m_lowerMotorVelocity.Output = target;
-          this.updateMotorSpeeds();
-        });
-    // add lower motor measured velocity property
-    builder.addDoubleProperty("Lower Measured Velocity",
-        () -> m_lowerMotor.getVelocity().getValueAsDouble(), null);
+        () -> m_intakeMotor.getVelocity().getValueAsDouble(), null);
   }
 }

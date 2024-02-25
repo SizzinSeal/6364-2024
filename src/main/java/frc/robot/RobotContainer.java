@@ -11,7 +11,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,13 +20,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.Field;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
@@ -45,7 +42,7 @@ public class RobotContainer {
   // Subsystems initialization.
   private final Intake m_intake = new Intake();
   public final Indexer m_indexer = new Indexer();
-  private final Flywheel m_shooter = new Flywheel();
+  private final Shooter m_shooter = new Shooter();
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0);
@@ -58,8 +55,6 @@ public class RobotContainer {
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
       .withDriveRequestType(DriveRequestType.Velocity); // closed loop velocity control
-
-  private final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
 
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
