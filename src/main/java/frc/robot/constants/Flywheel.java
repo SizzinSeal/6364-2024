@@ -30,7 +30,8 @@ public class Flywheel {
   public static final Slot0Configs kUpperControllerGains = // TODO: tune this
       new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
   public static final Slot0Configs kLowerControllerGains = // TODO: tune this
-      new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
+      new Slot0Configs().withKP(0).withKI(0).withKD(0).withKS(0.17641).withKV(0.10863)
+          .withKA(0.018805);
   // speeds (in rotations per second)
   public static final double kUpperSpeed = 0; // TODO: find this value
   public static final double kLowerSpeed = 0; // TODO: find this value
@@ -44,7 +45,7 @@ public class Flywheel {
   public static final double kUpperRatio = 1;
   public static final double kLowerRatio = 1;
   // sysid constants
-  public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(5.0).per(Second);
-  public static final Measure<Voltage> kStepVoltage = Volts.of(2.0);
-  public static final Measure<Time> kTimeout = Seconds.of(5.0);
+  public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(0.2).per(Second);
+  public static final Measure<Voltage> kStepVoltage = Volts.of(7.0);
+  public static final Measure<Time> kTimeout = Seconds.of(15.0);
 }
