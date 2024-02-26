@@ -63,9 +63,14 @@ public class RobotContainer {
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   private void ConfigureCommands() {
-    NamedCommands.registerCommand("Shoot", m_indexer.eject().until(shooterStateSupplier));
-    NamedCommands.registerCommand("IntakeNote",
-        m_intake.intake().alongWith(m_indexer.load()).until(noteStateSupplier));
+    NamedCommands.registerCommand("Intake",
+        m_deployer.deploy().until(() -> m_deployer.isDeployed()).withTimeout(2)
+            .andThen(m_intake.intake()).alongWith(m_indexer.load()).until(noteStateSupplier)
+            .andThen(m_angler.goToShoot()));
+    NamedCommands.registerCommand("RetractDeployer", m_deployer.retract());
+    NamedCommands.registerCommand("Shoot",
+        Commands.sequence(Commands.waitUntil(shooterStateSupplier).andThen(m_indexer.eject()),
+            Commands.waitSeconds(1)));
   }
 
   /**
@@ -90,18 +95,11 @@ public class RobotContainer {
     // -m_controller.getLeftX()))));
 
     // deploy and intake
-    m_controller.rightTrigger().onTrue(m_deployer.deploy());
-    // stop intaking
-
-    m_controller.rightBumper().onTrue(m_intake.intake());
-    m_controller.rightBumper().onFalse(m_intake.stop());
-
-    // load a note into the indexer
-    m_controller.y().onTrue(m_indexer.load());
-
-    // shoot a note
-    m_controller.b().onTrue(m_shooter.forwards());
-    m_controller.b().onFalse(m_shooter.stop());
+    m_controller.rightTrigger().whileTrue(NamedCommands.getCommand("Intake"));
+    // retract deployer
+    m_controller.rightBumper().onTrue(NamedCommands.getCommand("RetractDeployer"));
+    // shoot
+    m_controller.leftBumper().onTrue(NamedCommands.getCommand("Shoot"));
 
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
