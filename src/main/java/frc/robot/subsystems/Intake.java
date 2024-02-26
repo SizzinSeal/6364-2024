@@ -6,6 +6,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -42,6 +43,9 @@ public class Intake extends SubsystemBase {
     config.Feedback.SensorToMechanismRatio = kRatio;
     // apply configuration
     m_motor.getConfigurator().apply(config);
+    SmartDashboard.putData("Intake", this.intake());
+    SmartDashboard.putData("Outtake", this.outtake());
+    SmartDashboard.putData("Stop", this.stop());
   }
 
   /**

@@ -32,7 +32,7 @@ public class Angler extends SubsystemBase {
   // control outputs
   private final MotionMagicVoltage m_output = new MotionMagicVoltage(0);
 
-  // deployer sysid routine
+  // sysid routine
   private final VoltageOut m_sysIdOutput = new VoltageOut(0);
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));

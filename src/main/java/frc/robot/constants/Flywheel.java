@@ -1,8 +1,15 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 
 public class Flywheel {
   // sim loop period (seconds)
@@ -36,4 +43,8 @@ public class Flywheel {
   // ratios (driven/driver)
   public static final double kUpperRatio = 1;
   public static final double kLowerRatio = 1;
+  // sysid constants
+  public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(5.0).per(Second);
+  public static final Measure<Voltage> kStepVoltage = Volts.of(2.0);
+  public static final Measure<Time> kTimeout = Seconds.of(5.0);
 }
