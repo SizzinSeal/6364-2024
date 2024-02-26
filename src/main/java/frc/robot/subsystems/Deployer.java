@@ -124,11 +124,8 @@ public class Deployer extends SubsystemBase {
    * @return Command
    */
   public Command goToAngle(double angle) {
-    return this.startEnd(() -> {
+    return this.runOnce(() -> {
       m_output.Position = angle;
-      m_motor.setControl(m_output);
-    }, () -> {
-      m_output.Position = m_motor.getPosition().getValueAsDouble();
       m_motor.setControl(m_output);
     });
   }
