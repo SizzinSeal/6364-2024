@@ -14,6 +14,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -71,6 +72,16 @@ public class Deployer extends SubsystemBase {
     config.Feedback.SensorToMechanismRatio = kRatio;
     // apply configuration
     m_motor.getConfigurator().apply(config);
+    SmartDashboard.putData("Quasistatic Routine Up",
+        this.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    SmartDashboard.putData("Quasistatic Routine Down",
+        this.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    SmartDashboard.putData("Dynamic Routine Up",
+        this.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    SmartDashboard.putData("Dynamic Routine Down",
+        this.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    SmartDashboard.putData("Deploy", this.deploy());
+    SmartDashboard.putData("Retract", this.retract());
   }
 
   /**
