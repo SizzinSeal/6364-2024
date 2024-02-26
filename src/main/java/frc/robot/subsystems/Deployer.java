@@ -89,6 +89,8 @@ public class Deployer extends SubsystemBase {
     final TalonFXConfiguration config = new TalonFXConfiguration();
     // set controller gains
     config.Slot0 = kControllerGains;
+    config.Slot0.GravityType = kGravityType;
+    config.Slot0.kG = kG;
     // invert motors
     config.MotorOutput.Inverted = kMotorInverted;
     // set motor ratios
