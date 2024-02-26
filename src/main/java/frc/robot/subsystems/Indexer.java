@@ -66,11 +66,9 @@ public class Indexer extends SubsystemBase {
    * @param speed the speed to move at
    * @return Command
    */
-  private Command setSpeed(double speed) {
-    return this.runOnce(() -> {
-      m_output.Output = speed;
-      m_motor.setControl(m_output);
-    });
+  private void setSpeed(double speed) {
+    m_output.Output = speed;
+    m_motor.setControl(m_output);
   }
 
   /**
