@@ -70,7 +70,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("RetractDeployer", m_deployer.retract());
     NamedCommands.registerCommand("Shoot",
         Commands.sequence(Commands.waitUntil(shooterStateSupplier).andThen(m_indexer.eject()),
-            Commands.waitSeconds(1)));
+            Commands.waitSeconds(1), m_angler.goToLoad()));
   }
 
   /**
