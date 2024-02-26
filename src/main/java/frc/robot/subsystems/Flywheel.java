@@ -22,8 +22,8 @@ public class Flywheel extends SubsystemBase {
   private final TalonFX m_upperMotor = new TalonFX(kUpperMotorId, kUpperMotorBus);
   private final TalonFX m_lowerMotor = new TalonFX(kLowerMotorId, kLowerMotorBus);
   // control output objects
-  private final VoltageOut m_upperMotorVelocity = new VoltageOut(0);
-  private final VoltageOut m_lowerMotorVelocity = new VoltageOut(0);
+  private final VoltageOut m_upperOutput = new VoltageOut(0);
+  private final VoltageOut m_lowerOutput = new VoltageOut(0);
   // simulation objects
   private final TalonFXSimState m_upperMotorSimState = m_upperMotor.getSimState();
   private final TalonFXSimState m_lowerMotorSimState = m_lowerMotor.getSimState();
@@ -82,19 +82,29 @@ public class Flywheel extends SubsystemBase {
    * @return boolean
    */
   public Boolean isAtSpeed() {
-    return Math.abs(m_upperMotor.getVelocity().getValueAsDouble() - kUpperSpeed) < kUpperTolerance
-        && Math.abs(m_lowerMotor.getVelocity().getValueAsDouble() - kLowerSpeed) < kLowerTolerance;
+    return Math.abs(kUpperSpeed - m_upperMotor.getVelocity().getValueAsDouble()) < kUpperTolerance
+        && Math.abs(kLowerSpeed - m_lowerMotor.getVelocity().getValueAsDouble()) < kLowerTolerance;
   }
 
-  /**
-   * @brief Update motor speeds
-   * 
-   *        This is where we actually set the motor speeds. We do this in a seperate method to
-   *        simplify the commands that change the target velocity.
-   */
-  private void updateMotorSpeeds() {
-    m_upperMotor.setControl(m_upperMotorVelocity);
-    m_lowerMotor.setControl(m_lowerMotorVelocity);
+  public Command setUpperSpeed(double speed) {
+    return this.runOnce(() -> {
+      m_upperOutput.Output = speed;
+      m_upperMotor.setControl(m_upperOutput);
+    });
+  }
+
+  public Command setLowerSpeed(double speed) {
+    return this.runOnce(() -> {
+      m_lowerOutput.Output = speed;
+      m_lowerMotor.setControl(m_lowerOutput);
+    });
+  }
+
+  public Command setSpeed(double speed) {
+    return this.runOnce(() -> {
+      this.setUpperSpeed(speed);
+      this.setLowerSpeed(speed);
+    });
   }
 
   /**
@@ -104,9 +114,8 @@ public class Flywheel extends SubsystemBase {
    */
   public Command reverse() {
     return this.runOnce(() -> {
-      m_upperMotorVelocity.Output = -kUpperSpeed;
-      m_lowerMotorVelocity.Output = -kLowerSpeed;
-      this.updateMotorSpeeds();
+      this.setUpperSpeed(-kUpperSpeed);
+      this.setLowerSpeed(-kLowerSpeed);
     });
   }
 
@@ -117,9 +126,8 @@ public class Flywheel extends SubsystemBase {
    */
   public Command forwards() {
     return this.runOnce(() -> {
-      m_upperMotorVelocity.Output = kUpperSpeed;
-      m_lowerMotorVelocity.Output = kLowerSpeed;
-      this.updateMotorSpeeds();
+      this.setUpperSpeed(kUpperSpeed);
+      this.setLowerSpeed(kLowerSpeed);
     });
   }
 
@@ -129,11 +137,7 @@ public class Flywheel extends SubsystemBase {
    * @return Command
    */
   public Command stop() {
-    return this.runOnce(() -> {
-      m_upperMotorVelocity.Output = 0;
-      m_lowerMotorVelocity.Output = 0;
-      this.updateMotorSpeeds();
-    });
+    return this.setSpeed(0);
   }
 
   /**
@@ -176,20 +180,14 @@ public class Flywheel extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder); // call the superclass method
     // add upper motor target velocity property
-    builder.addDoubleProperty("Upper Target Velocity", () -> m_upperMotorVelocity.Output,
-        (double target) -> {
-          m_upperMotorVelocity.Output = target;
-          this.updateMotorSpeeds();
-        });
+    builder.addDoubleProperty("Upper Target Velocity", () -> m_upperOutput.Output,
+        (double target) -> this.setUpperSpeed(target));
     // add upper motor measured velocity property
     builder.addDoubleProperty("Upper Measured Velocity",
         () -> m_upperMotor.getVelocity().getValueAsDouble(), null);
     // add lower motor target velocity property
-    builder.addDoubleProperty("Lower Target Velocity", () -> m_lowerMotorVelocity.Output,
-        (double target) -> {
-          m_lowerMotorVelocity.Output = target;
-          this.updateMotorSpeeds();
-        });
+    builder.addDoubleProperty("Lower Target Velocity", () -> m_lowerOutput.Output,
+        (double target) -> this.setLowerSpeed(target));
     // add lower motor measured velocity property
     builder.addDoubleProperty("Lower Measured Velocity",
         () -> m_lowerMotor.getVelocity().getValueAsDouble(), null);
