@@ -18,7 +18,7 @@ public class Angler {
   // sensor ports
   public static final int kLimitPort = 0; // TODO: find this value
   // motor inversion TODO: find these values
-  public static final InvertedValue kMotorInverted = InvertedValue.Clockwise_Positive;
+  public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
   // controller constants
   public static final Slot0Configs kControllerGains = // TODO: tune this
       new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
