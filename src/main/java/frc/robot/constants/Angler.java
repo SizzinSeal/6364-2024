@@ -45,5 +45,5 @@ public class Angler {
   // sysid constants
   public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(5.0).per(Second);
   public static final Measure<Voltage> kStepVoltage = Volts.of(2.0);
-  public static final Measure<Time> kTimeout = Seconds.of(5.0); // seconds
+  public static final Measure<Time> kTimeout = Seconds.of(5.0);
 }

@@ -35,19 +35,19 @@ public class Deployer extends SubsystemBase {
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
-  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(null, // Default
-      null, // Reduce dynamic voltage to 4 to prevent motor brownout
-      null), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-        m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
-      }, log -> {
-        log.motor("deployer")
-            .voltage(m_appliedVoltage
-                .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
-            .angularPosition(
-                m_angle.mut_replace(m_motor.getPosition().getValueAsDouble(), Rotations))
-            .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
-                RotationsPerSecond));
-      }, this));
+  private final SysIdRoutine m_sysIdRoutine =
+      new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+          new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+            m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
+          }, log -> {
+            log.motor("deployer")
+                .voltage(m_appliedVoltage
+                    .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
+                .angularPosition(
+                    m_angle.mut_replace(m_motor.getPosition().getValueAsDouble(), Rotations))
+                .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
+                    RotationsPerSecond));
+          }, this));
 
   /**
    * @brief quasistatic sysid routine

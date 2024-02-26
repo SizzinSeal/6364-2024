@@ -32,19 +32,19 @@ public class Angler extends SubsystemBase {
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
-  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(kRampRate, // Default
-      kStepVoltage, // Reduce dynamic voltage to 4 to prevent motor brownout
-      kTimeout), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-        m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
-      }, log -> {
-        log.motor("angler")
-            .voltage(m_appliedVoltage
-                .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
-            .angularPosition(
-                m_angle.mut_replace(m_motor.getPosition().getValueAsDouble(), Rotations))
-            .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
-                RotationsPerSecond));
-      }, this));
+  private final SysIdRoutine m_sysIdRoutine =
+      new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+          new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+            m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
+          }, log -> {
+            log.motor("angler")
+                .voltage(m_appliedVoltage
+                    .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
+                .angularPosition(
+                    m_angle.mut_replace(m_motor.getPosition().getValueAsDouble(), Rotations))
+                .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
+                    RotationsPerSecond));
+          }, this));
 
   /**
    * @brief IntakeSubsystem constructor
@@ -66,7 +66,7 @@ public class Angler extends SubsystemBase {
     final MotionMagicConfigs motionMagicConfig = config.MotionMagic;
     motionMagicConfig.MotionMagicCruiseVelocity = kMaxSpeed; // rps
     motionMagicConfig.MotionMagicAcceleration = kAcceleration; // rps^2
-    motionMagicConfig.MotionMagicJerk = kJerk; // Target jerk of 1600 rps/s/s (0.1 seconds)
+    motionMagicConfig.MotionMagicJerk = kJerk; // rps^3
     // apply configuration
     m_motor.getConfigurator().apply(config);
   }

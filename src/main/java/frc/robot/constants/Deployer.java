@@ -1,7 +1,14 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.InvertedValue;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 
 public class Deployer {
   // sim loop period (milliseconds)
@@ -25,7 +32,8 @@ public class Deployer {
   // ratios (driven/driver)
   public static final double kRatio = 90;
   // SysId constants
-  public static final double kRampRate = 0.5; // volts per second
-  public static final double kStepVoltage = 4; // volts
-  public static final double kTimeout = 2; // seconds
+  public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(5.0).per(Second);
+  public static final Measure<Voltage> kStepVoltage = Volts.of(2.0);
+  public static final Measure<Time> kTimeout = Seconds.of(5.0);
+  public static final double kG = 0; // TODO: find this value
 }
