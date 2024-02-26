@@ -1,7 +1,14 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.InvertedValue;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.Time;
 
 public class Angler {
   // motor ids
@@ -28,9 +35,15 @@ public class Angler {
   public static final double kAcceleration = 0; // TODO: find this value
   public static final double kManualAcceleration = 0; // TODO: find this value
   public static final double kProbeAcceleration = 0; // TODO: find this value
+  // jerk (in rotations per second cubed)
+  public static final double kJerk = 0;
   // tolerances (in rotations)
-  public static final double kTolerance = 5; // TODO: find this value
+  public static final double kTolerance = 0.013889; // 5 degrees
   // ratios (driven/driver)
   public static final double kRatio = 1; // in reality this is a 1500 to 1 gear ratio, but
   // for some reason TalonFX doesn't support gear ratios higher than 1000 to 1
+  // sysid constants
+  public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(5.0).per(Second);
+  public static final Measure<Voltage> kStepVoltage = Volts.of(2.0);
+  public static final Measure<Time> kTimeout = Seconds.of(5.0); // seconds
 }

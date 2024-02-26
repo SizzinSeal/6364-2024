@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.MutableMeasure.mutable;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -31,9 +32,9 @@ public class Angler extends SubsystemBase {
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
-  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(null, // Default
-      null, // Reduce dynamic voltage to 4 to prevent motor brownout
-      null), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(kRampRate, // Default
+      kStepVoltage, // Reduce dynamic voltage to 4 to prevent motor brownout
+      kTimeout), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
       }, log -> {
         log.motor("angler")
@@ -44,6 +45,70 @@ public class Angler extends SubsystemBase {
             .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
                 RotationsPerSecond));
       }, this));
+
+  /**
+   * @brief IntakeSubsystem constructor
+   * 
+   *        This is where the motors are configured. We configure them here so that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   */
+  public Angler() {
+    super();
+    // configure motors
+    final TalonFXConfiguration config = new TalonFXConfiguration();
+    // set controller gains
+    config.Slot0 = kControllerGains;
+    // invert motors
+    config.MotorOutput.Inverted = kMotorInverted;
+    // set motor ratios
+    config.Feedback.SensorToMechanismRatio = kRatio;
+    // set Motion Magic settings
+    final MotionMagicConfigs motionMagicConfig = config.MotionMagic;
+    motionMagicConfig.MotionMagicCruiseVelocity = kMaxSpeed; // rps
+    motionMagicConfig.MotionMagicAcceleration = kAcceleration; // rps^2
+    motionMagicConfig.MotionMagicJerk = kJerk; // Target jerk of 1600 rps/s/s (0.1 seconds)
+    // apply configuration
+    m_motor.getConfigurator().apply(config);
+  }
+
+  /**
+   * @brief Set the motor to the specified voltage
+   * @return
+   */
+  public boolean atTarget() {
+    return Math.abs(m_output.Position - m_motor.getPosition().getValueAsDouble()) < kTolerance;
+  }
+
+  /**
+   * @brief Go the the specified angle
+   * 
+   * @param angle angle in degrees
+   * @return Command
+   */
+  public Command goToAngle(double angle) {
+    return this.runOnce(() -> {
+      m_output.Position = (angle / 360.0);
+      m_motor.setControl(m_output);
+    });
+  }
+
+  /**
+   * @brief Go to the shooting position
+   * 
+   * @return Command
+   */
+  public Command goToShoot() {
+    return this.goToAngle(kShootingPosition);
+  }
+
+  /**
+   * @brief Go to the loading position
+   * 
+   * @return Command
+   */
+  public Command goToLoad() {
+    return this.goToAngle(kLoadingPosition);
+  }
 
   /**
    * @brief quasistatic sysid routine
@@ -69,26 +134,6 @@ public class Angler extends SubsystemBase {
    */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return m_sysIdRoutine.dynamic(direction);
-  }
-
-  /**
-   * @brief IntakeSubsystem constructor
-   * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
-   */
-  public Angler() {
-    super();
-    // configure motors
-    final TalonFXConfiguration config = new TalonFXConfiguration();
-    // set controller gains
-    config.Slot0 = kControllerGains;
-    // invert motors
-    config.MotorOutput.Inverted = kMotorInverted;
-    // set motor ratios
-    config.Feedback.SensorToMechanismRatio = kRatio;
-    // apply configuration
-    m_motor.getConfigurator().apply(config);
   }
 
   /**
