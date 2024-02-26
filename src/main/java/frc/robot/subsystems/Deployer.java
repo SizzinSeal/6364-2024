@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
@@ -15,29 +14,23 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import static frc.robot.constants.Intake.*;
+import static frc.robot.constants.Deployer.*;
 
 /**
  * @brief Intake Subsystem
  * 
  */
-public class Intake extends SubsystemBase {
+public class Deployer extends SubsystemBase {
   // init motors
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // control outputs
-  private final VelocityVoltage m_output = new VelocityVoltage(0);
-  // simulation objects
-  private final TalonFXSimState m_motorSimState = m_motor.getSimState();
-  private final DCMotorSim m_motorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
+  private final MotionMagicVoltage m_output = new MotionMagicVoltage(0);
 
-  // intake sysid routine
+  // deployer sysid routine
   private final VoltageOut m_sysIdOutput = new VoltageOut(0);
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
@@ -47,7 +40,7 @@ public class Intake extends SubsystemBase {
       null), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
       }, log -> {
-        log.motor("intake")
+        log.motor("deployer")
             .voltage(m_appliedVoltage
                 .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
             .angularPosition(
@@ -88,86 +81,18 @@ public class Intake extends SubsystemBase {
    *        This is where the motors are configured. We configure them here so that we can swap
    *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
-  public Intake() {
+  public Deployer() {
     super();
     // configure motors
     final TalonFXConfiguration config = new TalonFXConfiguration();
     // set controller gains
     config.Slot0 = kControllerGains;
-    // set motor inversions
+    // invert motors
     config.MotorOutput.Inverted = kMotorInverted;
     // set motor ratios
     config.Feedback.SensorToMechanismRatio = kRatio;
     // apply configuration
     m_motor.getConfigurator().apply(config);
-  }
-
-  /**
-   * @brief Update motor speeds
-   * 
-   *        This is where we actually set the motor speeds. We do this in a separate method to
-   *        simplify the commands that change the target velocity.
-   */
-  private void updateMotorSpeeds() {
-    m_motor.setControl(m_output);
-  }
-
-  /**
-   * @brief Spin the intake motors to outtake notes
-   * 
-   * @return Command
-   */
-  public Command outtake() {
-    return this.runOnce(() -> {
-      m_output.Velocity = -kSpeed;
-      this.updateMotorSpeeds();
-    });
-  }
-
-  /**
-   * @brief Spin the intake motors to intake notes
-   * 
-   * @return Command
-   */
-  public Command intake() {
-    return this.runOnce(() -> {
-      m_output.Velocity = -kSpeed;
-      this.updateMotorSpeeds();
-    });
-  }
-
-  /**
-   * @brief Stop the intake motors
-   * 
-   * @return Command
-   */
-  public Command stop() {
-    return this.runOnce(() -> {
-      m_output.Velocity = 0;
-      this.updateMotorSpeeds();
-    });
-  }
-
-  /**
-   * @brief periodic update method
-   * 
-   *        This method is called periodically by the scheduler. We use it to update the simulated
-   *        motors.
-   */
-  @Override
-  public void periodic() {
-    if (Utils.isSimulation()) {
-      // update simulated motors
-      // set supply voltage (voltage of the simulated battery)
-      m_motorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
-      // set motor sim input voltage
-      m_motorSim.setInputVoltage(m_motorSimState.getMotorVoltage());
-      // update motor sim
-      m_motorSim.update(kSimLoopPeriod);
-      // update motor sim state
-      m_motorSimState.setRawRotorPosition(m_motorSim.getAngularPositionRotations());
-      m_motorSimState.setRotorVelocity(m_motorSim.getAngularVelocityRPM() / 60.0);
-    }
   }
 
   /**
@@ -182,13 +107,9 @@ public class Intake extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder); // call the superclass method
-    // measured velocity
-    builder.addDoubleProperty("Measured Velocity", () -> m_motor.getVelocity().getValueAsDouble(),
-        null);
-    // target velocity
-    builder.addDoubleProperty("Target Velocity", () -> m_output.Velocity, (double target) -> {
-      m_output.Velocity = target;
-      this.updateMotorSpeeds();
-    });
+    // measured position
+    builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(), null);
+    // target position
+    builder.addDoubleProperty("Target Position", () -> m_output.Position, null);
   }
 }

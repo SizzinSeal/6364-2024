@@ -14,14 +14,13 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
-import static frc.robot.Constants.Indexer.*;
+import static frc.robot.constants.Indexer.*;
 
 /**
  * @brief Intake Subsystem
  * 
  */
 public class Indexer extends SubsystemBase {
-  private static final double kSimLoopPeriod = 0.005; // 5 ms
   // init devices
   private final DigitalInput m_noteDetector = new DigitalInput(kNoteDetectorPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);

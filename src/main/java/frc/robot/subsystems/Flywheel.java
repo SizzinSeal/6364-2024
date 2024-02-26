@@ -8,21 +8,19 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
-import static frc.robot.Constants.Shooter.*;
+import static frc.robot.constants.Flywheel.*;
 
 /**
  * @brief Flywheel Subsystem
  * 
  */
-public class Shooter extends SubsystemBase {
-  private final double kSimLoopPeriod = 0.005; // 5 ms
+public class Flywheel extends SubsystemBase {
   // init motors
-  private final TalonFX m_upperMotor = new TalonFX(kUpperId, kUpperBus);
-  private final TalonFX m_lowerMotor = new TalonFX(kLowerId, kLowerBus);
+  private final TalonFX m_upperMotor = new TalonFX(kUpperMotorId, kUpperMotorBus);
+  private final TalonFX m_lowerMotor = new TalonFX(kLowerMotorId, kLowerMotorBus);
   // control output objects
   private final VoltageOut m_upperMotorVelocity = new VoltageOut(0);
   private final VoltageOut m_lowerMotorVelocity = new VoltageOut(0);
@@ -38,22 +36,26 @@ public class Shooter extends SubsystemBase {
    *        This is where the motors are configured. We configure them here so that we can swap
    *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
-  public Shooter() {
+  public Flywheel() {
     super();
     // configure motors
-    TalonFXConfiguration upperConfig = new TalonFXConfiguration();
-    TalonFXConfiguration lowerConfig = new TalonFXConfiguration();
+    final TalonFXConfiguration upperConfig = new TalonFXConfiguration();
+    final TalonFXConfiguration lowerConfig = new TalonFXConfiguration();
     // set controller gains
-    upperConfig.Slot0 = kUpperControllerConstants;
-    lowerConfig.Slot0 = kLowerControllerConstants;
+    upperConfig.Slot0 = kUpperControllerGains;
+    lowerConfig.Slot0 = kLowerControllerGains;
     // invert motors
-    upperConfig.MotorOutput.Inverted = kUpperInverted;
-    lowerConfig.MotorOutput.Inverted = kLowerInverted;
+    upperConfig.MotorOutput.Inverted = kUpperMotorInverted;
+    lowerConfig.MotorOutput.Inverted = kLowerMotorInverted;
+    // set ratios
+    upperConfig.Feedback.SensorToMechanismRatio = kUpperRatio;
+    lowerConfig.Feedback.SensorToMechanismRatio = kLowerRatio;
+    // set neutral modes
+    m_upperMotor.setNeutralMode(kUpperNeutralMode);
+    m_lowerMotor.setNeutralMode(kLowerNeutralMode);
     // apply configuration
     m_upperMotor.getConfigurator().apply((upperConfig));
     m_lowerMotor.getConfigurator().apply((lowerConfig));
-    m_upperMotor.setNeutralMode(NeutralModeValue.Brake);
-    m_lowerMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
   /**

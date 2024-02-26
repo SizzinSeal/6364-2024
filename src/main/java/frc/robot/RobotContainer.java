@@ -24,7 +24,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Angler;
+import frc.robot.subsystems.Deployer;
+import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
@@ -40,9 +42,12 @@ public class RobotContainer {
   public final Vision limelight1 = new Vision("limelight");
 
   // Subsystems initialization.
+  private final Angler m_angler = new Angler();
+  private final Deployer m_deployer = new Deployer();
   private final Intake m_intake = new Intake();
-  public final Indexer m_indexer = new Indexer();
-  private final Shooter m_shooter = new Shooter();
+  private final Indexer m_indexer = new Indexer();
+  private final Flywheel m_shooter = new Flywheel();
+
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0);
@@ -89,10 +94,6 @@ public class RobotContainer {
     // intake a note
     m_controller.rightBumper().onTrue(m_intake.intake());
     m_controller.rightBumper().onFalse(m_intake.stop());
-
-    // indexer unstuck
-    m_controller.x()
-        .onTrue(Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5), m_indexer.load()));
 
     // load a note into the indexer
     m_controller.y().onTrue(m_indexer.load());
