@@ -25,7 +25,7 @@ public class Indexer extends SubsystemBase {
   private final DigitalInput m_noteDetector = new DigitalInput(kNoteDetectorPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // control output objects
-  private final VoltageOut m_motorVelocity = new VoltageOut(0);
+  private final VoltageOut m_output = new VoltageOut(0);
   // simulation objects
   private final TalonFXSimState m_motorSimState = m_motor.getSimState();
   private final DCMotorSim m_motorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
@@ -52,13 +52,25 @@ public class Indexer extends SubsystemBase {
   }
 
   /**
-   * @brief Update motor speeds
+   * @brief whether a note is detected in the indexer or not
    * 
-   *        This is where we actually set the motor speeds. We do this in a seperate method to
-   *        simplify the commands that change the target velocity.
+   * @return true if not detected, false otherwise
    */
-  private void updateMotorSpeeds() {
-    m_motor.setControl(m_motorVelocity);
+  public Boolean noteDetected() {
+    return m_noteDetector.get();
+  }
+
+  /**
+   * @brief set the speed of the indexer
+   * 
+   * @param speed the speed to move at
+   * @return Command
+   */
+  private Command setSpeed(double speed) {
+    return this.runOnce(() -> {
+      m_output.Output = speed;
+      m_motor.setControl(m_output);
+    });
   }
 
   /**
@@ -67,14 +79,7 @@ public class Indexer extends SubsystemBase {
    * @return Command
    */
   public Command load() {
-    return Commands.sequence(this.runOnce(() -> {
-      m_motorVelocity.Output = kSpeed * 0.2;
-      this.updateMotorSpeeds();
-    }), Commands.waitUntil(() -> this.noteDetected()), this.stop());
-  }
-
-  public Boolean noteDetected() {
-    return m_noteDetector.get();
+    return Commands.startEnd(() -> this.setSpeed(-kLoadSpeed), () -> this.stop());
   }
 
   /**
@@ -83,10 +88,10 @@ public class Indexer extends SubsystemBase {
    * @return Command
    */
   public Command eject() {
-    return this.runOnce(() -> {
-      m_motorVelocity.Output = -kSpeed;
-      this.updateMotorSpeeds();
-    });
+    /**
+     * return this.runOnce(() -> { m_motorVelocity.Output = -kSpeed; this.updateMotorSpeeds(); });
+     */
+    return this.startEnd(() -> this.setSpeed(kEjectSpeed), () -> this.stop());
   }
 
   /**
@@ -95,10 +100,7 @@ public class Indexer extends SubsystemBase {
    * @return Command
    */
   public Command stop() {
-    return this.runOnce(() -> {
-      m_motorVelocity.Output = 0;
-      this.updateMotorSpeeds();
-    });
+    return this.runOnce(() -> this.setSpeed(0));
   }
 
   /**
@@ -136,10 +138,8 @@ public class Indexer extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder); // call the superclass method
     // add target velocity property
-    builder.addDoubleProperty("Target Velocity", () -> m_motorVelocity.Output, (double target) -> {
-      m_motorVelocity.Output = target;
-      this.updateMotorSpeeds();
-    });
+    builder.addDoubleProperty("Target Velocity", () -> m_output.Output,
+        (double target) -> this.setSpeed(target));
     // add measured velocity property
     builder.addDoubleProperty("Measured Velocity", () -> m_motor.getVelocity().getValueAsDouble(),
         null);

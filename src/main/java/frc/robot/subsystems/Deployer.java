@@ -52,6 +52,28 @@ public class Deployer extends SubsystemBase {
           }, this));
 
   /**
+   * @brief IntakeSubsystem constructor
+   * 
+   *        This is where the motors are configured. We configure them here so that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   */
+  public Deployer() {
+    super();
+    // configure motors
+    final TalonFXConfiguration config = new TalonFXConfiguration();
+    // set controller gains
+    config.Slot0 = kControllerGains;
+    config.Slot0.GravityType = kGravityType;
+    config.Slot0.kG = kG;
+    // invert motors
+    config.MotorOutput.Inverted = kMotorInverted;
+    // set motor ratios
+    config.Feedback.SensorToMechanismRatio = kRatio;
+    // apply configuration
+    m_motor.getConfigurator().apply(config);
+  }
+
+  /**
    * @brief quasistatic sysid routine
    * 
    *        Quasistatic routines accelerate the motor slowly to measure static friction and other
@@ -77,26 +99,43 @@ public class Deployer extends SubsystemBase {
     return m_sysIdRoutine.dynamic(direction);
   }
 
+  public boolean isDeployed() {
+    return Math.abs(kDownPosition - m_motor.getPosition().getValueAsDouble()) < kTolerance;
+  }
+
+  public boolean isRetracted() {
+    return Math.abs(kUpPosition - m_motor.getPosition().getValueAsDouble()) < kTolerance;
+  }
+
   /**
-   * @brief IntakeSubsystem constructor
+   * @brief move the deployer to the specified angle
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   * @param angle the angle to move to in rotations
+   * @return Command
    */
-  public Deployer() {
-    super();
-    // configure motors
-    final TalonFXConfiguration config = new TalonFXConfiguration();
-    // set controller gains
-    config.Slot0 = kControllerGains;
-    config.Slot0.GravityType = kGravityType;
-    config.Slot0.kG = kG;
-    // invert motors
-    config.MotorOutput.Inverted = kMotorInverted;
-    // set motor ratios
-    config.Feedback.SensorToMechanismRatio = kRatio;
-    // apply configuration
-    m_motor.getConfigurator().apply(config);
+  public Command goToAngle(double angle) {
+    return this.runOnce(() -> {
+      m_output.Position = angle;
+      m_motor.setControl(m_output);
+    });
+  }
+
+  /**
+   * @brief deploy the deployer
+   * 
+   * @return Command
+   */
+  public Command deploy() {
+    return this.runOnce(() -> goToAngle(kDownPosition));
+  }
+
+  /**
+   * @brief retract the deployer
+   * 
+   * @return Command
+   */
+  public Command retract() {
+    return this.runOnce(() -> goToAngle(kUpPosition));
   }
 
   /**

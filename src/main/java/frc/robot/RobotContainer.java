@@ -19,6 +19,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
@@ -47,13 +48,12 @@ public class RobotContainer {
   private final Indexer m_indexer = new Indexer();
   private final Flywheel m_shooter = new Flywheel();
 
-
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   private final SendableChooser<Command> autoChooser;
-  private BooleanSupplier shooterStateSupplier = () -> m_shooter.isAtSpeed();
-  private BooleanSupplier noteStateSupplier = () -> m_indexer.noteDetected();
+  private final BooleanSupplier shooterStateSupplier = () -> m_shooter.isAtSpeed();
+  private final BooleanSupplier noteStateSupplier = () -> m_indexer.noteDetected();
 
   // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
@@ -63,8 +63,7 @@ public class RobotContainer {
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   private void ConfigureCommands() {
-    NamedCommands.registerCommand("Shoot",
-        (m_shooter.forwards().andThen(m_indexer.eject())).until(shooterStateSupplier));
+    NamedCommands.registerCommand("Shoot", m_indexer.eject().until(shooterStateSupplier));
     NamedCommands.registerCommand("IntakeNote",
         m_intake.intake().alongWith(m_indexer.load()).until(noteStateSupplier));
   }
@@ -90,7 +89,10 @@ public class RobotContainer {
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
     // -m_controller.getLeftX()))));
 
-    // intake a note
+    // deploy and intake
+    m_controller.rightTrigger().onTrue(m_deployer.deploy());
+    // stop intaking
+
     m_controller.rightBumper().onTrue(m_intake.intake());
     m_controller.rightBumper().onFalse(m_intake.stop());
 

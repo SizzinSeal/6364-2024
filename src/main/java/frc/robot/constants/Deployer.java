@@ -32,6 +32,10 @@ public class Deployer {
   public static final double kMaxSpeed = 0; // TODO: find this value
   // acceleration (rotations per second squared)
   public static final double kMaxAccel = 0; // TODO: find this value
+  // jerk (rotations per second cubed)
+  public static final double kMaxJerk = 0;
+  // tolerances (rotations)
+  public static final double kTolerance = 0.1;
   // ratios (driven/driver)
   public static final double kRatio = 90;
   // SysId constants

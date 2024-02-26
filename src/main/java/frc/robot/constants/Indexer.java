@@ -19,7 +19,8 @@ public class Indexer {
   public static final Slot0Configs kMotorControllerConstants = // TODO: tune this
       new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
   // speeds (rotations per second)
-  public static final double kSpeed = 0; // TODO: find this value
+  public static final double kEjectSpeed = 0; // TODO: find this value
+  public static final double kLoadSpeed = 0; // TODO: find this value
   // ratios
   public static final double kRatio = 1;
 }

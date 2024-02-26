@@ -40,6 +40,7 @@
       "deadband",
       "drivecan",
       "holonomic",
+      "intaking",
       "Odometry",
       "Pathfinding",
       "Quasistatic",
