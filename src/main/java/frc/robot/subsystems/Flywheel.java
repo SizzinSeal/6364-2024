@@ -18,6 +18,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -33,8 +34,8 @@ public class Flywheel extends SubsystemBase {
   private final TalonFX m_upperMotor = new TalonFX(kUpperMotorId, kUpperMotorBus);
   private final TalonFX m_lowerMotor = new TalonFX(kLowerMotorId, kLowerMotorBus);
   // control output objects
-  private final VoltageOut m_upperOutput = new VoltageOut(0);
-  private final VoltageOut m_lowerOutput = new VoltageOut(0);
+  private final VelocityVoltage m_upperOutput = new VelocityVoltage(0);
+  private final VelocityVoltage m_lowerOutput = new VelocityVoltage(0);
   // simulation objects
   private final TalonFXSimState m_upperMotorSimState = m_upperMotor.getSimState();
   private final TalonFXSimState m_lowerMotorSimState = m_lowerMotor.getSimState();
@@ -68,7 +69,7 @@ public class Flywheel extends SubsystemBase {
           new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
             m_lowerMotor.setControl(m_lowerSysIdOutput.withOutput(volts.in(Volts)));
           }, log -> {
-            log.motor("angler")
+            log.motor("Lower Flywheel")
                 .voltage(m_lowerAppliedVoltage
                     .mut_replace(m_lowerMotor.get() * RobotController.getBatteryVoltage(), Volts))
                 .angularPosition(m_lowerAngle
@@ -158,11 +159,9 @@ public class Flywheel extends SubsystemBase {
    * @param speed speed in revolutions per second
    * @return Command
    */
-  public Command setUpperSpeed(double speed) {
-    return this.runOnce(() -> {
-      m_upperOutput.Output = speed;
-      m_upperMotor.setControl(m_upperOutput);
-    });
+  public void setUpperSpeed(double speed) {
+    m_upperOutput.Velocity = speed;
+    m_upperMotor.setControl(m_upperOutput);
   }
 
   /**
@@ -171,11 +170,9 @@ public class Flywheel extends SubsystemBase {
    * @param speed speed in revolutions per second
    * @return Command
    */
-  public Command setLowerSpeed(double speed) {
-    return this.runOnce(() -> {
-      m_lowerOutput.Output = speed;
-      m_lowerMotor.setControl(m_lowerOutput);
-    });
+  public void setLowerSpeed(double speed) {
+    m_lowerOutput.Velocity = speed;
+    m_lowerMotor.setControl(m_lowerOutput);
   }
 
   /**
@@ -316,13 +313,13 @@ public class Flywheel extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder); // call the superclass method
     // add upper motor target velocity property
-    builder.addDoubleProperty("Upper Target Velocity", () -> m_upperOutput.Output,
+    builder.addDoubleProperty("Upper Target Velocity", () -> m_upperOutput.Velocity,
         (double target) -> this.setUpperSpeed(target));
     // add upper motor measured velocity property
     builder.addDoubleProperty("Upper Measured Velocity",
         () -> m_upperMotor.getVelocity().getValueAsDouble(), null);
     // add lower motor target velocity property
-    builder.addDoubleProperty("Lower Target Velocity", () -> m_lowerOutput.Output,
+    builder.addDoubleProperty("Lower Target Velocity", () -> m_lowerOutput.Velocity,
         (double target) -> this.setLowerSpeed(target));
     // add lower motor measured velocity property
     builder.addDoubleProperty("Lower Measured Velocity",
