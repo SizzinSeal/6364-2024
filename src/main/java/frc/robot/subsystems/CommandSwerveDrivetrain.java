@@ -87,7 +87,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 .angularVelocity(m_velocity.mut_replace(
                     Modules[1].getDriveMotor().getVelocity().getValueAsDouble(),
                     RotationsPerSecond));
-            log.motor("Back Right")
+            log.motor("Back Left")
                 .voltage(m_appliedVoltage.mut_replace(
                     Modules[2].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
                 .angularPosition(m_angle.mut_replace(
@@ -95,7 +95,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 .angularVelocity(m_velocity.mut_replace(
                     Modules[2].getDriveMotor().getVelocity().getValueAsDouble(),
                     RotationsPerSecond));
-            log.motor("Back Left")
+            log.motor("Back Right")
                 .voltage(m_appliedVoltage.mut_replace(
                     Modules[3].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
                 .angularPosition(m_angle.mut_replace(
