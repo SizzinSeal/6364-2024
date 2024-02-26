@@ -16,7 +16,8 @@ public class Intake {
   public static final Slot0Configs kControllerGains = // TODO: tune this
       new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
   // speeds (rotations per second)
-  public static final double kSpeed = 0; // TODO: find this value
+  public static final double kIntakeSpeed = 0; // TODO: find this value
+  public static final double kOuttakeSpeed = 0; // TODO: find this value
   // ratios (driven/driver)
   public static final double kRatio = 1;
   // SysId constants

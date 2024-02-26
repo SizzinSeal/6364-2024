@@ -103,13 +103,18 @@ public class Intake extends SubsystemBase {
   }
 
   /**
-   * @brief Update motor speeds
-   * 
-   *        This is where we actually set the motor speeds. We do this in a separate method to
-   *        simplify the commands that change the target velocity.
+   * @brief set the speed of the intake
+   * @param speed
+   * @return
    */
-  private void updateMotorSpeeds() {
-    m_motor.setControl(m_output);
+  public Command setSpeed(double speed) {
+    return this.startEnd(() -> {
+      m_output.Velocity = speed;
+      m_motor.setControl(m_output);
+    }, () -> {
+      m_output.Velocity = 0;
+      m_motor.setControl(m_output);
+    });
   }
 
   /**
@@ -118,10 +123,7 @@ public class Intake extends SubsystemBase {
    * @return Command
    */
   public Command outtake() {
-    return this.runOnce(() -> {
-      m_output.Velocity = -kSpeed;
-      this.updateMotorSpeeds();
-    });
+    return this.setSpeed(-kOuttakeSpeed);
   }
 
   /**
@@ -130,10 +132,7 @@ public class Intake extends SubsystemBase {
    * @return Command
    */
   public Command intake() {
-    return this.runOnce(() -> {
-      m_output.Velocity = -kSpeed;
-      this.updateMotorSpeeds();
-    });
+    return this.setSpeed(kIntakeSpeed);
   }
 
   /**
@@ -142,10 +141,7 @@ public class Intake extends SubsystemBase {
    * @return Command
    */
   public Command stop() {
-    return this.runOnce(() -> {
-      m_output.Velocity = 0;
-      this.updateMotorSpeeds();
-    });
+    return this.setSpeed(0);
   }
 
   /**
@@ -186,9 +182,7 @@ public class Intake extends SubsystemBase {
     builder.addDoubleProperty("Measured Velocity", () -> m_motor.getVelocity().getValueAsDouble(),
         null);
     // target velocity
-    builder.addDoubleProperty("Target Velocity", () -> m_output.Velocity, (double target) -> {
-      m_output.Velocity = target;
-      this.updateMotorSpeeds();
-    });
+    builder.addDoubleProperty("Target Velocity", () -> m_output.Velocity,
+        (double target) -> this.setSpeed(target));
   }
 }

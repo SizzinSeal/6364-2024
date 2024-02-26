@@ -86,6 +86,12 @@ public class Flywheel extends SubsystemBase {
         && Math.abs(kLowerSpeed - m_lowerMotor.getVelocity().getValueAsDouble()) < kLowerTolerance;
   }
 
+  /**
+   * @brief set the speed of the upper motor
+   * 
+   * @param speed speed in revolutions per second
+   * @return Command
+   */
   public Command setUpperSpeed(double speed) {
     return this.runOnce(() -> {
       m_upperOutput.Output = speed;
@@ -93,6 +99,12 @@ public class Flywheel extends SubsystemBase {
     });
   }
 
+  /**
+   * @brief set the speed of the lower motor
+   * 
+   * @param speed speed in revolutions per second
+   * @return Command
+   */
   public Command setLowerSpeed(double speed) {
     return this.runOnce(() -> {
       m_lowerOutput.Output = speed;
@@ -100,6 +112,12 @@ public class Flywheel extends SubsystemBase {
     });
   }
 
+  /**
+   * @brief set the speed of the flywheel
+   * 
+   * @param speed speed in revolutions per second
+   * @return Command
+   */
   public Command setSpeed(double speed) {
     return this.runOnce(() -> {
       this.setUpperSpeed(speed);
