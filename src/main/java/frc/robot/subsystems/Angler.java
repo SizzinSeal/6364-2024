@@ -15,6 +15,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -73,6 +74,19 @@ public class Angler extends SubsystemBase {
     motionMagicConfig.MotionMagicJerk = kJerk; // rps^3
     // apply configuration
     m_motor.getConfigurator().apply(config);
+    // post commands to smart dashboard
+    SmartDashboard.putData("calibrate", this.calibrate());
+    SmartDashboard.putData("Shooting Angle", this.goToShoot());
+    SmartDashboard.putData("Loading Angle", this.goToLoad());
+    SmartDashboard.putData("Quasistatic Routine Up",
+        this.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    SmartDashboard.putData("Quasistatic Routine Down",
+        this.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    SmartDashboard.putData("Dynamic Routine Up",
+        this.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    SmartDashboard.putData("Dynamic Routine Down",
+        this.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
   }
 
   /**
@@ -127,6 +141,26 @@ public class Angler extends SubsystemBase {
    */
   public Command goToLoad() {
     return this.goToAngle(kLoadingPosition);
+  }
+
+  /**
+   * @brief Go up manually
+   * 
+   * @return Command
+   */
+  public Command manualUp() {
+    return this.startEnd(() -> m_motor.setControl(new VelocityVoltage(kManualSpeed)),
+        () -> m_motor.setControl(new VelocityVoltage(0)));
+  }
+
+  /**
+   * @brief Go up manually
+   * 
+   * @return Command
+   */
+  public Command manualDown() {
+    return this.startEnd(() -> m_motor.setControl(new VelocityVoltage(-kManualSpeed)),
+        () -> m_motor.setControl(new VelocityVoltage(0)));
   }
 
   /**
