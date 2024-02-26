@@ -38,7 +38,9 @@ public class Deployer extends SubsystemBase {
   private final SysIdRoutine m_sysIdRoutine =
       new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
           new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
+            // use manually tuned kG to prevent the deployer from being flung all over the place
+            m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)
+                + Math.sin(m_motor.getPosition().getValueAsDouble() * 2 * Math.PI) * kG));
           }, log -> {
             log.motor("deployer")
                 .voltage(m_appliedVoltage
