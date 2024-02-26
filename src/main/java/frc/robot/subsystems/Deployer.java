@@ -99,10 +99,20 @@ public class Deployer extends SubsystemBase {
     return m_sysIdRoutine.dynamic(direction);
   }
 
+  /**
+   * @brief whether the deployer is deployed or not
+   * 
+   * @return true if its deployed, false otherwise
+   */
   public boolean isDeployed() {
     return Math.abs(kDownPosition - m_motor.getPosition().getValueAsDouble()) < kTolerance;
   }
 
+  /**
+   * @brief whether the deployer is retracted or not
+   * 
+   * @return true if its retracted, false otherwise
+   */
   public boolean isRetracted() {
     return Math.abs(kUpPosition - m_motor.getPosition().getValueAsDouble()) < kTolerance;
   }
@@ -114,8 +124,11 @@ public class Deployer extends SubsystemBase {
    * @return Command
    */
   public Command goToAngle(double angle) {
-    return this.runOnce(() -> {
+    return this.startEnd(() -> {
       m_output.Position = angle;
+      m_motor.setControl(m_output);
+    }, () -> {
+      m_output.Position = m_motor.getPosition().getValueAsDouble();
       m_motor.setControl(m_output);
     });
   }
@@ -126,7 +139,7 @@ public class Deployer extends SubsystemBase {
    * @return Command
    */
   public Command deploy() {
-    return this.runOnce(() -> goToAngle(kDownPosition));
+    return goToAngle(kDownPosition);
   }
 
   /**
@@ -135,7 +148,7 @@ public class Deployer extends SubsystemBase {
    * @return Command
    */
   public Command retract() {
-    return this.runOnce(() -> goToAngle(kUpPosition));
+    return goToAngle(kUpPosition);
   }
 
   /**
@@ -153,6 +166,7 @@ public class Deployer extends SubsystemBase {
     // measured position
     builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(), null);
     // target position
-    builder.addDoubleProperty("Target Position", () -> m_output.Position, null);
+    builder.addDoubleProperty("Target Position", () -> m_output.Position,
+        (double target) -> goToAngle(target));
   }
 }
