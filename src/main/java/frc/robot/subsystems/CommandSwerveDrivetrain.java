@@ -4,7 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -24,12 +31,19 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Time;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.SimConstants;
 import me.nabdev.pathfinding.structures.Path;
@@ -41,6 +55,55 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
+  public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(0.2).per(Second);
+  public static final Measure<Voltage> kStepVoltage = Volts.of(7.0);
+  public static final Measure<Time> kTimeout = Seconds.of(15.0);
+
+  // sysid routine
+  private final VoltageOut m_sysIdOutput = new VoltageOut(0);
+  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+  private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
+  private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
+  private final SysIdRoutine m_sysIdRoutine =
+      new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+          new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+            for (int i = 0; i < Modules.length; i++) {
+              Modules[i].getDriveMotor().setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
+            }
+          }, log -> {
+            log.motor("Front Left")
+                .voltage(m_appliedVoltage.mut_replace(
+                    Modules[0].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+                .angularPosition(m_angle.mut_replace(
+                    Modules[0].getDriveMotor().getPosition().getValueAsDouble(), Rotations))
+                .angularVelocity(m_velocity.mut_replace(
+                    Modules[0].getDriveMotor().getVelocity().getValueAsDouble(),
+                    RotationsPerSecond));
+            log.motor("Front Right")
+                .voltage(m_appliedVoltage.mut_replace(
+                    Modules[1].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+                .angularPosition(m_angle.mut_replace(
+                    Modules[1].getDriveMotor().getPosition().getValueAsDouble(), Rotations))
+                .angularVelocity(m_velocity.mut_replace(
+                    Modules[1].getDriveMotor().getVelocity().getValueAsDouble(),
+                    RotationsPerSecond));
+            log.motor("Back Right")
+                .voltage(m_appliedVoltage.mut_replace(
+                    Modules[2].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+                .angularPosition(m_angle.mut_replace(
+                    Modules[2].getDriveMotor().getPosition().getValueAsDouble(), Rotations))
+                .angularVelocity(m_velocity.mut_replace(
+                    Modules[2].getDriveMotor().getVelocity().getValueAsDouble(),
+                    RotationsPerSecond));
+            log.motor("Back Left")
+                .voltage(m_appliedVoltage.mut_replace(
+                    Modules[3].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+                .angularPosition(m_angle.mut_replace(
+                    Modules[3].getDriveMotor().getPosition().getValueAsDouble(), Rotations))
+                .angularVelocity(m_velocity.mut_replace(
+                    Modules[3].getDriveMotor().getVelocity().getValueAsDouble(),
+                    RotationsPerSecond));
+          }, this));
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
       SwerveModuleConstants... modules) {

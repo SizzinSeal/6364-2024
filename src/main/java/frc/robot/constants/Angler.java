@@ -16,7 +16,7 @@ public class Angler {
   // motor CAN bus names
   public static final String kMotorBus = "rio";
   // sensor ports
-  public static final int kLimitPort = 0; // TODO: find this value
+  public static final int kLimitPort = 1; // TODO: find this value
   // motor inversion TODO: find these values
   public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
   // controller constants

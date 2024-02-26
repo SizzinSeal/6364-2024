@@ -45,7 +45,7 @@ public class RobotContainer {
   private final Angler m_angler = new Angler();
   private final Deployer m_deployer = new Deployer();
   private final Intake m_intake = new Intake();
-  private final Indexer m_indexer = new Indexer();
+  public final Indexer m_indexer = new Indexer();
   private final Flywheel m_flywheel = new Flywheel();
 
   // Setting up bindings for necessary control of the swerve drive platform

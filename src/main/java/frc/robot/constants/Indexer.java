@@ -9,7 +9,7 @@ public class Indexer {
   // motor ids
   public static final int kMotorId = 19;
   // sensor ids
-  public static final int kNoteDetectorPort = 8; // TODO: find this value
+  public static final int kNoteDetectorPort = 0; // TODO: find this value
   // motor CAN bus names
   public static final String kMotorBus = "rio";
   // motor inversion
