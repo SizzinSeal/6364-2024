@@ -10,7 +10,7 @@ public class Intake {
   // CAN bus name
   public static final String kMotorBus = "rio";
   // motor inversion TODO: find these values
-  public static final InvertedValue kMotorInverted = InvertedValue.Clockwise_Positive;
+  public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
   // speeds (voltage)
   public static final double kIntakeSpeed = 8;
   public static final double kOuttakeSpeed = 8;

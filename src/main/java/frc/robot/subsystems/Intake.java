@@ -53,14 +53,9 @@ public class Intake extends SubsystemBase {
    * @param speed
    * @return
    */
-  public Command setSpeed(double speed) {
-    return this.startEnd(() -> {
-      m_output.Output = speed;
-      m_motor.setControl(m_output);
-    }, () -> {
-      m_output.Output = 0;
-      m_motor.setControl(m_output);
-    });
+  public void setSpeed(double speed) {
+    m_output.Output = speed;
+    m_motor.setControl(m_output);
   }
 
   /**
@@ -69,7 +64,7 @@ public class Intake extends SubsystemBase {
    * @return Command
    */
   public Command outtake() {
-    return this.setSpeed(-kOuttakeSpeed);
+    return this.startEnd(() -> this.setSpeed(-kOuttakeSpeed), () -> this.setSpeed(0));
   }
 
   /**
@@ -78,7 +73,7 @@ public class Intake extends SubsystemBase {
    * @return Command
    */
   public Command intake() {
-    return this.setSpeed(kIntakeSpeed);
+    return this.startEnd(() -> this.setSpeed(kIntakeSpeed), () -> this.setSpeed(0));
   }
 
   /**
@@ -87,7 +82,7 @@ public class Intake extends SubsystemBase {
    * @return Command
    */
   public Command stop() {
-    return this.setSpeed(0);
+    return this.runOnce(() -> setSpeed(0));
   }
 
   /**
