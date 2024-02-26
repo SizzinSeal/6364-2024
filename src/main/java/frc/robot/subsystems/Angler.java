@@ -82,12 +82,15 @@ public class Angler extends SubsystemBase {
   /**
    * @brief Go the the specified angle
    * 
-   * @param angle angle in degrees
+   * @param angle angle in rotations
    * @return Command
    */
   public Command goToAngle(double angle) {
-    return this.runOnce(() -> {
-      m_output.Position = (angle / 360.0);
+    return this.startEnd(() -> {
+      m_output.Position = angle;
+      m_motor.setControl(m_output);
+    }, () -> {
+      m_output.Position = m_motor.getPosition().getValueAsDouble();
       m_motor.setControl(m_output);
     });
   }
@@ -151,6 +154,7 @@ public class Angler extends SubsystemBase {
     // measured position
     builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(), null);
     // target position
-    builder.addDoubleProperty("Target Position", () -> m_output.Position, null);
+    builder.addDoubleProperty("Target Position", () -> m_output.Position,
+        (double target) -> this.goToAngle(target));
   }
 }
