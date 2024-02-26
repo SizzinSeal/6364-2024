@@ -118,35 +118,35 @@ public class RobotContainer {
    * @brief Update the pose estimator with vision measurements
    */
   public void updatePoseEstimator() {
-    double xystd; // standard deviation of the x and y measurements
-    double degstd; // standard deviation of the angle measurement
+    double lateralDeviation; // standard deviation of the x and y measurements
+    double angularDeviation; // standard deviation of the angle measurement
     final MeasurementInfo internalTag = limelight1.tagDetector();
-    final double posdiff = m_drivetrain.getPoseDifference(limelight1.getPos2D());
+    final double posDiff = m_drivetrain.getPoseDifference(limelight1.getPos2D());
     // return if no tag detected
     if (internalTag.tagId == -1)
       return;
     // more than 1 tag in view
     if (internalTag.tagCount > 1) {
-      xystd = 0.5;
-      degstd = 6;
+      lateralDeviation = 0.5;
+      angularDeviation = 6;
     }
     // 1 target with large area and close to estimated pose
-    else if (internalTag.tagArea > 0.8 && posdiff < 0.5) {
-      xystd = 1.0;
-      degstd = 12;
+    else if (internalTag.tagArea > 0.8 && posDiff < 0.5) {
+      lateralDeviation = 1.0;
+      angularDeviation = 12;
     }
     // 1 target farther away and estimated pose is close
-    else if (internalTag.tagArea > 0.1 && posdiff < 0.3) {
-      xystd = 2.0;
-      degstd = 30;
+    else if (internalTag.tagArea > 0.1 && posDiff < 0.3) {
+      lateralDeviation = 2.0;
+      angularDeviation = 30;
     }
     // conditions don't match to add a vision measurement
     else
       return;
     // update the pose estimator
     m_drivetrain.addVisionMeasurement(limelight1.getPos2D(),
-        limelight1.getLatestLatencyAdjustedTimeStamp(),
-        VecBuilder.fill(xystd, xystd, Units.degreesToRadians(degstd)));
+        limelight1.getLatestLatencyAdjustedTimeStamp(), VecBuilder.fill(lateralDeviation,
+            lateralDeviation, Units.degreesToRadians(angularDeviation)));
   }
 
   /**

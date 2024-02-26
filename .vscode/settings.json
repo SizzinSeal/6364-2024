@@ -44,7 +44,8 @@
       "Odometry",
       "Pathfinding",
       "Quasistatic",
-      "telemeterize"
+      "telemeterize",
+      "teleop"
     ],
     "editor.guides.indentation": false
 }
