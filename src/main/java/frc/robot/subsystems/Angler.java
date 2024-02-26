@@ -4,6 +4,7 @@ import static edu.wpi.first.units.MutableMeasure.mutable;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.Angle;
@@ -12,6 +13,7 @@ import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +26,8 @@ import static frc.robot.constants.Angler.*;
 public class Angler extends SubsystemBase {
   // init motors
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
+  // init sensors
+  private final DigitalInput m_limit = new DigitalInput(kLimitPort);
   // control outputs
   private final MotionMagicVoltage m_output = new MotionMagicVoltage(0);
 
@@ -72,11 +76,26 @@ public class Angler extends SubsystemBase {
   }
 
   /**
-   * @brief Set the motor to the specified voltage
-   * @return
+   * @brief whether the angler is at the target position or not
+   * 
+   * @return boolean
    */
   public boolean atTarget() {
     return Math.abs(m_output.Position - m_motor.getPosition().getValueAsDouble()) < kTolerance;
+  }
+
+  /**
+   * @brief calibrate the angler
+   * 
+   * @return Command
+   */
+  public Command calibrate() {
+    return this.runOnce(() -> m_motor.setControl(new VelocityVoltage(-kManualSpeed)))
+        .until(() -> m_limit.get())
+        .andThen(() -> m_motor.setControl(new VelocityVoltage(kManualSpeed))).withTimeout(0.5)
+        .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeSpeed)))
+        .until(() -> m_limit.get()).andThen(() -> m_motor.setControl(new VoltageOut(0)))
+        .andThen(() -> m_motor.setPosition(0));
   }
 
   /**
