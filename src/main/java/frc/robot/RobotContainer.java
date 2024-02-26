@@ -46,13 +46,13 @@ public class RobotContainer {
   private final Deployer m_deployer = new Deployer();
   private final Intake m_intake = new Intake();
   private final Indexer m_indexer = new Indexer();
-  private final Flywheel m_shooter = new Flywheel();
+  private final Flywheel m_flywheel = new Flywheel();
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   private final SendableChooser<Command> autoChooser;
-  private final BooleanSupplier shooterStateSupplier = () -> m_shooter.isAtSpeed();
+  private final BooleanSupplier shooterStateSupplier = () -> m_flywheel.isAtSpeed();
   private final BooleanSupplier noteStateSupplier = () -> m_indexer.noteDetected();
 
   // Swerve drive request initialization. Using FieldCentric request type.
@@ -160,7 +160,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
     SmartDashboard.putData("Intake", m_intake);
     SmartDashboard.putData("Indexer", m_indexer);
-    SmartDashboard.putData("Flywheel", m_shooter);
+    SmartDashboard.putData("Flywheel", m_flywheel);
   }
 
   /**
