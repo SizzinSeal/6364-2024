@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import com.ctre.phoenix6.Utils;
@@ -22,7 +22,7 @@ import static frc.robot.constants.Indexer.*;
  */
 public class Indexer extends SubsystemBase {
   // init devices
-  private final DigitalInput m_noteDetector = new DigitalInput(kNoteDetectorPort);
+  private final AnalogInput m_noteDetector = new AnalogInput(kNoteDetectorPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // control output objects
   private final VoltageOut m_output = new VoltageOut(0);
@@ -57,7 +57,7 @@ public class Indexer extends SubsystemBase {
    * @return true if not detected, false otherwise
    */
   public Boolean noteDetected() {
-    return m_noteDetector.get();
+    return m_noteDetector.getValue() < 0.83;
   }
 
   /**
