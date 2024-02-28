@@ -1,11 +1,11 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
- 
+
 package frc.robot;
- 
+
 import java.util.function.BooleanSupplier;
- 
+
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -29,49 +29,50 @@ import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
- 
+
 public class RobotContainer {
- 
+
   // 6 meters per second desired top speed.
   private static final double kMaxSpeed = 2.0;
- 
+
   // Half a rotation per second max angular velocity.
   private static final double kMaxAngularRate = Math.PI;
- 
+
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
- 
+
   // Subsystems initialization.
   private final Angler m_angler = new Angler();
   private final Deployer m_deployer = new Deployer();
   private final Intake m_intake = new Intake();
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_flywheel = new Flywheel();
- 
+
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   private final SendableChooser<Command> autoChooser;
   private final BooleanSupplier shooterStateSupplier = () -> m_flywheel.isAtSpeed();
- 
+
   // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
       .withDriveRequestType(DriveRequestType.Velocity); // closed loop velocity control
- 
+
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
- 
+
   private void ConfigureCommands() {
-    NamedCommands.registerCommand("Intake",
-        m_deployer.deploy().until(() -> m_deployer.isDeployed()).withTimeout(2)
-            .andThen(m_intake.intake()).alongWith(m_indexer.load())
-            .andThen(m_angler.goToShoot()));
-    NamedCommands.registerCommand("RetractDeployer", m_deployer.retract());
-    NamedCommands.registerCommand("Shoot",
-        m_flywheel.forwards().until(() -> false).andThen(m_indexer.eject()));
- 
+    /*
+     * NamedCommands.registerCommand("Intake", m_deployer.deploy().until(() ->
+     * m_deployer.isDeployed()).withTimeout(2)
+     * .andThen(m_intake.intake()).alongWith(m_indexer.load()) .andThen(m_angler.goToShoot()));
+     * NamedCommands.registerCommand("RetractDeployer", m_deployer.retract());
+     * NamedCommands.registerCommand("Shoot", m_flywheel.forwards().until(() ->
+     * false).andThen(m_indexer.eject()));
+     */
+
   }
- 
+
   /**
    * @brief Configure the controller bindings for teleop
    */
@@ -80,20 +81,20 @@ public class RobotContainer {
         m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
             .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
             .withRotationalRate(-m_controller.getRightX())));
- 
+
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
- 
+
     // m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
     // .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
- 
+
     // m_controller.a().whileTrue(m_drivetrain
     // .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5),
     // Rotation2d.fromDegrees(180)))));
- 
+
     // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
     // -m_controller.getLeftX()))));
- 
+
     // deploy and intake
     // m_controller.rightBumper().whileTrue(m_intake.intake().alongWith(m_indexer.load())
     // .andThen(Commands.waitUntil(() ->
@@ -102,31 +103,37 @@ public class RobotContainer {
     // shoot
     // m_controller.leftBumper().whileTrue(m_flywheel.forwards());
     // m_controller.leftBumper().onFalse(m_flywheel.stop());
-    m_controller.rightTrigger().whileTrue(m_intake.intake().alongWith(m_indexer.load())
-        .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop()).andThen(
-            Commands.waitSeconds(0.05))
-        .andThen(m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected())).andThen(
-            Commands.waitUntil(() -> m_indexer.noteDetected()))
-        .andThen(m_indexer.stop()));
+    m_controller.rightTrigger()
+        .whileTrue(m_intake.intake().alongWith(m_indexer.load())
+            .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop())
+            .andThen(Commands.waitSeconds(0.05))
+            .andThen(m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected()))
+            .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_indexer.stop()));
     m_controller.rightTrigger().onFalse(m_indexer.stop().alongWith(m_intake.stop()));
- 
+
     m_controller.leftBumper()
         .whileTrue(m_flywheel.forwards().andThen(Commands.waitSeconds(2)).andThen(m_indexer.eject())
             .andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop()).andThen(m_indexer.stop()));
     m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()));
+
+    m_controller.povUp().whileTrue(m_deployer.up());
+    m_controller.povUp().onFalse(m_deployer.stop());
+    m_controller.povDown().whileTrue(m_deployer.down());
+    m_controller.povDown().onFalse(m_deployer.stop());
+
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
     // m_drivetrain));
- 
+
     // reset position if in simulation
     if (Utils.isSimulation()) {
       m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
- 
+
     // register telemetry
     m_drivetrain.registerTelemetry(m_logger::telemeterize);
   }
- 
+
   /**
    * @brief Update the pose estimator with vision measurements
    */
@@ -161,10 +168,9 @@ public class RobotContainer {
         limelight1.getLatestLatencyAdjustedTimeStamp(), VecBuilder.fill(lateralDeviation,
             lateralDeviation, Units.degreesToRadians(angularDeviation)));
   }
- 
+
   /**
-   * @brief Construct the container for the robot. This will be called upon
-   *        startup
+   * @brief Construct the container for the robot. This will be called upon startup
    */
   public RobotContainer() {
     ConfigureCommands();
@@ -176,7 +182,7 @@ public class RobotContainer {
     SmartDashboard.putData("Indexer", m_indexer);
     SmartDashboard.putData("Flywheel", m_flywheel);
   }
- 
+
   /**
    * @brief Get the autonomous command to run
    * 

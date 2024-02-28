@@ -28,29 +28,8 @@ import static frc.robot.constants.Deployer.*;
 public class Deployer extends SubsystemBase {
   // init motors
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
-  // control outputs
-  private final MotionMagicVoltage m_output = new MotionMagicVoltage(0);
-
-  // deployer sysid routine
-  private final VoltageOut m_sysIdOutput = new VoltageOut(0);
-  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
-  private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
-  private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
-  private final SysIdRoutine m_sysIdRoutine =
-      new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
-          new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            // use manually tuned kG to prevent the deployer from being flung all over the place
-            m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)
-                + Math.sin(m_motor.getPosition().getValueAsDouble() * 2 * Math.PI) * kG));
-          }, log -> {
-            log.motor("deployer")
-                .voltage(m_appliedVoltage
-                    .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
-                .angularPosition(
-                    m_angle.mut_replace(m_motor.getPosition().getValueAsDouble(), Rotations))
-                .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
-                    RotationsPerSecond));
-          }, this));
+  // init output
+  private final VoltageOut m_output = new VoltageOut(0);
 
   /**
    * @brief IntakeSubsystem constructor
@@ -72,42 +51,6 @@ public class Deployer extends SubsystemBase {
     config.Feedback.SensorToMechanismRatio = kRatio;
     // apply configuration
     m_motor.getConfigurator().apply(config);
-    SmartDashboard.putData("Quasistatic Routine Up",
-        this.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    SmartDashboard.putData("Quasistatic Routine Down",
-        this.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    SmartDashboard.putData("Dynamic Routine Up",
-        this.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    SmartDashboard.putData("Dynamic Routine Down",
-        this.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    SmartDashboard.putData("Deploy", this.deploy());
-    SmartDashboard.putData("Retract", this.retract());
-  }
-
-  /**
-   * @brief quasistatic sysid routine
-   * 
-   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is negligible.
-   * 
-   * @param direction the direction of the sysid routine
-   * @return Command
-   */
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
-  }
-
-  /**
-   * @brief dynamic sysid routine
-   * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
-   *        non-linear effects.
-   * 
-   * @param direction the direction of the sysid routine
-   * @return Command
-   */
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
   }
 
   /**
@@ -129,25 +72,15 @@ public class Deployer extends SubsystemBase {
   }
 
   /**
-   * @brief move the deployer to the specified angle
-   * 
-   * @param angle the angle to move to in rotations
-   * @return Command
-   */
-  public Command goToAngle(double angle) {
-    return this.runOnce(() -> {
-      m_output.Position = angle;
-      m_motor.setControl(m_output);
-    });
-  }
-
-  /**
    * @brief deploy the deployer
    * 
    * @return Command
    */
-  public Command deploy() {
-    return goToAngle(kDownPosition);
+  public Command down() {
+    return this.runOnce(() -> {
+      m_output.Output = -0.5;
+      m_motor.setControl(m_output);
+    });
   }
 
   /**
@@ -155,8 +88,18 @@ public class Deployer extends SubsystemBase {
    * 
    * @return Command
    */
-  public Command retract() {
-    return goToAngle(kUpPosition);
+  public Command up() {
+    return this.runOnce(() -> {
+      m_output.Output = 0.5;
+      m_motor.setControl(m_output);
+    });
+  }
+
+  public Command stop() {
+    return this.runOnce(() -> {
+      m_output.Output = 0;
+      m_motor.setControl(m_output);
+    });
   }
 
   /**
@@ -173,8 +116,5 @@ public class Deployer extends SubsystemBase {
     super.initSendable(builder); // call the superclass method
     // measured position
     builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(), null);
-    // target position
-    builder.addDoubleProperty("Target Position", () -> m_output.Position,
-        (double target) -> goToAngle(target));
   }
 }
