@@ -78,8 +78,8 @@ public class RobotContainer {
    */
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(m_controller.getLeftX() * kMaxSpeed)
+            .withVelocityY(-m_controller.getLeftY() * kMaxSpeed)
             .withRotationalRate(-m_controller.getRightX())));
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));

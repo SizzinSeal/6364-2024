@@ -21,11 +21,11 @@ public class Flywheel {
   public static final String kUpperMotorBus = "rio";
   public static final String kLowerMotorBus = "rio";
   // motor inversion TODO: find these values
-  public static final InvertedValue kUpperMotorInverted = InvertedValue.Clockwise_Positive;
+  public static final InvertedValue kUpperMotorInverted = InvertedValue.CounterClockwise_Positive;
   public static final InvertedValue kLowerMotorInverted = InvertedValue.CounterClockwise_Positive;
   // motor neutral modes
-  public static final NeutralModeValue kUpperNeutralMode = NeutralModeValue.Coast;
-  public static final NeutralModeValue kLowerNeutralMode = NeutralModeValue.Coast;
+  public static final NeutralModeValue kUpperNeutralMode = NeutralModeValue.Brake;
+  public static final NeutralModeValue kLowerNeutralMode = NeutralModeValue.Brake;
   // controller constants
   public static final Slot0Configs kUpperControllerGains = // TODO: tune this
       new Slot0Configs().withKP(0).withKI(0).withKD(0).withKS(0.22748).withKV(0.11942)
@@ -34,8 +34,8 @@ public class Flywheel {
       new Slot0Configs().withKP(0).withKI(0).withKD(0).withKS(0.17641).withKV(0.10863)
           .withKA(0.018805);
   // speeds (in rotations per second)
-  public static final double kUpperSpeed = 60; // TODO: find this value
-  public static final double kLowerSpeed = 60; // TODO: find this value
+  public static final double kUpperSpeed = 100; // TODO: find this value
+  public static final double kLowerSpeed = 100; // TODO: find this value
   // acceleration (in rotations per second squared)
   public static final double kUpperAccel = 0; // TODO: find this value
   public static final double kLowerAccel = 0; // TODO: find this value

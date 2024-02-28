@@ -27,7 +27,7 @@ public class Deployer {
   public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
   // positions (rotations) TODO: tune this so 90 degrees is up relative to the ground
   public static final double kUpPosition = 0.02;
-  public static final double kDownPosition = -0.18;
+  public static final double kDownPosition = -0.13;
   // speeds (rotations per second)
   public static final double kUpSpeed = 5; // TODO: find this value
   public static final double kDownSpeed = 4;
