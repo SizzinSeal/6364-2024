@@ -1,23 +1,10 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static frc.robot.constants.Deployer.*;
 
@@ -74,29 +61,34 @@ public class Deployer extends SubsystemBase {
   }
 
   /**
-   * @brief deploy the deployer
+   * @brief move the deployer down
    * 
    * @return Command
    */
   public Command down() {
     return this.runOnce(() -> {
-      m_output.Output = -0.5;
+      m_output.Output = -kDownSpeed;
       m_motor.setControl(m_output);
     });
   }
 
   /**
-   * @brief retract the deployer
+   * @brief move the deployer up
    * 
    * @return Command
    */
   public Command up() {
     return this.runOnce(() -> {
-      m_output.Output = 0.5;
+      m_output.Output = kUpSpeed;
       m_motor.setControl(m_output);
     });
   }
 
+  /**
+   * @brief stop the deployer from moving
+   * 
+   * @return Command
+   */
   public Command stop() {
     return this.runOnce(() -> {
       m_output.Output = 0;

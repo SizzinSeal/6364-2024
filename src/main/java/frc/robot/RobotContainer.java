@@ -116,7 +116,8 @@ public class RobotContainer {
             .andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop()).andThen(m_indexer.stop()));
     m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()));
 
-    m_controller.povUp().whileTrue(m_deployer.up());
+    m_controller.povUp().whileTrue(m_deployer.up()
+        .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
     m_controller.povDown().whileTrue(m_deployer.down()
         .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
 
@@ -181,6 +182,7 @@ public class RobotContainer {
     SmartDashboard.putData("Indexer", m_indexer);
     SmartDashboard.putData("Flywheel", m_flywheel);
     SmartDashboard.putData("Deployer", m_deployer);
+    SmartDashboard.putData("Angler", m_angler);
   }
 
   /**
