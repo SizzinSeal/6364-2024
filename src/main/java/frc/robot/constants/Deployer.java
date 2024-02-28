@@ -26,11 +26,11 @@ public class Deployer {
   public static final double kG = 0;
   public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
   // positions (rotations) TODO: tune this so 90 degrees is up relative to the ground
-  public static final double kUpPosition = 0;
+  public static final double kUpPosition = 0.02;
   public static final double kDownPosition = -0.18;
   // speeds (rotations per second)
-  public static final double kUpSpeed = 1; // TODO: find this value
-  public static final double kDownSpeed = 1;
+  public static final double kUpSpeed = 5; // TODO: find this value
+  public static final double kDownSpeed = 4;
   // acceleration (rotations per second squared)
   public static final double kMaxAccel = 0; // TODO: find this value
   // jerk (rotations per second cubed)
