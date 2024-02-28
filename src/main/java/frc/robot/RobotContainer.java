@@ -117,9 +117,8 @@ public class RobotContainer {
     m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()));
 
     m_controller.povUp().whileTrue(m_deployer.up());
-    m_controller.povUp().onFalse(m_deployer.stop());
-    m_controller.povDown().whileTrue(m_deployer.down());
-    m_controller.povDown().onFalse(m_deployer.stop());
+    m_controller.povDown().whileTrue(m_deployer.down()
+        .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
 
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
@@ -181,6 +180,7 @@ public class RobotContainer {
     SmartDashboard.putData("Intake", m_intake);
     SmartDashboard.putData("Indexer", m_indexer);
     SmartDashboard.putData("Flywheel", m_flywheel);
+    SmartDashboard.putData("Deployer", m_deployer);
   }
 
   /**

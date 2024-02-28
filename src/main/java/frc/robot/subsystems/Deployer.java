@@ -51,6 +51,8 @@ public class Deployer extends SubsystemBase {
     config.Feedback.SensorToMechanismRatio = kRatio;
     // apply configuration
     m_motor.getConfigurator().apply(config);
+    // set motor position to 0
+    m_motor.setPosition(0);
   }
 
   /**
