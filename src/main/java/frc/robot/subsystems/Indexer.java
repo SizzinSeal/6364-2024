@@ -1,12 +1,11 @@
 package frc.robot.subsystems;
- 
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import com.ctre.phoenix6.Utils;
@@ -16,7 +15,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static frc.robot.constants.Indexer.*;
- 
+
 /**
  * @brief Intake Subsystem
  * 
@@ -30,14 +29,12 @@ public class Indexer extends SubsystemBase {
   // simulation objects
   private final TalonFXSimState m_motorSimState = m_motor.getSimState();
   private final DCMotorSim m_motorSim = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.001);
- 
+
   /**
    * @brief IndexerSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so
-   *        that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix
-   *        Tuner.
+   *        This is where the motors are configured. We configure them here so that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
   public Indexer() {
     super();
@@ -53,7 +50,7 @@ public class Indexer extends SubsystemBase {
     m_motor.getConfigurator().apply((motorConfig));
     m_motor.setNeutralMode(NeutralModeValue.Brake);
   }
- 
+
   /**
    * @brief whether a note is detected in the indexer or not
    * 
@@ -62,7 +59,7 @@ public class Indexer extends SubsystemBase {
   public Boolean noteDetected() {
     return m_noteDetector.getVoltage() > 0.83;
   }
- 
+
   /**
    * @brief set the speed of the indexer
    * 
@@ -73,7 +70,7 @@ public class Indexer extends SubsystemBase {
     m_output.Output = speed;
     m_motor.setControl(m_output);
   }
- 
+
   /**
    * @brief Spin the indexer motors to load a note
    * 
@@ -82,11 +79,11 @@ public class Indexer extends SubsystemBase {
   public Command load() {
     return Commands.runOnce(() -> this.setSpeed(kLoadSpeed));
   }
- 
+
   public Command slowLoad() {
     return Commands.runOnce(() -> this.setSpeed(-2));
   }
- 
+
   /**
    * @brief Spin the intake motors to eject a note
    * 
@@ -95,7 +92,7 @@ public class Indexer extends SubsystemBase {
   public Command eject() {
     return this.runOnce(() -> this.setSpeed(kEjectSpeed));
   }
- 
+
   /**
    * @brief Stop the indexer motors
    * 
@@ -103,12 +100,11 @@ public class Indexer extends SubsystemBase {
   public Command stop() {
     return this.runOnce(() -> setSpeed(0));
   }
- 
+
   /**
    * @brief periodic update method
    * 
-   *        This method is called periodically by the scheduler. We use it to
-   *        update the simulated
+   *        This method is called periodically by the scheduler. We use it to update the simulated
    *        motors.
    */
   @Override
@@ -126,16 +122,13 @@ public class Indexer extends SubsystemBase {
       m_motorSimState.setRotorVelocity(m_motorSim.getAngularVelocityRPM() / 60.0);
     }
   }
- 
+
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We
-   *        use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the
-   *        motors. This
-   *        allows us to tune intake speed in real time, without having to
-   *        re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the motors. This
+   *        allows us to tune intake speed in real time, without having to re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */

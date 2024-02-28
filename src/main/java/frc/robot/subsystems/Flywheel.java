@@ -107,22 +107,24 @@ public class Flywheel extends SubsystemBase {
     SmartDashboard.putData("Forwards", this.forwards());
     SmartDashboard.putData("Reverse", this.reverse());
     SmartDashboard.putData("Stop", this.stop());
-    SmartDashboard.putData("Upper Quasistatic Routine Up",
-        this.upperSysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    SmartDashboard.putData("Upper Quasistatic Routine Down",
-        this.upperSysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    SmartDashboard.putData("Upper Dynamic Routine Up",
-        this.upperSysIdDynamic(SysIdRoutine.Direction.kForward));
-    SmartDashboard.putData("Upper Dynamic Routine Down",
-        this.upperSysIdDynamic(SysIdRoutine.Direction.kReverse));
-    SmartDashboard.putData("Lower Quasistatic Routine Up",
-        this.lowerSysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    SmartDashboard.putData("Lower Quasistatic Routine Down",
-        this.lowerSysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    SmartDashboard.putData("Lower Dynamic Routine Up",
-        this.lowerSysIdDynamic(SysIdRoutine.Direction.kForward));
-    SmartDashboard.putData("Lower Dynamic Routine Down",
-        this.lowerSysIdDynamic(SysIdRoutine.Direction.kReverse));
+    /*
+     * SmartDashboard.putData("Upper Quasistatic Routine Up",
+     * this.upperSysIdQuasistatic(SysIdRoutine.Direction.kForward));
+     * SmartDashboard.putData("Upper Quasistatic Routine Down",
+     * this.upperSysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+     * SmartDashboard.putData("Upper Dynamic Routine Up",
+     * this.upperSysIdDynamic(SysIdRoutine.Direction.kForward));
+     * SmartDashboard.putData("Upper Dynamic Routine Down",
+     * this.upperSysIdDynamic(SysIdRoutine.Direction.kReverse));
+     * SmartDashboard.putData("Lower Quasistatic Routine Up",
+     * this.lowerSysIdQuasistatic(SysIdRoutine.Direction.kForward));
+     * SmartDashboard.putData("Lower Quasistatic Routine Down",
+     * this.lowerSysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+     * SmartDashboard.putData("Lower Dynamic Routine Up",
+     * this.lowerSysIdDynamic(SysIdRoutine.Direction.kForward));
+     * SmartDashboard.putData("Lower Dynamic Routine Down",
+     * this.lowerSysIdDynamic(SysIdRoutine.Direction.kReverse));
+     */
   }
 
   /**
