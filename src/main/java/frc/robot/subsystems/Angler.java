@@ -78,14 +78,6 @@ public class Angler extends SubsystemBase {
     SmartDashboard.putData("calibrate", this.calibrate());
     SmartDashboard.putData("Shooting Angle", this.goToShoot());
     SmartDashboard.putData("Loading Angle", this.goToLoad());
-    SmartDashboard.putData("Quasistatic Routine Up",
-        this.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    SmartDashboard.putData("Quasistatic Routine Down",
-        this.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    SmartDashboard.putData("Dynamic Routine Up",
-        this.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    SmartDashboard.putData("Dynamic Routine Down",
-        this.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
   }
 
