@@ -101,7 +101,7 @@ public class Deployer extends SubsystemBase {
     return this.runOnce(() -> {
       m_output.Output = 0;
       m_motor.setControl(m_output);
-      m_motor.setControl(new StaticBrake());
+      m_motor.setNeutralMode(NeutralModeValue.Brake);
     });
   }
 

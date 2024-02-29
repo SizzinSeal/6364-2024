@@ -16,8 +16,10 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static edu.wpi.first.units.Units.Rotations;
@@ -46,43 +48,45 @@ public class Flywheel extends SubsystemBase {
   private final MutableMeasure<Voltage> m_upperAppliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_upperAngle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_upperVelocity = mutable(RotationsPerSecond.of(0));
-  private final SysIdRoutine m_upperSysIdRoutine =
-      new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
-          new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            m_upperMotor.setControl(m_upperSysIdOutput.withOutput(volts.in(Volts)));
-          }, log -> {
-            log.motor("Upper Flywheel")
-                .voltage(m_upperAppliedVoltage
-                    .mut_replace(m_upperMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                .angularPosition(m_upperAngle
-                    .mut_replace(m_upperMotor.getPosition().getValueAsDouble(), Rotations))
-                .angularVelocity(m_upperVelocity.mut_replace(
-                    m_upperMotor.getVelocity().getValueAsDouble(), RotationsPerSecond));
-          }, this));
+  private final SysIdRoutine m_upperSysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+      new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+        m_upperMotor.setControl(m_upperSysIdOutput.withOutput(volts.in(Volts)));
+      }, log -> {
+        log.motor("Upper Flywheel")
+            .voltage(m_upperAppliedVoltage
+                .mut_replace(m_upperMotor.get() * RobotController.getBatteryVoltage(), Volts))
+            .angularPosition(m_upperAngle
+                .mut_replace(m_upperMotor.getPosition().getValueAsDouble(), Rotations))
+            .angularVelocity(m_upperVelocity.mut_replace(
+                m_upperMotor.getVelocity().getValueAsDouble(), RotationsPerSecond));
+      }, this));
   // lower sysid routine
   private final VoltageOut m_lowerSysIdOutput = new VoltageOut(0);
   private final MutableMeasure<Voltage> m_lowerAppliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_lowerAngle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_lowerVelocity = mutable(RotationsPerSecond.of(0));
-  private final SysIdRoutine m_lowerSysIdRoutine =
-      new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
-          new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            m_lowerMotor.setControl(m_lowerSysIdOutput.withOutput(volts.in(Volts)));
-          }, log -> {
-            log.motor("Lower Flywheel")
-                .voltage(m_lowerAppliedVoltage
-                    .mut_replace(m_lowerMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                .angularPosition(m_lowerAngle
-                    .mut_replace(m_lowerMotor.getPosition().getValueAsDouble(), Rotations))
-                .angularVelocity(m_lowerVelocity.mut_replace(
-                    m_lowerMotor.getVelocity().getValueAsDouble(), RotationsPerSecond));
-          }, this));
+  private final SysIdRoutine m_lowerSysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+      new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+        m_lowerMotor.setControl(m_lowerSysIdOutput.withOutput(volts.in(Volts)));
+      }, log -> {
+        log.motor("Lower Flywheel")
+            .voltage(m_lowerAppliedVoltage
+                .mut_replace(m_lowerMotor.get() * RobotController.getBatteryVoltage(), Volts))
+            .angularPosition(m_lowerAngle
+                .mut_replace(m_lowerMotor.getPosition().getValueAsDouble(), Rotations))
+            .angularVelocity(m_lowerVelocity.mut_replace(
+                m_lowerMotor.getVelocity().getValueAsDouble(), RotationsPerSecond));
+      }, this));
 
   /**
    * @brief FlywheelSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Flywheel() {
     super();
@@ -164,6 +168,9 @@ public class Flywheel extends SubsystemBase {
   public void setUpperSpeed(double speed) {
     m_upperOutput.Velocity = speed;
     m_upperMotor.setControl(m_upperOutput);
+    m_upperMotor.setNeutralMode(NeutralModeValue.Brake);
+    if (speed == 0.0)
+      m_lowerMotor.setControl(new StaticBrake());
   }
 
   /**
@@ -175,6 +182,9 @@ public class Flywheel extends SubsystemBase {
   public void setLowerSpeed(double speed) {
     m_lowerOutput.Velocity = speed;
     m_lowerMotor.setControl(m_lowerOutput);
+    m_lowerMotor.setNeutralMode(NeutralModeValue.Brake);
+    if (speed == 0.0)
+      m_lowerMotor.setControl(new StaticBrake());
   }
 
   /**
@@ -226,8 +236,10 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static
+   *        friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is
+   *        negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -239,7 +251,8 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic
+   *        friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -252,8 +265,10 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static
+   *        friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is
+   *        negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -265,7 +280,8 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic
+   *        friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -278,7 +294,8 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief periodic update method
    * 
-   *        This method is called periodically by the scheduler. We use it to update the simulated
+   *        This method is called periodically by the scheduler. We use it to
+   *        update the simulated
    *        motors.
    */
   @Override
@@ -305,9 +322,12 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */

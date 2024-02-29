@@ -21,7 +21,7 @@ public class Angler {
   public static final InvertedValue kMotorInverted = InvertedValue.Clockwise_Positive;
   // controller constants
   public static final Slot0Configs kControllerGains = // TODO: tune this
-      new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0.2539).withKV(0.11015)
+      new Slot0Configs().withKP(1).withKI(0).withKD(0).withKS(0.2539).withKV(0.11015)
           .withKA(0.0010909);
   // positions (in rotations)
   public static final double kMaxPosition = 0; // TODO: find this value

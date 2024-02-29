@@ -112,7 +112,7 @@ public class Angler extends SubsystemBase {
 
   public Command setSpeed(double speed) {
     return this.runOnce(() -> {
-      m_motor.setControl(new VelocityVoltage(speed));
+      m_motor.setControl(new VoltageOut(speed));
     });
   }
 

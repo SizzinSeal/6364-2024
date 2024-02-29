@@ -73,12 +73,11 @@ public class RobotContainer {
   // command to intake
   private final SequentialCommandGroup m_intakeCommand = new SequentialCommandGroup(
       m_intake.intake().alongWith(m_deployerDownCommand).alongWith(m_indexer.load())
-          .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop())
-          .andThen(Commands.waitSeconds(0.2))
+          .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop()).andThen(m_angler.goToShoot())
+          .andThen(Commands.waitSeconds(0.4))
           .andThen(m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected()))
           .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_indexer.stop())
-          .andThen(m_intake.stop())
-          .andThen(m_angler.goToShoot()));
+          .andThen(m_intake.stop()));
 
   // command to shoot
   private final SequentialCommandGroup m_shootCommand = new SequentialCommandGroup(
@@ -87,12 +86,12 @@ public class RobotContainer {
           .andThen(m_angler.goToLoad()));
 
   // command to calibrate angler
-  private final SequentialCommandGroup m_calibrateCommand = new SequentialCommandGroup(m_angler.setSpeed(-80))
+  private final SequentialCommandGroup m_calibrateCommand = new SequentialCommandGroup(m_angler.setSpeed(-3))
       .andThen(Commands.waitUntil(() -> m_angler.getLimit()))
-      .andThen(m_angler.setSpeed(80)).andThen(Commands.waitSeconds(0.3))
-      .andThen(m_angler.setSpeed(-10))
+      .andThen(m_angler.setSpeed(5)).andThen(Commands.waitSeconds(0.3))
+      .andThen(m_angler.setSpeed(-1))
       .andThen(Commands.waitUntil(() -> m_angler.getLimit()))
-      .andThen(m_angler.setSpeed(0))
+      .andThen(m_angler.setSpeed(0)).andThen(Commands.waitSeconds(1))
       .andThen(m_angler.zero());
 
   private final SequentialCommandGroup m_manualLoad = new SequentialCommandGroup();
@@ -211,6 +210,7 @@ public class RobotContainer {
         .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
     SmartDashboard.putData("Deployer Up", m_deployer.up()
         .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
+    SmartDashboard.putData("CalibrateAngler", m_calibrateCommand);
   }
 
   /**
