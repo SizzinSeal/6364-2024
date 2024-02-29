@@ -183,6 +183,10 @@ public class RobotContainer {
     SmartDashboard.putData("Flywheel", m_flywheel);
     SmartDashboard.putData("Deployer", m_deployer);
     SmartDashboard.putData("Angler", m_angler);
+    SmartDashboard.putData("Deployer Down", m_deployer.down()
+        .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
+    SmartDashboard.putData("Deployer Up", m_deployer.up()
+        .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
   }
 
   /**

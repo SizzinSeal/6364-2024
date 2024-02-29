@@ -51,7 +51,7 @@ public class Deployer extends SubsystemBase {
    * @return true if its deployed, false otherwise
    */
   public boolean isDeployed() {
-    return Math.abs(kDownPosition - m_motor.getPosition().getValueAsDouble()) < kTolerance;
+    return m_motor.getPosition().getValueAsDouble() - kTolerance < kDownPosition;
   }
 
   /**
@@ -60,7 +60,7 @@ public class Deployer extends SubsystemBase {
    * @return true if its retracted, false otherwise
    */
   public boolean isRetracted() {
-    return Math.abs(kUpPosition - m_motor.getPosition().getValueAsDouble()) < kTolerance;
+    return m_motor.getPosition().getValueAsDouble() + kTolerance > kUpPosition;
   }
 
   /**
