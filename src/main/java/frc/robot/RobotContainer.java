@@ -152,7 +152,9 @@ public class RobotContainer {
         .whileTrue(NamedCommands.getCommand("ShootCommand"));
     m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()).andThen(m_angler.goToLoad()));
 
-    // reset robot position manually
+    // manual indexer load
+    m_controller.b().onTrue(NamedCommands.getCommand("ManualLoad"));
+    // reset robot position
     m_controller.a().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
 
     m_controller.povUp().whileTrue(NamedCommands.getCommand("ClimberUp"));
@@ -228,6 +230,8 @@ public class RobotContainer {
     SmartDashboard.putData("Deployer Up", m_deployer.up()
         .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
     SmartDashboard.putData("CalibrateAngler", m_calibrateCommand);
+    SmartDashboard.putData("Climber Up", m_climberUp);
+    SmartDashboard.putData("Climber Down", m_climberDown);
   }
 
   /**
