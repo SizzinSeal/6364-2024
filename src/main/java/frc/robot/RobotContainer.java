@@ -128,8 +128,9 @@ public class RobotContainer {
 
     m_controller.rightTrigger()
         .whileTrue(NamedCommands.getCommand("IntakeCommand"));
-    m_controller.rightTrigger().onFalse(m_indexer.stop().alongWith(m_intake.stop()));
-    m_controller.rightBumper().whileTrue(NamedCommands.getCommand("DeployerUp"));
+    m_controller.rightTrigger()
+        .onFalse(m_indexer.stop().alongWith(m_intake.stop()).andThen(NamedCommands.getCommand("DeployerUp")));
+    // m_controller.rightBumper().whileTrue(NamedCommands.getCommand("DeployerUp"));
 
     m_controller.leftBumper()
         .whileTrue(NamedCommands.getCommand("ShootCommand"));

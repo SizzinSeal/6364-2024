@@ -28,7 +28,7 @@ public class Deployer {
   // positions (rotations) TODO: tune this so 90 degrees is up relative to the
   // ground
   public static final double kUpPosition = 0.01;
-  public static final double kDownPosition = -0.16;
+  public static final double kDownPosition = -0.18;
   // speeds (rotations per second)
   public static final double kUpSpeed = 2; // 5
   public static final double kDownSpeed = 2; // 4
