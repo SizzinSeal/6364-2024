@@ -100,9 +100,13 @@ public class RobotContainer {
 
   private final SequentialCommandGroup m_climberUp = new SequentialCommandGroup(m_climber.up()
       .andThen(Commands.waitUntil(() -> m_climber.isRetracted())).andThen(m_climber.stop()));
+
   // command to climb
   private final SequentialCommandGroup m_climberDown = new SequentialCommandGroup(m_climber.down()
       .andThen(Commands.waitUntil(() -> m_climber.isDeployed())).andThen(m_deployer.stop()));
+
+  // auto routine
+  private final SequentialCommandGroup m_autoRoutine = new SequentialCommandGroup(m_angler.goToShoot());
 
   private final SequentialCommandGroup m_manualLoad = new SequentialCommandGroup(
       m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected())
@@ -127,7 +131,7 @@ public class RobotContainer {
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
         m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-            .withVelocityY(m_controller.getLeftX() * kMaxSpeed)
+            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
             .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
