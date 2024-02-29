@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,10 +37,10 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
 
   // 6 meters per second desired top speed.
-  private static final double kMaxSpeed = 2.0;
+  private static final double kMaxSpeed = 4.0;
 
   // Half a rotation per second max angular velocity.
-  private static final double kMaxAngularRate = Math.PI;
+  private static final double kMaxAngularRate = 1.5 * Math.PI;
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
@@ -59,7 +61,7 @@ public class RobotContainer {
 
   // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
-      .withDeadband(kMaxSpeed * 0.2).withRotationalDeadband(kMaxAngularRate * 0.2) // 20% deadband
+      .withDeadband(kMaxSpeed * 0.05).withRotationalDeadband(kMaxAngularRate * 0.05) // 20% deadband
       .withDriveRequestType(DriveRequestType.Velocity); // closed loop velocity control
 
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
@@ -125,8 +127,8 @@ public class RobotContainer {
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
         m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
-            .withRotationalRate(-m_controller.getRightX())));
+            .withVelocityY(m_controller.getLeftX() * kMaxSpeed)
+            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
 
