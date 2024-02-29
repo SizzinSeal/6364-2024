@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import static edu.wpi.first.units.Units.Rotations;
@@ -37,25 +38,27 @@ public class Angler extends SubsystemBase {
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
-  private final SysIdRoutine m_sysIdRoutine =
-      new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
-          new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
-          }, log -> {
-            log.motor("angler")
-                .voltage(m_appliedVoltage
-                    .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
-                .angularPosition(
-                    m_angle.mut_replace(m_motor.getPosition().getValueAsDouble(), Rotations))
-                .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
-                    RotationsPerSecond));
-          }, this));
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+      new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+        m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
+      }, log -> {
+        log.motor("angler")
+            .voltage(m_appliedVoltage
+                .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
+            .angularPosition(
+                m_angle.mut_replace(m_motor.getPosition().getValueAsDouble(), Rotations))
+            .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
+                RotationsPerSecond));
+      }, this));
 
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Angler() {
     super();
@@ -74,6 +77,8 @@ public class Angler extends SubsystemBase {
     motionMagicConfig.MotionMagicJerk = kJerk; // rps^3
     // apply configuration
     m_motor.getConfigurator().apply(config);
+    // set 0 position
+    m_motor.setPosition(0);
     // post commands to smart dashboard
     SmartDashboard.putData("calibrate", this.calibrate());
     SmartDashboard.putData("Shooting Angle", this.goToShoot());
@@ -97,10 +102,11 @@ public class Angler extends SubsystemBase {
    */
   public Command calibrate() {
     return this.runOnce(() -> m_motor.setControl(new VelocityVoltage(-kManualSpeed)))
-        .until(() -> m_limit.get())
+        .andThen(Commands.waitUntil(() -> m_limit.get()))
         .andThen(() -> m_motor.setControl(new VelocityVoltage(kManualSpeed))).withTimeout(0.5)
         .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeSpeed)))
-        .until(() -> m_limit.get()).andThen(() -> m_motor.setControl(new VoltageOut(0)))
+        .andThen(Commands.waitUntil(() -> m_limit.get()))
+        .andThen(() -> m_motor.setControl(new VoltageOut(0)))
         .andThen(() -> m_motor.setPosition(0));
   }
 
@@ -158,8 +164,10 @@ public class Angler extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static
+   *        friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is
+   *        negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -171,7 +179,8 @@ public class Angler extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic
+   *        friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -184,9 +193,12 @@ public class Angler extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */

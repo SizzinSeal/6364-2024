@@ -29,9 +29,9 @@ public class Angler {
   public static final double kShootingPosition = 0; // TODO: find this value
   public static final double kLoadingPosition = 0; // TODO: find this value
   // speeds (in rotations per second)
-  public static final double kMaxSpeed = 100; // TODO: find this value
-  public static final double kManualSpeed = 0; // TODO: find this value
-  public static final double kProbeSpeed = 0; // TODO: find this value
+  public static final double kMaxSpeed = 150; // TODO: find this value
+  public static final double kManualSpeed = 30; // TODO: find this value
+  public static final double kProbeSpeed = 15; // TODO: find this value
   // acceleration (in rotations per second squared)
   public static final double kAcceleration = 100; // TODO: find this value
   public static final double kManualAcceleration = 0; // TODO: find this value
