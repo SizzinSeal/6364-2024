@@ -121,6 +121,7 @@ public class Deployer extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder); // call the superclass method
     // measured position
-    builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(), null);
+    builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(),
+        (double position) -> m_motor.setPosition(position));
   }
 }

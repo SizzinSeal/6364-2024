@@ -62,12 +62,15 @@ public class RobotContainer {
 
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
+  // command to move the deployer down
   private final SequentialCommandGroup m_deployerDownCommand = new SequentialCommandGroup(m_deployer.down()
       .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
 
+  // command to move the deployer up
   private final SequentialCommandGroup m_deployerUpCommand = new SequentialCommandGroup(m_deployer.up()
       .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
 
+  // command to intake
   private final SequentialCommandGroup m_intakeCommand = new SequentialCommandGroup(
       m_intake.intake().alongWith(m_deployerDownCommand).alongWith(m_indexer.load())
           .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop())
@@ -77,13 +80,29 @@ public class RobotContainer {
           .andThen(m_intake.stop())
           .andThen(m_angler.goToShoot()));
 
+  // command to shoot
+  private final SequentialCommandGroup m_shootCommand = new SequentialCommandGroup(
+      m_flywheel.forwards().andThen(Commands.waitSeconds(2)).andThen(m_indexer.eject())
+          .andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop()).andThen(m_indexer.stop())
+          .andThen(m_angler.goToLoad()));
+
+  // command to calibrate angler
+  private final SequentialCommandGroup m_calibrateCommand = new SequentialCommandGroup(m_angler.setSpeed(-80))
+      .andThen(Commands.waitUntil(() -> m_angler.getLimit()))
+      .andThen(m_angler.setSpeed(80)).andThen(Commands.waitSeconds(0.3))
+      .andThen(m_angler.setSpeed(-10))
+      .andThen(Commands.waitUntil(() -> m_angler.getLimit()))
+      .andThen(m_angler.setSpeed(0))
+      .andThen(m_angler.zero());
+
   private final SequentialCommandGroup m_manualLoad = new SequentialCommandGroup();
 
   private void ConfigureCommands() {
     NamedCommands.registerCommand("DeployerDown", m_deployerDownCommand);
     NamedCommands.registerCommand("DeployerUp", m_deployerUpCommand);
     NamedCommands.registerCommand("IntakeCommand", m_intakeCommand);
-    NamedCommands.registerCommand("CalibrateAngler", m_angler.calibrate());
+    NamedCommands.registerCommand("ShootCommand", m_shootCommand);
+    NamedCommands.registerCommand("CalibrateAngler", m_calibrateCommand);
   }
 
   /**
@@ -91,8 +110,8 @@ public class RobotContainer {
    */
   private void configureBindings() {
     m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(m_controller.getLeftX() * kMaxSpeed)
-            .withVelocityY(-m_controller.getLeftY() * kMaxSpeed)
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
+            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
             .withRotationalRate(-m_controller.getRightX())));
 
     // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
@@ -108,28 +127,22 @@ public class RobotContainer {
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
     // -m_controller.getLeftX()))));
 
-    // deploy and intake
-    // m_controller.rightBumper().whileTrue(m_intake.intake().alongWith(m_indexer.load())
-    // .andThen(Commands.waitUntil(() ->
-    // m_indexer.noteDetected()).andThen(m_indexer.stop())));
-    // m_controller.rightBumper().onFalse(m_indexer.stop());
-    // shoot
-    // m_controller.leftBumper().whileTrue(m_flywheel.forwards());
-    // m_controller.leftBumper().onFalse(m_flywheel.stop());
     m_controller.rightTrigger()
         .whileTrue(NamedCommands.getCommand("IntakeCommand"));
     m_controller.rightTrigger().onFalse(m_indexer.stop().alongWith(m_intake.stop()));
     m_controller.rightBumper().whileTrue(NamedCommands.getCommand("DeployerUp"));
 
     m_controller.leftBumper()
-        .whileTrue(m_flywheel.forwards().andThen(Commands.waitSeconds(2)).andThen(m_indexer.eject())
-            .andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop()).andThen(m_indexer.stop()));
+        .whileTrue(NamedCommands.getCommand("ShootCommand"));
     m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()).andThen(m_angler.goToLoad()));
 
     m_controller.povUp().whileTrue(m_deployer.up()
         .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
     m_controller.povDown().whileTrue(m_deployer.down()
         .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
+
+    // reset robot position manually
+    m_controller.a().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
 
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),

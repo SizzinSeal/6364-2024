@@ -110,6 +110,20 @@ public class Angler extends SubsystemBase {
         .andThen(() -> m_motor.setPosition(0));
   }
 
+  public Command setSpeed(double speed) {
+    return this.runOnce(() -> {
+      m_motor.setControl(new VelocityVoltage(speed));
+    });
+  }
+
+  public Boolean getLimit() {
+    return m_limit.get();
+  }
+
+  public Command zero() {
+    return this.runOnce(() -> m_motor.setPosition(0));
+  }
+
   /**
    * @brief Go the the specified angle
    * 
@@ -206,7 +220,8 @@ public class Angler extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder); // call the superclass method
     // measured position
-    builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(), null);
+    builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(),
+        (double position) -> m_motor.setPosition(position));
     // target position
     builder.addDoubleProperty("Target Position", () -> m_output.Position,
         (double target) -> this.goToAngle(target).schedule());

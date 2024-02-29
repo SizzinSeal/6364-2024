@@ -14,6 +14,8 @@
       "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/Autonomous routine": "String Chooser",
       "/SmartDashboard/Deployer": "Subsystem",
+      "/SmartDashboard/Deployer Down": "Command",
+      "/SmartDashboard/Deployer Up": "Command",
       "/SmartDashboard/Dynamic Routine Down": "Command",
       "/SmartDashboard/Dynamic Routine Up": "Command",
       "/SmartDashboard/Field": "Field2d",
