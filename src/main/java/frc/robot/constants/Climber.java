@@ -11,11 +11,11 @@ import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 
-public class Deployer {
+public class Climber {
   // sim loop period (milliseconds)
   public static final double kSimLoopPeriod = 0.005;
   // motor ids
-  public static final int kMotorId = 18;
+  public static final int kMotorId = 16;
   // CAN bus name
   public static final String kMotorBus = "rio";
   // motor inversion TODO: find these values
@@ -27,8 +27,8 @@ public class Deployer {
   public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
   // positions (rotations) TODO: tune this so 90 degrees is up relative to the
   // ground
-  public static final double kUpPosition = -0.02;
-  public static final double kDownPosition = -0.10;
+  public static final double kUpPosition = 0;
+  public static final double kDownPosition = 1;
   // speeds (rotations per second)
   public static final double kUpSpeed = 5; // TODO: find this value
   public static final double kDownSpeed = 4;

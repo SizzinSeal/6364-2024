@@ -8,13 +8,13 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
-import static frc.robot.constants.Deployer.*;
+import static frc.robot.constants.Climber.*;
 
 /**
  * @brief Intake Subsystem
  * 
  */
-public class Deployer extends SubsystemBase {
+public class Climber extends SubsystemBase {
   // init motors
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // init output
@@ -28,7 +28,7 @@ public class Deployer extends SubsystemBase {
    *        motors without having to worry about reconfiguring them in Phoenix
    *        Tuner.
    */
-  public Deployer() {
+  public Climber() {
     super();
     // configure motors
     final TalonFXConfiguration config = new TalonFXConfiguration();

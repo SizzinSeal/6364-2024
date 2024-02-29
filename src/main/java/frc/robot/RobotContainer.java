@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.generated.TunerConstants;
@@ -61,16 +62,28 @@ public class RobotContainer {
 
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
-  private void ConfigureCommands() {
-    /*
-     * NamedCommands.registerCommand("Intake", m_deployer.deploy().until(() ->
-     * m_deployer.isDeployed()).withTimeout(2)
-     * .andThen(m_intake.intake()).alongWith(m_indexer.load()) .andThen(m_angler.goToShoot()));
-     * NamedCommands.registerCommand("RetractDeployer", m_deployer.retract());
-     * NamedCommands.registerCommand("Shoot", m_flywheel.forwards().until(() ->
-     * false).andThen(m_indexer.eject()));
-     */
+  private final SequentialCommandGroup m_deployerDownCommand = new SequentialCommandGroup(m_deployer.down()
+      .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
 
+  private final SequentialCommandGroup m_deployerUpCommand = new SequentialCommandGroup(m_deployer.up()
+      .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
+
+  private final SequentialCommandGroup m_intakeCommand = new SequentialCommandGroup(
+      m_intake.intake().alongWith(m_deployerDownCommand).alongWith(m_indexer.load())
+          .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop())
+          .andThen(Commands.waitSeconds(0.2))
+          .andThen(m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected()))
+          .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_indexer.stop())
+          .andThen(m_intake.stop())
+          .andThen(m_angler.goToShoot()));
+
+  private final SequentialCommandGroup m_manualLoad = new SequentialCommandGroup();
+
+  private void ConfigureCommands() {
+    NamedCommands.registerCommand("DeployerDown", m_deployerDownCommand);
+    NamedCommands.registerCommand("DeployerUp", m_deployerUpCommand);
+    NamedCommands.registerCommand("IntakeCommand", m_intakeCommand);
+    NamedCommands.registerCommand("CalibrateAngler", m_angler.calibrate());
   }
 
   /**
@@ -104,17 +117,14 @@ public class RobotContainer {
     // m_controller.leftBumper().whileTrue(m_flywheel.forwards());
     // m_controller.leftBumper().onFalse(m_flywheel.stop());
     m_controller.rightTrigger()
-        .whileTrue(m_intake.intake().alongWith(m_indexer.load())
-            .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop())
-            .andThen(Commands.waitSeconds(0.05))
-            .andThen(m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected()))
-            .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_indexer.stop()));
+        .whileTrue(NamedCommands.getCommand("IntakeCommand"));
     m_controller.rightTrigger().onFalse(m_indexer.stop().alongWith(m_intake.stop()));
+    m_controller.rightBumper().whileTrue(NamedCommands.getCommand("DeployerUp"));
 
     m_controller.leftBumper()
         .whileTrue(m_flywheel.forwards().andThen(Commands.waitSeconds(2)).andThen(m_indexer.eject())
             .andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop()).andThen(m_indexer.stop()));
-    m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()));
+    m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()).andThen(m_angler.goToLoad()));
 
     m_controller.povUp().whileTrue(m_deployer.up()
         .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
@@ -170,7 +180,8 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon startup
+   * @brief Construct the container for the robot. This will be called upon
+   *        startup
    */
   public RobotContainer() {
     ConfigureCommands();

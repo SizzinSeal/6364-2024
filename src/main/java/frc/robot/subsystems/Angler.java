@@ -103,7 +103,7 @@ public class Angler extends SubsystemBase {
   public Command calibrate() {
     return this.runOnce(() -> m_motor.setControl(new VelocityVoltage(-kManualSpeed)))
         .andThen(Commands.waitUntil(() -> m_limit.get()))
-        .andThen(() -> m_motor.setControl(new VelocityVoltage(kManualSpeed))).withTimeout(0.5)
+        .andThen(() -> m_motor.setControl(new VelocityVoltage(80))).withTimeout(0.5)
         .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeSpeed)))
         .andThen(Commands.waitUntil(() -> m_limit.get()))
         .andThen(() -> m_motor.setControl(new VoltageOut(0)))
