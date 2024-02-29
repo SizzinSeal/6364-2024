@@ -205,7 +205,7 @@ public class Angler extends SubsystemBase {
     builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(), null);
     // target position
     builder.addDoubleProperty("Target Position", () -> m_output.Position,
-        (double target) -> this.goToAngle(target));
+        (double target) -> this.goToAngle(target).schedule());
     // limit switch
     builder.addBooleanProperty("Limit Triggered", () -> m_limit.get(), null);
   }
