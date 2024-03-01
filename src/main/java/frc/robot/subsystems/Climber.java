@@ -75,7 +75,7 @@ public class Climber extends SubsystemBase {
    */
   public Command down() {
     return this.runOnce(() -> {
-      m_output.Output = -kDownSpeed;
+      m_output.Output = kDownSpeed;
       m_motor.setControl(m_output);
     });
   }
@@ -87,7 +87,7 @@ public class Climber extends SubsystemBase {
    */
   public Command up() {
     return this.runOnce(() -> {
-      m_output.Output = kUpSpeed;
+      m_output.Output = -kUpSpeed;
       m_motor.setControl(m_output);
     });
   }

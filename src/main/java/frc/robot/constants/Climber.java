@@ -30,8 +30,8 @@ public class Climber {
   public static final double kUpPosition = 0;
   public static final double kDownPosition = 1;
   // speeds (rotations per second)
-  public static final double kUpSpeed = 5; // TODO: find this value
-  public static final double kDownSpeed = 4;
+  public static final double kUpSpeed = 80; // TODO: find this value
+  public static final double kDownSpeed = 80;
   // acceleration (rotations per second squared)
   public static final double kMaxAccel = 0; // TODO: find this value
   // jerk (rotations per second cubed)

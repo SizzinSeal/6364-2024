@@ -16,8 +16,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,7 +55,6 @@ public class RobotContainer {
   private final CommandXboxController m_controller = new CommandXboxController(0);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   private final SendableChooser<Command> autoChooser;
-  private final BooleanSupplier shooterStateSupplier = () -> m_flywheel.isAtSpeed();
 
   // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
@@ -85,7 +82,7 @@ public class RobotContainer {
 
   // command to shoot
   private final SequentialCommandGroup m_shootCommand = new SequentialCommandGroup(
-      m_flywheel.forwards().andThen(m_angler.goToShoot()).andThen(Commands.waitSeconds(2)).andThen(m_indexer.eject())
+      m_flywheel.forwards().andThen(m_angler.goToShoot()).andThen(Commands.waitSeconds(1.5)).andThen(m_indexer.eject())
           .andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop()).andThen(m_indexer.stop())
           .andThen(m_angler.goToLoad()));
 
@@ -106,7 +103,13 @@ public class RobotContainer {
       .andThen(Commands.waitUntil(() -> m_climber.isDeployed())).andThen(m_deployer.stop()));
 
   // auto routine
-  private final SequentialCommandGroup m_autoRoutine = new SequentialCommandGroup(m_angler.goToShoot());
+  private final SequentialCommandGroup m_autoRoutine = new SequentialCommandGroup(
+      m_angler.goToShoot().andThen(m_flywheel.forwards()).andThen(Commands.waitSeconds(2)).andThen(m_indexer.eject())
+          .andThen(Commands.waitSeconds(1)).andThen(m_indexer.stop()).andThen(m_angler.goToLoad())
+          .andThen(m_flywheel.stop())
+          .andThen(m_drivetrain.applyRequest(() -> m_drive.withVelocityX(1)
+              .withVelocityY(0)
+              .withRotationalRate(0))));
 
   private final SequentialCommandGroup m_manualLoad = new SequentialCommandGroup(
       m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected())
@@ -163,9 +166,9 @@ public class RobotContainer {
     // reset robot position
     m_controller.a().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
 
-    m_controller.povUp().whileTrue(NamedCommands.getCommand("ClimberUp"));
+    m_controller.povUp().whileTrue(m_climber.up());
     m_controller.povUp().onFalse(m_climber.stop());
-    m_controller.povDown().whileTrue(NamedCommands.getCommand("ClimberDown"));
+    m_controller.povDown().whileTrue(m_climber.down());
     m_controller.povDown().onFalse(m_climber.stop());
 
     // move to the Amp
@@ -246,6 +249,6 @@ public class RobotContainer {
    * @return Command
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return m_autoRoutine;
   }
 }
