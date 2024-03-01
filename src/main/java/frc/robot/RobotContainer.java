@@ -51,6 +51,7 @@ public class RobotContainer {
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0);
+  private final CommandXboxController m_secondary = new CommandXboxController(1);
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   private final SendableChooser<Command> autoChooser;
 
@@ -107,7 +108,8 @@ public class RobotContainer {
           .andThen(m_flywheel.stop())
           .andThen(m_drivetrain.applyRequest(() -> m_drive.withVelocityX(1)
               .withVelocityY(0)
-              .withRotationalRate(0))));
+              .withRotationalRate(0)))
+          .andThen(Commands.waitSeconds(1.5)).andThen(m_deployerDownCommand));
 
   private final SequentialCommandGroup m_manualLoad = new SequentialCommandGroup(
       m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected())
@@ -164,10 +166,17 @@ public class RobotContainer {
     // reset robot position
     m_controller.a().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
 
+    // primary controller climber controls
     m_controller.povUp().whileTrue(m_climber.up());
     m_controller.povUp().onFalse(m_climber.stop());
     m_controller.povDown().whileTrue(m_climber.down());
     m_controller.povDown().onFalse(m_climber.stop());
+
+    // secondary controller climber controls
+    m_secondary.povUp().whileTrue(m_climber.up());
+    m_secondary.povUp().onFalse(m_climber.stop());
+    m_secondary.povDown().whileTrue(m_climber.down());
+    m_secondary.povDown().onFalse(m_climber.stop());
 
     // move to the Amp
     // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
