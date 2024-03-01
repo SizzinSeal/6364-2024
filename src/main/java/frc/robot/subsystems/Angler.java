@@ -4,6 +4,7 @@ import static edu.wpi.first.units.MutableMeasure.mutable;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -30,8 +32,11 @@ public class Angler extends SubsystemBase {
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // init sensors
   private final DigitalInput m_limit = new DigitalInput(kLimitPort);
+  private final Trigger m_limitTrigger = new Trigger(() -> m_limit.get());
   // control outputs
   private final MotionMagicVoltage m_output = new MotionMagicVoltage(0);
+
+  private boolean m_calibrating = false;
 
   // sysid routine
   private final VoltageOut m_sysIdOutput = new VoltageOut(0);
@@ -83,7 +88,9 @@ public class Angler extends SubsystemBase {
     SmartDashboard.putData("calibrate", this.calibrate());
     SmartDashboard.putData("Shooting Angle", this.goToShoot());
     SmartDashboard.putData("Loading Angle", this.goToLoad());
-
+    // add limit switch trigger. Zeroes motor if, for some reason, the angler goes
+    // too far down.
+    m_limitTrigger.onTrue(limitTrigger());
   }
 
   /**
@@ -101,13 +108,16 @@ public class Angler extends SubsystemBase {
    * @return Command
    */
   public Command calibrate() {
-    return this.runOnce(() -> m_motor.setControl(new VelocityVoltage(-kManualSpeed)))
+    return this.runOnce(() -> {
+      m_motor.setControl(new VelocityVoltage(-kManualSpeed));
+      m_calibrating = true;
+    })
         .andThen(Commands.waitUntil(() -> m_limit.get()))
         .andThen(() -> m_motor.setControl(new VelocityVoltage(80))).withTimeout(0.5)
         .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeSpeed)))
         .andThen(Commands.waitUntil(() -> m_limit.get()))
         .andThen(() -> m_motor.setControl(new VoltageOut(0)))
-        .andThen(() -> m_motor.setPosition(0));
+        .andThen(() -> m_motor.setPosition(0)).andThen(() -> m_calibrating = false);
   }
 
   public Command setSpeed(double speed) {
@@ -173,6 +183,17 @@ public class Angler extends SubsystemBase {
   public Command manualDown() {
     return this.startEnd(() -> m_motor.setControl(new VelocityVoltage(-kManualSpeed)),
         () -> m_motor.setControl(new VelocityVoltage(0)));
+  }
+
+  private Command limitTrigger() {
+    return this.runOnce(() -> {
+      if (!m_calibrating) {
+        m_motor.setControl(new VoltageOut(0));
+        m_motor.setControl(new StaticBrake());
+        Commands.waitSeconds(0.5);
+        m_motor.setPosition(0);
+      }
+    });
   }
 
   /**
