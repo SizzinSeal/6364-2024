@@ -30,8 +30,8 @@ public class Deployer {
   public static final double kUpPosition = 0.01;
   public static final double kDownPosition = -0.18;
   // speeds (rotations per second)
-  public static final double kUpSpeed = 2; // 5
-  public static final double kDownSpeed = 2; // 4
+  public static final double kUpSpeed = 7; // 5
+  public static final double kDownSpeed = 5; // 4
   // acceleration (rotations per second squared)
   public static final double kMaxAccel = 0; // TODO: find this value
   // jerk (rotations per second cubed)

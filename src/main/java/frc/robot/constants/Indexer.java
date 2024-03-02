@@ -21,7 +21,7 @@ public class Indexer {
       new Slot0Configs().withKP(0.01).withKI(0).withKD(0).withKS(0).withKV(0).withKA(0);
   // speeds (rotations per second)
   public static final double kEjectSpeed = 2; // TODO: find this value
-  public static final double kLoadSpeed = 2; // TODO: find this value
+  public static final double kLoadSpeed = 3; // TODO: find this value
   // ratios
   public static final double kRatio = 1;
 }
