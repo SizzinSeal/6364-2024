@@ -101,20 +101,25 @@ public class RobotContainer {
   private final SequentialCommandGroup m_climberDown = new SequentialCommandGroup(m_climber.down()
       .andThen(Commands.waitUntil(() -> m_climber.isDeployed())).andThen(m_deployer.stop()));
 
-  // auto routine
-  private final SequentialCommandGroup m_autoRoutine = new SequentialCommandGroup(
-      m_angler.goToShoot().andThen(m_flywheel.forwards()).andThen(Commands.waitSeconds(2)).andThen(m_indexer.eject())
-          .andThen(Commands.waitSeconds(1)).andThen(m_indexer.stop()).andThen(m_angler.goToLoad())
-          .andThen(m_flywheel.stop())
-          .andThen(m_drivetrain.applyRequest(() -> m_drive.withVelocityX(1)
-              .withVelocityY(0)
-              .withRotationalRate(0)))
-          .andThen(Commands.waitSeconds(1.5)).andThen(m_deployerDownCommand));
-
   private final SequentialCommandGroup m_manualLoad = new SequentialCommandGroup(
       m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected())
           .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_indexer.stop())
           .andThen(m_intake.stop()));
+
+  // auto routine
+  private final SequentialCommandGroup m_autoRoutine = new SequentialCommandGroup(
+      m_angler.goToShoot().alongWith(m_deployerDownCommand).andThen(m_flywheel.forwards())
+          .andThen(Commands.waitSeconds(2)).andThen(m_indexer.eject())
+          .andThen(Commands.waitSeconds(1)).andThen(m_indexer.stop()).andThen(m_angler.goToLoad())
+          .andThen(m_flywheel.stop().alongWith(m_intake.intake()).alongWith(m_indexer.load())
+              .alongWith(m_drivetrain.applyRequest(() -> m_drive.withVelocityX(1.5)
+                  .withVelocityY(0)
+                  .withRotationalRate(0)))
+              .until(() -> m_indexer.noteDetected()))
+          .andThen(m_indexer.stop()).andThen(m_intake.stop()).andThen(m_manualLoad).andThen(m_angler.goToShoot())
+          .andThen(m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-1)
+              .withVelocityY(0)
+              .withRotationalRate(0)).withTimeout(3.0).andThen(m_shootCommand)));
 
   private void ConfigureCommands() {
     NamedCommands.registerCommand("DeployerDown", m_deployerDownCommand);
