@@ -12,7 +12,7 @@ public class Intake {
   // motor inversion TODO: find these values
   public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
   // speeds (voltage)
-  public static final double kIntakeSpeed = 10;
+  public static final double kIntakeSpeed = 7;
   public static final double kOuttakeSpeed = 8;
   // ratios (driven/driver)
   public static final double kRatio = 1;

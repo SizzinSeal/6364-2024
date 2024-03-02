@@ -74,7 +74,7 @@ public class RobotContainer {
   private final SequentialCommandGroup m_intakeCommand = new SequentialCommandGroup(
       m_intake.intake().alongWith(m_indexer.load()).alongWith(m_angler.goToLoad())
           .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop()).andThen(m_angler.goToShoot())
-          .andThen(Commands.waitSeconds(0.4))
+          .andThen(Commands.waitSeconds(0.2))
           .andThen(m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected()))
           .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_indexer.stop())
           .andThen(m_intake.stop()));
@@ -170,6 +170,10 @@ public class RobotContainer {
     m_controller.b().onTrue(NamedCommands.getCommand("ManualLoad"));
     // reset robot position
     m_controller.a().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
+    // outtake
+    m_controller.x().whileTrue(Commands.runOnce(() -> m_indexer.setSpeed(-5)).andThen(() -> m_intake.setSpeed(-8))
+        .andThen(NamedCommands.getCommand("DeployerDown")));
+    m_controller.x().onFalse(m_intake.stop().andThen(m_indexer.stop()).andThen(NamedCommands.getCommand("DeployerUp")));
 
     // primary controller climber controls
     m_controller.povUp().whileTrue(m_climber.up());
