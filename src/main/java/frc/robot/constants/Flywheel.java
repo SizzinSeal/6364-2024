@@ -40,8 +40,8 @@ public class Flywheel {
   public static final double kUpperAccel = 0; // TODO: find this value
   public static final double kLowerAccel = 0; // TODO: find this value
   // tolerances (in rotations)
-  public static final double kUpperTolerance = 5; // TODO: find this value
-  public static final double kLowerTolerance = 5; // TODO: find this value
+  public static final double kUpperTolerance = 20; // TODO: find this value
+  public static final double kLowerTolerance = 20; // TODO: find this value
   // ratios (driven/driver)
   public static final double kUpperRatio = 1;
   public static final double kLowerRatio = 1;

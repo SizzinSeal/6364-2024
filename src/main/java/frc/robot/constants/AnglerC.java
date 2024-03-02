@@ -10,7 +10,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.units.Time;
 
-public class Angler {
+public class AnglerC {
   // motor ids
   public static final int kMotorId = 17;
   // motor CAN bus names
@@ -26,7 +26,7 @@ public class Angler {
   // positions (in rotations)
   public static final double kMaxPosition = 0; // TODO: find this value
   public static final double kMinPosition = 0;
-  public static final double kShootingPosition = 130; // TODO: find this value
+  public static double kShootingPosition = 130; // TODO: find this value
   public static final double kLoadingPosition = 20; // TODO: find this value
   // speeds (in rotations per second)
   public static final double kMaxSpeed = 120; // TODO: find this value

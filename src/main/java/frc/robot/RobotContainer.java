@@ -29,6 +29,7 @@ import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.constants.AnglerC;
 
 public class RobotContainer {
 
@@ -70,18 +71,36 @@ public class RobotContainer {
   private final SequentialCommandGroup m_deployerUpCommand = new SequentialCommandGroup(m_deployer.up()
       .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
 
+  private Command spinUp() {
+    if (m_indexer.noteDetected())
+      return Commands.runOnce(() -> m_flywheel.forwards());
+    else
+      return Commands.runOnce(() -> {
+      });
+  }
+
   // command to intake
   private final SequentialCommandGroup m_intakeCommand = new SequentialCommandGroup(
       m_intake.intake().alongWith(m_indexer.load()).alongWith(m_angler.goToLoad())
           .until(() -> m_indexer.noteDetected()).andThen(m_indexer.stop()).andThen(m_angler.goToShoot())
           .andThen(Commands.waitSeconds(0.2))
+          .andThen(spinUp())
           .andThen(m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected()))
           .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_indexer.stop())
-          .andThen(m_intake.stop()));
+          .andThen(m_intake.stop()).andThen(m_flywheel.forwards()));
+
+  private Command e() {
+    if (m_flywheel.isAtSpeed()) {
+      return m_indexer.eject();
+    } else {
+      return Commands.waitSeconds(0.2);
+    }
+  }
 
   // command to shoot
   private final SequentialCommandGroup m_shootCommand = new SequentialCommandGroup(
-      m_flywheel.forwards().andThen(m_angler.goToShoot()).andThen(Commands.waitSeconds(1)).andThen(m_indexer.eject())
+      m_flywheel.forwards().andThen(m_angler.goToShoot())
+          .andThen(e()).andThen(m_indexer.eject())
           .andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop()).andThen(m_indexer.stop())
           .andThen(m_angler.goToLoad()));
 
@@ -166,6 +185,9 @@ public class RobotContainer {
         .whileTrue(NamedCommands.getCommand("ShootCommand"));
     m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()).andThen(m_angler.goToLoad()));
 
+    // secondary controller manual overrides
+    m_secondary.a().onTrue(m_flywheel.forwards());
+
     // manual indexer load
     m_controller.b().onTrue(NamedCommands.getCommand("ManualLoad"));
     // reset robot position
@@ -176,10 +198,12 @@ public class RobotContainer {
     m_controller.x().onFalse(m_intake.stop().andThen(m_indexer.stop()).andThen(NamedCommands.getCommand("DeployerUp")));
 
     // primary controller climber controls
-    m_controller.povUp().whileTrue(m_climber.up());
-    m_controller.povUp().onFalse(m_climber.stop());
-    m_controller.povDown().whileTrue(m_climber.down());
-    m_controller.povDown().onFalse(m_climber.stop());
+    m_controller.povUp().onTrue(Commands.runOnce(() -> {
+      AnglerC.kShootingPosition += 10;
+    }));
+    m_controller.povDown().whileTrue(Commands.runOnce(() -> {
+      AnglerC.kShootingPosition -= 10;
+    }));
 
     // secondary controller climber controls
     m_secondary.povUp().whileTrue(m_climber.up());
