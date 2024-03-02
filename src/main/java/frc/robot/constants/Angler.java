@@ -33,11 +33,11 @@ public class Angler {
   public static final double kManualSpeed = 30; // TODO: find this value
   public static final double kProbeSpeed = 30; // TODO: find this value
   // acceleration (in rotations per second squared)
-  public static final double kAcceleration = 100; // TODO: find this value
+  public static final double kAcceleration = 200; // TODO: find this value
   public static final double kManualAcceleration = 0; // TODO: find this value
   public static final double kProbeAcceleration = 0; // TODO: find this value
   // jerk (in rotations per second cubed)
-  public static final double kJerk = 400;
+  public static final double kJerk = 800;
   // tolerances (in rotations)
   public static final double kTolerance = 0.013889; // 5 degrees
   // ratios (driven/driver)

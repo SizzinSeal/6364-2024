@@ -81,14 +81,14 @@ public class RobotContainer {
 
   // command to shoot
   private final SequentialCommandGroup m_shootCommand = new SequentialCommandGroup(
-      m_flywheel.forwards().andThen(m_angler.goToShoot()).andThen(Commands.waitSeconds(1.5)).andThen(m_indexer.eject())
+      m_flywheel.forwards().andThen(m_angler.goToShoot()).andThen(Commands.waitSeconds(1)).andThen(m_indexer.eject())
           .andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop()).andThen(m_indexer.stop())
           .andThen(m_angler.goToLoad()));
 
   // command to calibrate angler
   private final SequentialCommandGroup m_calibrateCommand = new SequentialCommandGroup(m_angler.setSpeed(-3))
       .andThen(Commands.waitUntil(() -> m_angler.getLimit()))
-      .andThen(m_angler.setSpeed(5)).andThen(Commands.waitSeconds(0.3))
+      .andThen(m_angler.setSpeed(5)).andThen(Commands.waitSeconds(0.2))
       .andThen(m_angler.setSpeed(-1))
       .andThen(Commands.waitUntil(() -> m_angler.getLimit()))
       .andThen(m_angler.setSpeed(0)).andThen(Commands.waitSeconds(1))
