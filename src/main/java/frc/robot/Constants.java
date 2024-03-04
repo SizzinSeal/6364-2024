@@ -231,6 +231,22 @@ public class Constants {
     public static final double kRatio = 1;
   }
 
+  public class Intake {
+    // sim loop period (seconds)
+    public static final double kSimLoopPeriod = 0.005;
+    // motor ids
+    public static final int kMotorId = 20;
+    // CAN bus name
+    public static final String kMotorBus = "rio";
+    // motor inversion
+    public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
+    // speeds (voltage)
+    public static final double kIntakeSpeed = 7;
+    public static final double kOuttakeSpeed = 8;
+    // ratios (driven/driver)
+    public static final double kRatio = 1;
+  }
+
   public class PathPlanner {
     public static final PIDConstants kTranslationalPIDConstants = new PIDConstants(4.0, 0.0, 0.5);
     public static final PIDConstants kRotationalPIDConstants = new PIDConstants(4.0, 0.0, 0.5);
