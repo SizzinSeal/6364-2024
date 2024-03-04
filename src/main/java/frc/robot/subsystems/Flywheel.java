@@ -18,14 +18,17 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.constants.Flywheel.*;
+import static frc.robot.Constants.Flywheel.*;
 
 /**
  * @brief Flywheel Subsystem
@@ -49,7 +52,7 @@ public class Flywheel extends SubsystemBase {
   private final MutableMeasure<Angle> m_upperAngle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_upperVelocity = mutable(RotationsPerSecond.of(0));
   private final SysIdRoutine m_upperSysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage), Seconds.of(kTimeout)),
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         m_upperMotor.setControl(m_upperSysIdOutput.withOutput(volts.in(Volts)));
       }, log -> {
@@ -67,7 +70,7 @@ public class Flywheel extends SubsystemBase {
   private final MutableMeasure<Angle> m_lowerAngle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_lowerVelocity = mutable(RotationsPerSecond.of(0));
   private final SysIdRoutine m_lowerSysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage), Seconds.of(kTimeout)),
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         m_lowerMotor.setControl(m_lowerSysIdOutput.withOutput(volts.in(Volts)));
       }, log -> {
@@ -94,8 +97,10 @@ public class Flywheel extends SubsystemBase {
     final TalonFXConfiguration upperConfig = new TalonFXConfiguration();
     final TalonFXConfiguration lowerConfig = new TalonFXConfiguration();
     // set controller gains
-    upperConfig.Slot0 = kUpperControllerGains;
-    lowerConfig.Slot0 = kLowerControllerGains;
+    upperConfig.Slot0 = new Slot0Configs().withKP(kUpperKP).withKI(kUpperKI).withKD(kUpperKD).withKS(kUpperKS)
+        .withKV(kUpperKV).withKA(kUpperKA);
+    lowerConfig.Slot0 = new Slot0Configs().withKP(kLowerKP).withKI(kLowerKI).withKD(kLowerKD).withKS(kLowerKS)
+        .withKV(kLowerKV).withKA(kLowerKA);
     // invert motors
     upperConfig.MotorOutput.Inverted = kUpperMotorInverted;
     lowerConfig.MotorOutput.Inverted = kLowerMotorInverted;
@@ -111,24 +116,6 @@ public class Flywheel extends SubsystemBase {
     SmartDashboard.putData("Forwards", this.forwards());
     SmartDashboard.putData("Reverse", this.reverse());
     SmartDashboard.putData("Stop", this.stop());
-    /*
-     * SmartDashboard.putData("Upper Quasistatic Routine Up",
-     * this.upperSysIdQuasistatic(SysIdRoutine.Direction.kForward));
-     * SmartDashboard.putData("Upper Quasistatic Routine Down",
-     * this.upperSysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-     * SmartDashboard.putData("Upper Dynamic Routine Up",
-     * this.upperSysIdDynamic(SysIdRoutine.Direction.kForward));
-     * SmartDashboard.putData("Upper Dynamic Routine Down",
-     * this.upperSysIdDynamic(SysIdRoutine.Direction.kReverse));
-     * SmartDashboard.putData("Lower Quasistatic Routine Up",
-     * this.lowerSysIdQuasistatic(SysIdRoutine.Direction.kForward));
-     * SmartDashboard.putData("Lower Quasistatic Routine Down",
-     * this.lowerSysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-     * SmartDashboard.putData("Lower Dynamic Routine Up",
-     * this.lowerSysIdDynamic(SysIdRoutine.Direction.kForward));
-     * SmartDashboard.putData("Lower Dynamic Routine Down",
-     * this.lowerSysIdDynamic(SysIdRoutine.Direction.kReverse));
-     */
   }
 
   /**

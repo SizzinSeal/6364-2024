@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -156,6 +157,53 @@ public class Constants {
     public static final double kRampRate = 5.0;
     public static final double kStepVoltage = 2.0;
     public static final double kTimeout = 5.0;
+  }
+
+  public class Flywheel {
+    // sim loop period (seconds)
+    public static final double kSimLoopPeriod = 0.005;
+    // motor ids
+    public static final int kUpperMotorId = 14;
+    public static final int kLowerMotorId = 15;
+    // motor CAN bus names
+    public static final String kUpperMotorBus = "rio";
+    public static final String kLowerMotorBus = "rio";
+    // motor inversion
+    public static final InvertedValue kUpperMotorInverted = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue kLowerMotorInverted = InvertedValue.CounterClockwise_Positive;
+    // motor neutral modes
+    public static final NeutralModeValue kUpperNeutralMode = NeutralModeValue.Brake;
+    public static final NeutralModeValue kLowerNeutralMode = NeutralModeValue.Brake;
+    // upper motor controller gains
+    public static final double kUpperKP = 0;
+    public static final double kUpperKI = 0;
+    public static final double kUpperKD = 0;
+    public static final double kUpperKS = 0.22748;
+    public static final double kUpperKV = 0.11942;
+    public static final double kUpperKA = 0.015106;
+    // lower motor controller gains
+    public static final double kLowerKP = 0;
+    public static final double kLowerKI = 0;
+    public static final double kLowerKD = 0;
+    public static final double kLowerKS = 0.17641;
+    public static final double kLowerKV = 0.10863;
+    public static final double kLowerKA = 0.018805;
+    // speeds (in rotations per second)
+    public static final double kUpperSpeed = 100; // TODO: find this value
+    public static final double kLowerSpeed = 100; // TODO: find this value
+    // acceleration (in rotations per second squared)
+    public static final double kUpperAccel = 0; // TODO: find this value
+    public static final double kLowerAccel = 0; // TODO: find this value
+    // tolerances (in rotations)
+    public static final double kUpperTolerance = 20; // TODO: find this value
+    public static final double kLowerTolerance = 20; // TODO: find this value
+    // ratios (driven/driver)
+    public static final double kUpperRatio = 1;
+    public static final double kLowerRatio = 1;
+    // sysid constants
+    public static final double kRampRate = 0.2;
+    public static final double kStepVoltage = 7.0;
+    public static final double kTimeout = 15.0;
   }
 
   public class PathPlanner {
