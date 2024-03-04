@@ -206,6 +206,31 @@ public class Constants {
     public static final double kTimeout = 15.0;
   }
 
+  public class Indexer {
+    // simulation loop period (seconds)
+    public static final double kSimLoopPeriod = 0.005; // 5 ms
+    // motor ids
+    public static final int kMotorId = 19;
+    // sensor ids
+    public static final int kNoteDetectorPort = 1; // TODO: find this value
+    // motor CAN bus names
+    public static final String kMotorBus = "rio";
+    // motor inversion
+    public static final InvertedValue kInverted = InvertedValue.CounterClockwise_Positive;
+    // controller gains
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kS = 0;
+    public static final double kV = 0;
+    public static final double kA = 0;
+    // speeds (rotations per second)
+    public static final double kEjectSpeed = 2; // TODO: find this value
+    public static final double kLoadSpeed = 3; // TODO: find this value
+    // ratios
+    public static final double kRatio = 1;
+  }
+
   public class PathPlanner {
     public static final PIDConstants kTranslationalPIDConstants = new PIDConstants(4.0, 0.0, 0.5);
     public static final PIDConstants kRotationalPIDConstants = new PIDConstants(4.0, 0.0, 0.5);
