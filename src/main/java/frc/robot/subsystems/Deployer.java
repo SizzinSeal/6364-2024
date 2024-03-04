@@ -5,10 +5,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
-import static frc.robot.constants.Deployer.*;
+import static frc.robot.Constants.Deployer.*;
 
 /**
  * @brief Intake Subsystem
@@ -33,9 +34,8 @@ public class Deployer extends SubsystemBase {
     // configure motors
     final TalonFXConfiguration config = new TalonFXConfiguration();
     // set controller gains
-    config.Slot0 = kControllerGains;
-    config.Slot0.GravityType = kGravityType;
-    config.Slot0.kG = kG;
+    config.Slot0 = new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG)
+        .withGravityType(kGravityType);
     // invert motors
     config.MotorOutput.Inverted = kMotorInverted;
     // set motor ratios
@@ -56,7 +56,7 @@ public class Deployer extends SubsystemBase {
    * @return true if its deployed, false otherwise
    */
   public boolean isDeployed() {
-    return m_motor.getPosition().getValueAsDouble() - kTolerance < kDownPosition;
+    return m_motor.getPosition().getValueAsDouble() - kTolerance < kMinPosition;
   }
 
   /**
@@ -65,7 +65,7 @@ public class Deployer extends SubsystemBase {
    * @return true if its retracted, false otherwise
    */
   public boolean isRetracted() {
-    return m_motor.getPosition().getValueAsDouble() + kTolerance > kUpPosition;
+    return m_motor.getPosition().getValueAsDouble() + kTolerance > kMaxPosition;
   }
 
   /**
@@ -75,7 +75,7 @@ public class Deployer extends SubsystemBase {
    */
   public Command down() {
     return this.runOnce(() -> {
-      m_output.Output = -kDownSpeed;
+      m_output.Output = -kSpeed;
       m_motor.setControl(m_output);
     });
   }
@@ -87,7 +87,7 @@ public class Deployer extends SubsystemBase {
    */
   public Command up() {
     return this.runOnce(() -> {
-      m_output.Output = kUpSpeed;
+      m_output.Output = kSpeed;
       m_motor.setControl(m_output);
     });
   }

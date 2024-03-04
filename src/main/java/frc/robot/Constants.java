@@ -90,7 +90,46 @@ public class Constants {
     // motor inversion
     public static final InvertedValue kMotorInverted = InvertedValue.Clockwise_Positive;
     // gravity type
-    public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
+    public static final GravityTypeValue kGravityType = GravityTypeValue.Elevator_Static;
+    // controller constants
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kS = 0;
+    public static final double kV = 0;
+    public static final double kA = 0;
+    public static final double kG = 0;
+    // positions (rotations) TODO: tune this so 90 degrees is up relative to the
+    // ground
+    public static final double kMaxPosition = 0;
+    public static final double kMinPosition = 1;
+    // speeds (rotations per second)
+    public static final double kSpeed = 80; // TODO: find this value
+    // acceleration (rotations per second squared)
+    public static final double kAccel = 0; // TODO: find this value
+    // jerk (rotations per second cubed)
+    public static final double kJerk = 0; // TODO: find this value
+    // tolerances (rotations)
+    public static final double kTolerance = 0; // TODO: find this value
+    // ratios (driven/driver)
+    public static final double kRatio = 90;
+    // SysId constants
+    public static final double kRampRate = 5.0;
+    public static final double kStepVoltage = 2.0;
+    public static final double kTimeout = 5.0;
+  }
+
+  public class Deployer {
+    // sim loop period (milliseconds)
+    public static final double kSimLoopPeriod = 0.005;
+    // motor ids
+    public static final int kMotorId = 18;
+    // CAN bus name
+    public static final String kMotorBus = "rio";
+    // motor inversion
+    public static final InvertedValue kMotorInverted = InvertedValue.Clockwise_Positive;
+    // gravity type
+    public static final GravityTypeValue kGravityType = GravityTypeValue.Elevator_Static;
     // controller constants
     public static final double kP = 0;
     public static final double kI = 0;
