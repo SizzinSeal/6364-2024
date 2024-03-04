@@ -2,12 +2,13 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.MutableMeasure.mutable;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
@@ -20,12 +21,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.constants.AnglerC.*;
+import static frc.robot.Constants.Angler.*;
 
 public class Angler extends SubsystemBase {
   // init motors
@@ -41,7 +43,7 @@ public class Angler extends SubsystemBase {
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
   private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
+      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage), Seconds.of(kTimeout)),
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
       }, log -> {
@@ -67,7 +69,8 @@ public class Angler extends SubsystemBase {
     // configure motors
     final TalonFXConfiguration config = new TalonFXConfiguration();
     // set controller gains
-    config.Slot0 = kControllerGains;
+    config.Slot0 = new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG)
+        .withGravityType(kGravityType);
     // invert motors
     config.MotorOutput.Inverted = kMotorInverted;
     // set motor ratios
@@ -103,11 +106,11 @@ public class Angler extends SubsystemBase {
    */
   public Command calibrate() {
     return this.runOnce(() -> {
-      m_motor.setControl(new VelocityVoltage(-kManualSpeed));
+      m_motor.setControl(new VelocityVoltage(-kProbeInitialSpeed));
     })
         .andThen(Commands.waitUntil(() -> m_limit.get()))
-        .andThen(() -> m_motor.setControl(new VelocityVoltage(80))).withTimeout(0.5)
-        .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeSpeed)))
+        .andThen(() -> m_motor.setControl(new VelocityVoltage(kProbeInitialSpeed))).withTimeout(0.5)
+        .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeFinalSpeed)))
         .andThen(Commands.waitUntil(() -> m_limit.get()))
         .andThen(() -> m_motor.setControl(new VoltageOut(0)))
         .andThen(() -> m_motor.setPosition(0));
@@ -156,26 +159,6 @@ public class Angler extends SubsystemBase {
    */
   public Command goToLoad() {
     return this.goToAngle(kLoadingPosition);
-  }
-
-  /**
-   * @brief Go up manually
-   * 
-   * @return Command
-   */
-  public Command manualUp() {
-    return this.startEnd(() -> m_motor.setControl(new VelocityVoltage(kManualSpeed)),
-        () -> m_motor.setControl(new VelocityVoltage(0)));
-  }
-
-  /**
-   * @brief Go up manually
-   * 
-   * @return Command
-   */
-  public Command manualDown() {
-    return this.startEnd(() -> m_motor.setControl(new VelocityVoltage(-kManualSpeed)),
-        () -> m_motor.setControl(new VelocityVoltage(0)));
   }
 
   /**

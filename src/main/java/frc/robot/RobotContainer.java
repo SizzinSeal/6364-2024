@@ -29,7 +29,6 @@ import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.constants.AnglerC;
 
 public class RobotContainer {
 
@@ -196,14 +195,6 @@ public class RobotContainer {
     m_controller.x().whileTrue(Commands.runOnce(() -> m_indexer.setSpeed(-5)).andThen(() -> m_intake.setSpeed(-8))
         .andThen(NamedCommands.getCommand("DeployerDown")));
     m_controller.x().onFalse(m_intake.stop().andThen(m_indexer.stop()).andThen(NamedCommands.getCommand("DeployerUp")));
-
-    // primary controller climber controls
-    m_controller.povUp().onTrue(Commands.runOnce(() -> {
-      AnglerC.kShootingPosition += 10;
-    }));
-    m_controller.povDown().whileTrue(Commands.runOnce(() -> {
-      AnglerC.kShootingPosition -= 10;
-    }));
 
     // secondary controller climber controls
     m_secondary.povUp().whileTrue(m_climber.up());
