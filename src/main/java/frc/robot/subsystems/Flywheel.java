@@ -113,9 +113,6 @@ public class Flywheel extends SubsystemBase {
     // apply configuration
     m_upperMotor.getConfigurator().apply((upperConfig));
     m_lowerMotor.getConfigurator().apply((lowerConfig));
-    SmartDashboard.putData("Forwards", this.forwards());
-    SmartDashboard.putData("Reverse", this.reverse());
-    SmartDashboard.putData("Stop", this.stop());
   }
 
   /**

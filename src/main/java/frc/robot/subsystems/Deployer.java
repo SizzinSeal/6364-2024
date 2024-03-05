@@ -1,8 +1,11 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -24,18 +27,16 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so
-   *        that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix
-   *        Tuner.
+   *        This is where the motors are configured. We configure them here so that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
   public Deployer() {
     super();
     // configure motors
     final TalonFXConfiguration config = new TalonFXConfiguration();
     // set controller gains
-    config.Slot0 = new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG)
-        .withGravityType(kGravityType);
+    config.Slot0 = new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV)
+        .withKA(kA).withKG(kG).withGravityType(kGravityType);
     // invert motors
     config.MotorOutput.Inverted = kMotorInverted;
     // set motor ratios
@@ -73,7 +74,7 @@ public class Deployer extends SubsystemBase {
    * 
    * @return Command
    */
-  public Command down() {
+  private Command down() {
     return this.runOnce(() -> {
       m_output.Output = -kSpeed;
       m_motor.setControl(m_output);
@@ -85,7 +86,7 @@ public class Deployer extends SubsystemBase {
    * 
    * @return Command
    */
-  public Command up() {
+  private Command up() {
     return this.runOnce(() -> {
       m_output.Output = kSpeed;
       m_motor.setControl(m_output);
@@ -97,7 +98,7 @@ public class Deployer extends SubsystemBase {
    * 
    * @return Command
    */
-  public Command stop() {
+  private Command stop() {
     return this.runOnce(() -> {
       m_output.Output = 0;
       m_motor.setControl(m_output);
@@ -106,14 +107,31 @@ public class Deployer extends SubsystemBase {
   }
 
   /**
+   * @brief deploy the deployer
+   * 
+   * @return Command
+   */
+  public Command deploy() {
+    return new SequentialCommandGroup(
+        this.down().andThen(Commands.waitUntil(() -> this.isDeployed())).andThen(this.stop()));
+  }
+
+  /**
+   * @brief retract the deployer
+   * 
+   * @return Command
+   */
+  public Command retract() {
+    return new SequentialCommandGroup(
+        this.up().andThen(Commands.waitUntil(() -> this.isRetracted())).andThen(this.stop()));
+  }
+
+  /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We
-   *        use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the
-   *        motors. This
-   *        allows us to tune intake speed in real time, without having to
-   *        re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the motors. This
+   *        allows us to tune intake speed in real time, without having to re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */
