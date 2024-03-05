@@ -52,17 +52,18 @@ public class Flywheel extends SubsystemBase {
   private final MutableMeasure<Angle> m_upperAngle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_upperVelocity = mutable(RotationsPerSecond.of(0));
   private final SysIdRoutine m_upperSysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage), Seconds.of(kTimeout)),
+      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage),
+          Seconds.of(kTimeout)),
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         m_upperMotor.setControl(m_upperSysIdOutput.withOutput(volts.in(Volts)));
       }, log -> {
         log.motor("Upper Flywheel")
             .voltage(m_upperAppliedVoltage
                 .mut_replace(m_upperMotor.get() * RobotController.getBatteryVoltage(), Volts))
-            .angularPosition(m_upperAngle
-                .mut_replace(m_upperMotor.getPosition().getValueAsDouble(), Rotations))
-            .angularVelocity(m_upperVelocity.mut_replace(
-                m_upperMotor.getVelocity().getValueAsDouble(), RotationsPerSecond));
+            .angularPosition(
+                m_upperAngle.mut_replace(m_upperMotor.getPosition().getValueAsDouble(), Rotations))
+            .angularVelocity(m_upperVelocity
+                .mut_replace(m_upperMotor.getVelocity().getValueAsDouble(), RotationsPerSecond));
       }, this));
   // lower sysid routine
   private final VoltageOut m_lowerSysIdOutput = new VoltageOut(0);
@@ -70,26 +71,25 @@ public class Flywheel extends SubsystemBase {
   private final MutableMeasure<Angle> m_lowerAngle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_lowerVelocity = mutable(RotationsPerSecond.of(0));
   private final SysIdRoutine m_lowerSysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage), Seconds.of(kTimeout)),
+      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage),
+          Seconds.of(kTimeout)),
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         m_lowerMotor.setControl(m_lowerSysIdOutput.withOutput(volts.in(Volts)));
       }, log -> {
         log.motor("Lower Flywheel")
             .voltage(m_lowerAppliedVoltage
                 .mut_replace(m_lowerMotor.get() * RobotController.getBatteryVoltage(), Volts))
-            .angularPosition(m_lowerAngle
-                .mut_replace(m_lowerMotor.getPosition().getValueAsDouble(), Rotations))
-            .angularVelocity(m_lowerVelocity.mut_replace(
-                m_lowerMotor.getVelocity().getValueAsDouble(), RotationsPerSecond));
+            .angularPosition(
+                m_lowerAngle.mut_replace(m_lowerMotor.getPosition().getValueAsDouble(), Rotations))
+            .angularVelocity(m_lowerVelocity
+                .mut_replace(m_lowerMotor.getVelocity().getValueAsDouble(), RotationsPerSecond));
       }, this));
 
   /**
    * @brief FlywheelSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so
-   *        that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix
-   *        Tuner.
+   *        This is where the motors are configured. We configure them here so that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
   public Flywheel() {
     super();
@@ -97,10 +97,10 @@ public class Flywheel extends SubsystemBase {
     final TalonFXConfiguration upperConfig = new TalonFXConfiguration();
     final TalonFXConfiguration lowerConfig = new TalonFXConfiguration();
     // set controller gains
-    upperConfig.Slot0 = new Slot0Configs().withKP(kUpperKP).withKI(kUpperKI).withKD(kUpperKD).withKS(kUpperKS)
-        .withKV(kUpperKV).withKA(kUpperKA);
-    lowerConfig.Slot0 = new Slot0Configs().withKP(kLowerKP).withKI(kLowerKI).withKD(kLowerKD).withKS(kLowerKS)
-        .withKV(kLowerKV).withKA(kLowerKA);
+    upperConfig.Slot0 = new Slot0Configs().withKP(kUpperKP).withKI(kUpperKI).withKD(kUpperKD)
+        .withKS(kUpperKS).withKV(kUpperKV).withKA(kUpperKA);
+    lowerConfig.Slot0 = new Slot0Configs().withKP(kLowerKP).withKI(kLowerKI).withKD(kLowerKD)
+        .withKS(kLowerKS).withKV(kLowerKV).withKA(kLowerKA);
     // invert motors
     upperConfig.MotorOutput.Inverted = kUpperMotorInverted;
     lowerConfig.MotorOutput.Inverted = kLowerMotorInverted;
@@ -223,10 +223,8 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static
-   *        friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is
-   *        negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -238,8 +236,7 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic
-   *        friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -252,10 +249,8 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static
-   *        friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is
-   *        negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -267,8 +262,7 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic
-   *        friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -281,8 +275,7 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief periodic update method
    * 
-   *        This method is called periodically by the scheduler. We use it to
-   *        update the simulated
+   *        This method is called periodically by the scheduler. We use it to update the simulated
    *        motors.
    */
   @Override
@@ -309,12 +302,9 @@ public class Flywheel extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We
-   *        use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the
-   *        motors. This
-   *        allows us to tune intake speed in real time, without having to
-   *        re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the motors. This
+   *        allows us to tune intake speed in real time, without having to re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */
@@ -325,13 +315,13 @@ public class Flywheel extends SubsystemBase {
     builder.addDoubleProperty("Upper Target Velocity", () -> m_upperOutput.Velocity,
         (double target) -> this.setUpperSpeed(target));
     // add upper motor measured velocity property
-    builder.addDoubleProperty("Upper Measured Velocity",
-        () -> m_upperMotor.getVelocity().getValueAsDouble(), null);
+    builder.addDoubleProperty("Upper Velocity", () -> m_upperMotor.getVelocity().getValueAsDouble(),
+        null);
     // add lower motor target velocity property
     builder.addDoubleProperty("Lower Target Velocity", () -> m_lowerOutput.Velocity,
         (double target) -> this.setLowerSpeed(target));
     // add lower motor measured velocity property
-    builder.addDoubleProperty("Lower Measured Velocity",
-        () -> m_lowerMotor.getVelocity().getValueAsDouble(), null);
+    builder.addDoubleProperty("Lower Velocity", () -> m_lowerMotor.getVelocity().getValueAsDouble(),
+        null);
   }
 }
