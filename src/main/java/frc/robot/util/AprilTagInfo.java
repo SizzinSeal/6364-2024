@@ -6,11 +6,11 @@ package frc.robot.util;
 public class AprilTagInfo {
   public Integer primaryTagId;
   public Integer numTagInView;
-  public Double screenArea;
+  public Double tagArea;
 
   public AprilTagInfo(Integer id, Integer count, Double area) {
     primaryTagId = id;
     numTagInView = count;
-    screenArea = area;
+    tagArea = area;
   };
 }

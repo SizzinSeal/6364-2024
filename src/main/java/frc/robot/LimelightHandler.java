@@ -1,11 +1,15 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.units.*;
+import edu.wpi.first.math.util.Units;
 import frc.robot.util.AprilTagInfo;
 
 /**
@@ -18,7 +22,7 @@ public class LimelightHandler {
   private static DoubleArraySubscriber m_poseSubscriber;
 
   /**
-   * @return Whether the limelight has any valid targets.
+   * @brief Whether the limelight has any valid targets.
    */
   public static Boolean hasValidTarget() {
     if ((int) kTable.getEntry("tv").getDouble(0) == 1) {
@@ -47,7 +51,7 @@ public class LimelightHandler {
   /**
    * @brief Horizontal offset of target from origin.
    * 
-   * @return Offset in degrees.
+   * @return Offset in degrees (WPI Units Library).
    */
   public static Measure<Angle> getHorizontalOffset() {
     double value = kTable.getEntry("tx").getDouble(0);
@@ -57,7 +61,7 @@ public class LimelightHandler {
   /**
    * @brief Vertical offset of target from origin.
    * 
-   * @return Offset in degrees.
+   * @return Offset in degrees (WPI Units Library).
    */
   public static Measure<Angle> getVerticalOffset() {
     double value = kTable.getEntry("ty").getDouble(0);
@@ -67,7 +71,7 @@ public class LimelightHandler {
   /**
    * @brief Target Area (0% of image to 100% of image).
    * 
-   * @return Double target area of image (0.0...1.0).
+   * @return Double target area of image (0.0 .. 1.0).
    */
   public static Double getTargetArea() {
     return kTable.getEntry("ta").getDouble(0);
@@ -100,13 +104,30 @@ public class LimelightHandler {
   }
 
   /**
-   * @brief get the latest latency adjusted timestamp in seconds
+   * @brief Get the latest latency adjusted timestamp in seconds.
    * 
-   * @return double latest latency adjusted timestamp in seconds
+   * @return Double latest latency adjusted timestamp in seconds.
    */
   public static Double getLatestLatencyAdjustedTimestamp() {
     TimestampedDoubleArray internal2 = m_poseSubscriber.getAtomic();
     return ((internal2.timestamp - internal2.value[6]) / 1000.0);
+  }
+
+  /**
+   * @brief Get the 2D position measured by the limelight.
+   * 
+   * @return Pose2d 2D position measured by the limelight
+   */
+  public static Pose2d getLimelightFieldPose2DEstimate() {
+    try {
+      double[] raw = m_poseSubscriber.get();
+      return new Pose2d(new Translation2d(raw[0], raw[1]),
+          new Rotation2d(Units.degreesToRadians(raw[5])));
+    } catch (NullPointerException e) {
+      System.err.println("Something went wrong when trying to getLimelightFieldPose2DEstimate.");
+      System.out.println(e);
+      return null;
+    }
   }
 
   /**
