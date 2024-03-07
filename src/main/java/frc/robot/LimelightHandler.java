@@ -4,65 +4,115 @@ import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.units.*;
+import frc.robot.util.AprilTagInfo;
 
+/**
+ * @brief "Handles" incoming limelight data from Networktables.
+ */
 public class LimelightHandler {
-  public class AprilTagInfo {
-    public Integer id;
-    public Integer count;
-    public Integer area;
 
-    public AprilTagInfo(Integer id, Integer count, Integer area) {
-      this.id = id;
-      this.count = count;
-      this.area = area;
-    };
-  }
+  private static final NetworkTable kTable =
+      NetworkTableInstance.getDefault().getTable("limelight");;
+  private static DoubleArraySubscriber m_poseSubscriber;
 
-  private NetworkTable m_table;
-  private DoubleArraySubscriber m_poseSubscriber;
-
-  public LimelightHandler(String limelightName) {
-    m_table = NetworkTableInstance.getDefault().getTable(limelightName);
-  }
-
-  public Boolean hasValidTarget() {
-    if ((int) m_table.getEntry("tv").getDouble(0) == 1) {
+  /**
+   * @return Whether the limelight has any valid targets.
+   */
+  public static Boolean hasValidTarget() {
+    if ((int) kTable.getEntry("tv").getDouble(0) == 1) {
       return true;
     } else {
       return false;
     }
   }
 
-  public Integer getActivePipeline() {
-    return (int) m_table.getEntry("getpipe").getDouble(0);
+  /**
+   * @return Active pipeline index of the camera (0 .. 9).
+   */
+  public static Integer getActivePipeline() {
+    return (int) kTable.getEntry("getpipe").getDouble(0);
   }
 
-  public Integer getPrimaryDetectorClassID() {
-    return (int) m_table.getEntry("tclass").getDouble(0);
+  /**
+   * @brief Class ID of primary neural detector result. Only applies to "Detector" pipeline.
+   * 
+   * @return Class ID.
+   */
+  public static Integer getPrimaryDetectorClassID() {
+    return (int) kTable.getEntry("tclass").getDouble(0);
   }
 
-  public Measure<Angle> getHorizontalOffset() {
-    double value = m_table.getEntry("tx").getDouble(0);
+  /**
+   * @brief Horizontal offset of target from origin.
+   * 
+   * @return Offset in degrees.
+   */
+  public static Measure<Angle> getHorizontalOffset() {
+    double value = kTable.getEntry("tx").getDouble(0);
     return Degrees.of(value);
   }
 
-  public Measure<Angle> getVerticalOffset() {
-    double value = m_table.getEntry("ty").getDouble(0);
+  /**
+   * @brief Vertical offset of target from origin.
+   * 
+   * @return Offset in degrees.
+   */
+  public static Measure<Angle> getVerticalOffset() {
+    double value = kTable.getEntry("ty").getDouble(0);
     return Degrees.of(value);
   }
 
-  public Double getTargetArea() {
-    return m_table.getEntry("ta").getDouble(0);
+  /**
+   * @brief Target Area (0% of image to 100% of image).
+   * 
+   * @return Double target area of image (0.0...1.0).
+   */
+  public static Double getTargetArea() {
+    return kTable.getEntry("ta").getDouble(0);
   }
 
-  public void SubscribeToRobotPose() {}
+  /**
+   * @brief Subscribe! Check for connection then subscribe to NetworkTable topic. Prints err message
+   *        to console otherwise.
+   */
+  public static void SubscribeToRobotPose() {
+    if (isConnected()) {
+      m_poseSubscriber = kTable.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[7]);
+    } else {
+      System.err.print("Limelight not connected!");
+    }
+  }
 
-  public AprilTagInfo detectTag() {
-    Integer id = (int) m_table.getEntry("tid").getInteger(-1);
-    Integer count = 0;
-    out.area = 0;
+  /**
+   * @brief Detect tag.
+   * 
+   * @return AprilTagInfo about the detected tag.
+   */
+  public static AprilTagInfo detectTag() {
+    Integer id = (int) kTable.getEntry("tid").getInteger(-1);
+    double[] tempCornerCoordArray = kTable.getEntry("tcornxy").getDoubleArray(new double[32]);
+    Integer count = tempCornerCoordArray.length / 8;
+    Double area = getTargetArea();
 
-    return out;
+    return new AprilTagInfo(id, count, area);
+  }
+
+  /**
+   * @brief get the latest latency adjusted timestamp in seconds
+   * 
+   * @return double latest latency adjusted timestamp in seconds
+   */
+  public static Double getLatestLatencyAdjustedTimestamp() {
+    TimestampedDoubleArray internal2 = m_poseSubscriber.getAtomic();
+    return ((internal2.timestamp - internal2.value[6]) / 1000.0);
+  }
+
+  /**
+   * @brief Check connection.
+   */
+  private static Boolean isConnected() {
+    return kTable.containsSubTable("botpose_wpiblue");
   }
 }
