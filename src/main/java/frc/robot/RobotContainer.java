@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.controls.StaticBrake;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
 import frc.robot.generated.TunerConstants;
@@ -178,11 +181,13 @@ public class RobotContainer {
     m_controller.rightTrigger().onTrue(NamedCommands.getCommand("DeployerDown"));
     m_controller.rightTrigger()
         .onFalse(m_indexer.stop().alongWith(m_intake.stop()).andThen(NamedCommands.getCommand("DeployerUp")));
-    // m_controller.rightBumper().whileTrue(NamedCommands.getCommand("DeployerUp"));
+    //
+    m_controller.rightBumper().whileTrue(NamedCommands.getCommand("DeployerUp"));
 
     m_controller.leftBumper()
         .whileTrue(NamedCommands.getCommand("ShootCommand"));
-    m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop()).andThen(m_angler.goToLoad()));
+    m_controller.leftBumper().onFalse(m_flywheel.stop().andThen(m_indexer.stop())
+        .andThen(m_angler.goToLoad()));
 
     // secondary controller manual overrides
     m_secondary.a().onTrue(m_flywheel.forwards());
@@ -194,7 +199,8 @@ public class RobotContainer {
     // outtake
     m_controller.x().whileTrue(Commands.runOnce(() -> m_indexer.setSpeed(-5)).andThen(() -> m_intake.setSpeed(-8))
         .andThen(NamedCommands.getCommand("DeployerDown")));
-    m_controller.x().onFalse(m_intake.stop().andThen(m_indexer.stop()).andThen(NamedCommands.getCommand("DeployerUp")));
+    m_controller.x().onFalse(m_intake.stop().andThen(m_indexer.stop()).andThen(
+        NamedCommands.getCommand("DeployerUp")));
 
     // secondary controller climber controls
     m_secondary.povUp().whileTrue(m_climber.up());
