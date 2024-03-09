@@ -5,9 +5,11 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
@@ -31,11 +33,11 @@ import static frc.robot.Constants.Angler.*;
 
 public class Angler extends SubsystemBase {
   // init motors
-  private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
+  public final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // init sensors
   private final DigitalInput m_limit = new DigitalInput(kLimitPort);
   // control outputs
-  private final MotionMagicVoltage m_output = new MotionMagicVoltage(0);
+  private final MotionMagicVoltage m_output = new MotionMagicVoltage(kLoadingPosition);
 
   // sysid routine
   private final VoltageOut m_sysIdOutput = new VoltageOut(0);
@@ -80,12 +82,15 @@ public class Angler extends SubsystemBase {
     motionMagicConfig.MotionMagicCruiseVelocity = kMaxSpeed; // rps
     motionMagicConfig.MotionMagicAcceleration = kAcceleration; // rps^2
     motionMagicConfig.MotionMagicJerk = kJerk; // rps^3
+    // set motor brake
+    m_motor.setNeutralMode(NeutralModeValue.Brake);
     // apply configuration
     m_motor.getConfigurator().apply(config);
     // set 0 position
-    m_motor.setPosition(0);
+    m_motor.setPosition(kZeroPosition);
+    // start braking
+    m_motor.setControl(new StaticBrake());
     // post commands to smart dashboard
-    SmartDashboard.putData("calibrate", this.calibrate());
     SmartDashboard.putData("Shooting Angle", this.goToShoot());
     SmartDashboard.putData("Loading Angle", this.goToLoad());
   }
@@ -113,7 +118,7 @@ public class Angler extends SubsystemBase {
         .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeFinalSpeed)))
         .andThen(Commands.waitUntil(() -> m_limit.get()))
         .andThen(() -> m_motor.setControl(new VoltageOut(0)))
-        .andThen(() -> m_motor.setPosition(0));
+        .andThen(() -> m_motor.setPosition(kZeroPosition));
   }
 
   public Command setSpeed(double speed) {
