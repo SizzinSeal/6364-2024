@@ -34,8 +34,9 @@ public class Constants {
     public static final double kBotWidth = 0.7; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-        .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
+        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+            .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
   }
 
   public class Angler {
@@ -71,7 +72,7 @@ public class Constants {
     // jerk (in rotations per second cubed)
     public static final double kJerk = 800;
     // tolerances (in rotations)
-    public static final double kTolerance = 0.013889; // 5 degrees
+    public static final double kTolerance = 5; // 5 degrees
     // ratios (driven/driver)
     public static final double kRatio = 1; // in reality this is a 1500 to 1 gear ratio, but
     // for some reason TalonFX doesn't support gear ratios higher than 1000 to 1
@@ -128,7 +129,7 @@ public class Constants {
     // CAN bus name
     public static final String kMotorBus = "rio";
     // motor inversion
-    public static final InvertedValue kMotorInverted = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
     // gravity type
     public static final GravityTypeValue kGravityType = GravityTypeValue.Elevator_Static;
     // controller constants
@@ -142,15 +143,15 @@ public class Constants {
     // positions (rotations) TODO: tune this so 90 degrees is up relative to the
     // ground
     public static final double kMaxPosition = 0;
-    public static final double kMinPosition = 1;
+    public static final double kMinPosition = -0.17;
     // speeds (rotations per second)
-    public static final double kSpeed = 80; // TODO: find this value
+    public static final double kSpeed = 0; // TODO: find this value
     // acceleration (rotations per second squared)
     public static final double kAccel = 0; // TODO: find this value
     // jerk (rotations per second cubed)
     public static final double kJerk = 0; // TODO: find this value
     // tolerances (rotations)
-    public static final double kTolerance = 0; // TODO: find this value
+    public static final double kTolerance = 0.02; // TODO: find this value
     // ratios (driven/driver)
     public static final double kRatio = 90;
     // SysId constants
@@ -263,16 +264,16 @@ public class Constants {
     // Blue Amp Lineup Pos
     public static final double kBlueAmpLineupX = 3;
     public static final double kBlueAmpLineupY = 5;
-    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
-        kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupTheta =
+        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 14;
     public static final double kRedAmpLineupY = 5;
-    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
-        .getRadians();
+    public static final double kRedAmpLineupTheta =
+        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()
