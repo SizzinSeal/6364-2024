@@ -1,14 +1,29 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.MutableMeasure.mutable;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotController;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
+
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.Deployer.*;
 
 /**
@@ -20,6 +35,25 @@ public class Deployer extends SubsystemBase {
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // init output
   private final VoltageOut m_output = new VoltageOut(0);
+
+  // sysid routine
+  private final VoltageOut m_sysIdOutput = new VoltageOut(0);
+  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+  private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
+  private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage), Seconds.of(kTimeout)),
+      new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+        m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
+      }, log -> {
+        log.motor("angler")
+            .voltage(m_appliedVoltage
+                .mut_replace(m_motor.get() * RobotController.getBatteryVoltage(), Volts))
+            .angularPosition(
+                m_angle.mut_replace(m_motor.getPosition().getValueAsDouble(), Rotations))
+            .angularVelocity(m_velocity.mut_replace(m_motor.getVelocity().getValueAsDouble(),
+                RotationsPerSecond));
+      }, this));
 
   /**
    * @brief IntakeSubsystem constructor
@@ -45,7 +79,7 @@ public class Deployer extends SubsystemBase {
     // apply configuration
     m_motor.getConfigurator().apply(config);
     // set motor position to 0
-    m_motor.setPosition(0);
+    m_motor.setPosition(kMaxPosition);
     // brake the motor
     m_motor.setControl(new StaticBrake());
   }
@@ -103,6 +137,35 @@ public class Deployer extends SubsystemBase {
       m_motor.setControl(m_output);
       m_motor.setNeutralMode(NeutralModeValue.Brake);
     });
+  }
+
+  /**
+   * @brief quasistatic sysid routine
+   * 
+   *        Quasistatic routines accelerate the motor slowly to measure static
+   *        friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is
+   *        negligible.
+   * 
+   * @param direction the direction of the sysid routine
+   * @return Command
+   */
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction);
+  }
+
+  /**
+   * @brief dynamic sysid routine
+   * 
+   *        Dynamic routines accelerate the motor quickly to measure dynamic
+   *        friction and other
+   *        non-linear effects.
+   * 
+   * @param direction the direction of the sysid routine
+   * @return Command
+   */
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction);
   }
 
   /**
