@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,6 +21,8 @@ public class LimelightHandler {
   private static final NetworkTable kTable =
       NetworkTableInstance.getDefault().getTable("limelight");;
   private static DoubleArraySubscriber m_poseSubscriber;
+
+  public static DoubleSupplier tempLimelighDoubleSupplier = null;
 
   /**
    * @brief Whether the limelight has any valid targets.
