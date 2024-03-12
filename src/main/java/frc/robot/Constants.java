@@ -155,9 +155,9 @@ public class Constants {
     // ratios (driven/driver)
     public static final double kRatio = 90;
     // SysId constants
-    public static final double kRampRate = 5.0;
-    public static final double kStepVoltage = 2.0;
-    public static final double kTimeout = 5.0;
+    public static final double kRampRate = 0.2;
+    public static final double kStepVoltage = 8.0;
+    public static final double kTimeout = 20.0;
   }
 
   public class Flywheel {
