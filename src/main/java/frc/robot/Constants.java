@@ -15,19 +15,16 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class Constants {
   public class Drivetrain {
-    /**
-     * Drivetrain P constant. From SysId. TODO
-     */
-    public static final double kP = 0.0;
-    /**
-     * Drivetrain I constant. From SysId. TODO
-     */
-    public static final double kI = 0.0;
-    /**
-     * Drivetrain I constant. From SysId. TODO
-     */
-    public static final double kD = 0.0;
 
+    // TODO
+    public static final double driveKP = 0.0;
+    public static final double driveKI = 0.0;
+    public static final double driveKD = 0.0;
+
+    // TODO
+    public static final double turningKP = 0.0;
+    public static final double turningKI = 0.0;
+    public static final double turningKD = 0.0;
 
     // feedforward gains
     // lateral position controller
@@ -49,9 +46,8 @@ public class Constants {
     public static final double kBotWidth = 0.7; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-            .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+        .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
   }
 
   public class Angler {
@@ -279,16 +275,16 @@ public class Constants {
     // Blue Amp Lineup Pos
     public static final double kBlueAmpLineupX = 3;
     public static final double kBlueAmpLineupY = 5;
-    public static final double kBlueAmpLineupTheta =
-        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
+        kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 14;
     public static final double kRedAmpLineupY = 5;
-    public static final double kRedAmpLineupTheta =
-        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
+    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
+        .getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()

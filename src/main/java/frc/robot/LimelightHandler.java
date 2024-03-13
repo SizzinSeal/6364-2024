@@ -1,9 +1,12 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
+
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
@@ -11,6 +14,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.units.*;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.util.AprilTagInfo;
 
 /**
@@ -18,11 +22,10 @@ import frc.robot.util.AprilTagInfo;
  */
 public class LimelightHandler {
 
-  private static final NetworkTable kTable =
-      NetworkTableInstance.getDefault().getTable("limelight");;
+  private static final NetworkTable kTable = NetworkTableInstance.getDefault().getTable("limelight");;
   private static DoubleArraySubscriber m_poseSubscriber;
-
-  public static DoubleSupplier tempLimelighDoubleSupplier = null;
+  private static final double limelightMountAngleDegrees = -0.0; // SHOULD BE NEGATIVE
+  private static final double limelightLensHeightInches = 20.0;
 
   /**
    * @brief Whether the limelight has any valid targets.
@@ -43,7 +46,8 @@ public class LimelightHandler {
   }
 
   /**
-   * @brief Class ID of primary neural detector result. Only applies to "Detector" pipeline.
+   * @brief Class ID of primary neural detector result. Only applies to "Detector"
+   *        pipeline.
    * 
    * @return Class ID.
    */
@@ -81,7 +85,8 @@ public class LimelightHandler {
   }
 
   /**
-   * @brief Subscribe! Check for connection then subscribe to NetworkTable topic. Prints err message
+   * @brief Subscribe! Check for connection then subscribe to NetworkTable topic.
+   *        Prints err message
    *        to console otherwise.
    */
   public static void SubscribeToRobotPose() {
@@ -131,6 +136,23 @@ public class LimelightHandler {
       System.out.println(e);
       return null;
     }
+  }
+
+  public static Pose2d getNoteFieldPose2DEstimate(CommandSwerveDrivetrain m_drivetrain) {
+    Transform2d transformation = new Transform2d(
+        new Translation2d(getDistanceToNote(), new Rotation2d(getHorizontalOffset())),
+        new Rotation2d(getHorizontalOffset()));
+    return m_drivetrain.getPose().transformBy(transformation);
+  }
+
+  private static double getDistanceToNote() {
+    if (hasValidTarget()) {
+      double limelightMountAngleRadians = Radians.convertFrom(limelightMountAngleDegrees, Degrees);
+      double angleToNoteRadians = limelightMountAngleRadians + getVerticalOffset().in(Radians);
+      double value = (-limelightLensHeightInches) / Math.tan(angleToNoteRadians);
+      return value;
+    }
+    return 0.0;
   }
 
   /**
