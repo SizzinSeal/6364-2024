@@ -34,9 +34,8 @@ public class Constants {
     public static final double kBotWidth = 0.7; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-            .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+        .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
   }
 
   public class Angler {
@@ -131,32 +130,34 @@ public class Constants {
     // motor inversion
     public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
     // gravity type
-    public static final GravityTypeValue kGravityType = GravityTypeValue.Elevator_Static;
+    public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
     // controller constants
-    public static final double kP = 0;
+    public static final double kP = 20;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static final double kS = 0;
-    public static final double kV = 0;
-    public static final double kA = 0;
-    public static final double kG = 0;
+    public static final double kS = 0.33237;
+    public static final double kV = 2.0077;
+    public static final double kA = 1.4688;
+    public static final double kG = 0.0;
     // positions (rotations) TODO: tune this so 90 degrees is up relative to the
     // ground
-    public static final double kMaxPosition = 0;
-    public static final double kMinPosition = -0.17;
+    public static final double kMaxPosition = 0.49;
+    public static final double kMinPosition = 0;
     // speeds (rotations per second)
-    public static final double kSpeed = 0; // TODO: find this value
+    public static final double kSpeed = 0.7; // TODO: find this value
     // acceleration (rotations per second squared)
-    public static final double kAccel = 0; // TODO: find this value
+    public static final double kAccel = 0.4; // TODO: find this value
     // jerk (rotations per second cubed)
     public static final double kJerk = 0; // TODO: find this value
     // tolerances (rotations)
     public static final double kTolerance = 0.02; // TODO: find this value
     // ratios (driven/driver)
-    public static final double kRatio = 90;
+    public static final double kRatio = 32.5;
+    // current limit (we use this to limit accel)
+    public static final double kCurrentLimit = 15;
     // SysId constants
     public static final double kRampRate = 0.2;
-    public static final double kStepVoltage = 8.0;
+    public static final double kStepVoltage = 2.5;
     public static final double kTimeout = 20.0;
   }
 
@@ -264,16 +265,16 @@ public class Constants {
     // Blue Amp Lineup Pos
     public static final double kBlueAmpLineupX = 3;
     public static final double kBlueAmpLineupY = 5;
-    public static final double kBlueAmpLineupTheta =
-        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
+        kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 14;
     public static final double kRedAmpLineupY = 5;
-    public static final double kRedAmpLineupTheta =
-        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
+    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
+        .getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()

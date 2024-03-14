@@ -13,9 +13,11 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.StaticBrake;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -32,7 +34,7 @@ public class Deployer extends SubsystemBase {
   // init motors
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // init output
-  private final VoltageOut m_output = new VoltageOut(0);
+  private final PositionVoltage m_output = new PositionVoltage(kMaxPosition);
 
   private final VoltageOut m_sysIdOutput = new VoltageOut(0);
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
@@ -56,8 +58,10 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Deployer() {
     super();
@@ -70,14 +74,20 @@ public class Deployer extends SubsystemBase {
     config.MotorOutput.Inverted = kMotorInverted;
     // set motor ratios
     config.Feedback.SensorToMechanismRatio = kRatio;
+    // set current limit
+    config.CurrentLimits.StatorCurrentLimit = kCurrentLimit;
+    config.CurrentLimits.SupplyCurrentLimit = kCurrentLimit;
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
     // set brake
     m_motor.setNeutralMode(NeutralModeValue.Brake);
+
     // apply configuration
     m_motor.getConfigurator().apply(config);
     // set motor position to 0
-    m_motor.setPosition(0);
-    // brake the motor
-    m_motor.setControl(new StaticBrake());
+    m_motor.setPosition(kMaxPosition);
+    // set motor control mode
+    m_motor.setControl(m_output);
   }
 
   /**
@@ -98,6 +108,27 @@ public class Deployer extends SubsystemBase {
     return m_motor.getPosition().getValueAsDouble() + kTolerance > kMaxPosition;
   }
 
+  public Command goToAngle(double position) {
+    return this.runOnce(() -> {
+      m_output.Position = position;
+      m_motor.setControl(m_output);
+    });
+  }
+
+  public Command deploy() {
+    return this.runOnce(() -> {
+      m_output.Position = 0;
+      m_motor.setControl(m_output);
+    });
+  }
+
+  public Command retract() {
+    return this.runOnce(() -> {
+      m_output.Position = kMaxPosition;
+      m_motor.setControl(m_output);
+    });
+  }
+
   /**
    * @brief move the deployer down
    * 
@@ -105,7 +136,7 @@ public class Deployer extends SubsystemBase {
    */
   public Command down() {
     return this.runOnce(() -> {
-      m_output.Output = -kSpeed;
+      // m_output.Position = -kSpeed;
       m_motor.setControl(m_output);
     });
   }
@@ -117,7 +148,7 @@ public class Deployer extends SubsystemBase {
    */
   public Command up() {
     return this.runOnce(() -> {
-      m_output.Output = kSpeed;
+      // m_output.Output = kSpeed;
       m_motor.setControl(m_output);
     });
   }
@@ -129,7 +160,7 @@ public class Deployer extends SubsystemBase {
    */
   public Command stop() {
     return this.runOnce(() -> {
-      m_output.Output = 0;
+      // m_output.Output = 0;
       m_motor.setControl(m_output);
       m_motor.setNeutralMode(NeutralModeValue.Brake);
     });
@@ -138,8 +169,10 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static
+   *        friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is
+   *        negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -151,7 +184,8 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic
+   *        friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -164,9 +198,12 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */
@@ -176,5 +213,7 @@ public class Deployer extends SubsystemBase {
     // measured position
     builder.addDoubleProperty("Position", () -> m_motor.getPosition().getValueAsDouble(),
         (double position) -> m_motor.setPosition(position));
+    builder.addDoubleProperty("Target Position", () -> m_output.Position,
+        (double target) -> this.goToAngle(target).schedule());
   }
 }
