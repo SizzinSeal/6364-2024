@@ -60,8 +60,8 @@ public class Constants {
     // positions (in rotations)
     public static final double kMaxPosition = 150;
     public static final double kMinPosition = 0;
-    public static final double kShootingPosition = 130;
-    public static final double kLoadingPosition = 20;
+    public static final double kShootingPosition = 50;
+    public static final double kLoadingPosition = 10;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 120;
     public static final double kProbeInitialSpeed = 30;
@@ -150,7 +150,7 @@ public class Constants {
     // jerk (rotations per second cubed)
     public static final double kJerk = 0; // TODO: find this value
     // tolerances (rotations)
-    public static final double kTolerance = 0.02; // TODO: find this value
+    public static final double kTolerance = 0.1; // TODO: find this value
     // ratios (driven/driver)
     public static final double kRatio = 32.5;
     // current limit (we use this to limit accel)
