@@ -119,9 +119,8 @@ public class RobotContainer {
             .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
     // note detected in the intake
-    m_intake.noteDetected.onTrue(
-        Commands.sequence(Commands.waitSeconds(0.1), m_intake.slowIntake(), m_indexer.slowLoad())
-            .onlyIf(() -> !m_indexer.isNoteDetected()));
+    m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(), m_indexer.slowLoad())
+        .onlyIf(() -> !m_indexer.isNoteDetected()));
 
     // note detected in the indexer
     m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
