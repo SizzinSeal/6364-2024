@@ -248,16 +248,17 @@ public class RobotContainer {
 
     double lateralDeviation; // standard deviation of the x and y measurements
     double angularDeviation; // standard deviation of the angle measurement
-    final MeasurementInfo internalTag = visionInstance.new MeasurementInfo(
-        PhotonVisionHandler.getAprilTagID(), PhotonVisionHandler.getNumberofTags(), // gets the
-                                                                                    // april tag
-                                                                                    // that is being
-                                                                                    // identified
-                                                                                    // and number of
-                                                                                    // total tags
-        PhotonVisionHandler.areaOfAprilTag);// gets the Area of the april tag on the screen
+    final MeasurementInfo internalTag =
+        visionInstance.new MeasurementInfo(PhotonVisionHandler.getAprilTagID(),
+            PhotonVisionHandler.getNumberofTags(), PhotonVisionHandler.areaOfAprilTag());// gets the
+                                                                                         // Area of
+                                                                                         // the
+                                                                                         // april
+                                                                                         // tag on
+                                                                                         // the
+                                                                                         // screen
 
-    final double posDiff = m_drivetrain.getPoseDifference(limelight1.getPos2D());
+    final double posDiff = m_drivetrain.getPoseDifference(PhotonVisionHandler.getPos2D());
 
     // return if no tag detected
     if (internalTag.tagId == -1)
@@ -281,7 +282,7 @@ public class RobotContainer {
     else
       return;
     // update the pose estimator
-    m_drivetrain.addVisionMeasurement(limelight1.getPos2D(),
+    m_drivetrain.addVisionMeasurement(PhotonVisionHandler.getPos2D(),
         limelight1.getLatestLatencyAdjustedTimeStamp(), VecBuilder.fill(lateralDeviation,
             lateralDeviation, Units.degreesToRadians(angularDeviation)));
   }

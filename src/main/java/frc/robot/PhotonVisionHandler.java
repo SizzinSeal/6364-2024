@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.HashMap;
 import java.util.List;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
@@ -10,10 +11,28 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class PhotonVisionHandler {
   private static PhotonCamera vision = new PhotonCamera("photonvision");
   private static PhotonTrackedTarget target = vision.getLatestResult().getBestTarget();
-  private final static double kCameraHeight = 0.35052; // meters
+  private final static double latencyMilis = vision.getLatestResult().getLatencyMillis() / 1000.0;
 
-  // in order of ID 1 to ID 16
-  private static double[] AprilTagHeights = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+  private final static HashMap<Integer, Double> kAprilTagHeights;
+  static {
+    kAprilTagHeights = new HashMap<>();
+    kAprilTagHeights.put(1, 0.0);
+    kAprilTagHeights.put(2, 0.0);
+    kAprilTagHeights.put(3, 0.0);
+    kAprilTagHeights.put(4, 0.0);
+    kAprilTagHeights.put(5, 0.0);
+    kAprilTagHeights.put(6, 0.0);
+    kAprilTagHeights.put(7, 0.0);
+    kAprilTagHeights.put(8, 0.0);
+    kAprilTagHeights.put(9, 0.0);
+    kAprilTagHeights.put(10, 0.0);
+    kAprilTagHeights.put(11, 0.0);
+    kAprilTagHeights.put(12, 0.0);
+    kAprilTagHeights.put(13, 0.0);
+    kAprilTagHeights.put(14, 0.0);
+    kAprilTagHeights.put(15, 0.0);
+  }
 
   /**
    * Get the number of April Tags in total
@@ -28,6 +47,10 @@ public class PhotonVisionHandler {
 
   public static double areaOfAprilTag() {
     return target.getArea(); // gets area of apriltag
+  }
+
+  public static double latency() {
+    return latencyMilis; // gets area of apriltag
   }
 
   // camera dimensions from center of robot (x, y, z) (10.4x, -6.5y, 13.8z) inches
