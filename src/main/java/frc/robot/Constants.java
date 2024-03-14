@@ -51,30 +51,30 @@ public class Constants {
     // gravity type
     public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
     // controller constants
-    public static final double kP = 1;
+    public static final double kP = 1.358;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static final double kS = 0.2539;
-    public static final double kV = 0.11015;
-    public static final double kA = 0.0010909;
-    public static final double kG = 0;
+    public static final double kS = 0.27194;
+    public static final double kV = 48.377;
+    public static final double kA = 0.95165;
+    public static final double kG = 0.14449;
     // positions (in rotations)
     public static final double kMaxPosition = 150;
     public static final double kMinPosition = 0;
     public static final double kShootingPosition = 20;
     public static final double kLoadingPosition = 10;
     // speeds (in rotations per second)
-    public static final double kMaxSpeed = 120;
-    public static final double kProbeInitialSpeed = 30;
-    public static final double kProbeFinalSpeed = 10;
+    public static final double kMaxSpeed = 0.2;
+    public static final double kProbeInitialSpeed = 1;
+    public static final double kProbeFinalSpeed = 1;
     // acceleration (in rotations per second squared)
-    public static final double kAcceleration = 200;
+    public static final double kAcceleration = 1;
     // jerk (in rotations per second cubed)
-    public static final double kJerk = 800;
+    public static final double kJerk = 2;
     // tolerances (in rotations)
     public static final double kTolerance = 5; // 5 degrees
     // ratios (driven/driver)
-    public static final double kRatio = 1; // in reality this is a 1500 to 1 gear ratio, but
+    public static final double kRatio = 500; // in reality this is a 1500 to 1 gear ratio, but
     // for some reason TalonFX doesn't support gear ratios higher than 1000 to 1
     // sysid constants
     public static final double kRampRate = 0.2;

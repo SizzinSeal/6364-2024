@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.controls.StaticBrake;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
 import frc.robot.generated.TunerConstants;
