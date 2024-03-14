@@ -113,19 +113,19 @@ public class RobotContainer {
             .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
             .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
-    // intake
-    m_controller.rightTrigger().onTrue(NamedCommands.getCommand("IntakeCommand"));
-    // shoot
-    m_controller.leftBumper().whileTrue(NamedCommands.getCommand("ShootCommand"));
+    // note detected in the intake
+    m_intake.noteDetected.debounce(0.5)
+        .onTrue(Commands
+            .sequence(Commands.waitSeconds(0.1), m_intake.slowIntake(), m_indexer.slowLoad())
+            .onlyIf(() -> !m_indexer.isNoteDetected()));
 
-    // reset robot position
-    m_controller.a().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
+    // note detected in the indexer
+    m_indexer.noteDetected.debounce(0.5).onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
+        m_deployer.retract(), m_angler.goToShoot()));
 
-    // secondary controller climber controls
-    m_secondary.povUp().whileTrue(m_climber.up());
-    m_secondary.povUp().onFalse(m_climber.stop());
-    m_secondary.povDown().whileTrue(m_climber.down());
-    m_secondary.povDown().onFalse(m_climber.stop());
+    // note left the indexer
+    m_indexer.noteDetected.debounce(0.5).onFalse(
+        Commands.sequence(Commands.waitSeconds(0.5), m_indexer.stop(), m_angler.goToLoad()));
 
     // reset position if in simulation
     if (Utils.isSimulation()) {

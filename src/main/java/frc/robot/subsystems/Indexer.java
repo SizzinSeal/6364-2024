@@ -15,6 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static frc.robot.Constants.Indexer.*;
 
@@ -27,7 +28,7 @@ public class Indexer extends SubsystemBase {
   private final AnalogInput m_beamBreak = new AnalogInput(kBeamBreakPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // triggers and event loops
-  public final Trigger m_noteDetected = new Trigger(() -> m_beamBreak.getVoltage() > 0.83);
+  public final Trigger noteDetected = new Trigger(() -> m_beamBreak.getVoltage() > 0.83);
   private final EventLoop m_noteDetectedLoop = new EventLoop();
   // control output objects
   private final VoltageOut m_output = new VoltageOut(0);
@@ -49,11 +50,21 @@ public class Indexer extends SubsystemBase {
     motorConfig.MotorOutput.Inverted = kInverted;
     // set gear ratio
     motorConfig.Feedback.SensorToMechanismRatio = kRatio;
-    // one shot the motor
-    // m_output.withUpdateFreqHz(0);
+    // set brake
+    m_motor.setNeutralMode(NeutralModeValue.Brake);
     // apply configuration
     m_motor.getConfigurator().apply((motorConfig));
-    m_motor.setNeutralMode(NeutralModeValue.Brake);
+    // brake the motor
+    m_motor.setControl(new StaticBrake());
+  }
+
+  /**
+   * @brief Whether the note is detected or not
+   * 
+   * @return Boolean
+   */
+  public Boolean isNoteDetected() {
+    return m_beamBreak.getVoltage() > 0.83;
   }
 
   /**
@@ -102,11 +113,24 @@ public class Indexer extends SubsystemBase {
   }
 
   /**
+   * @brief Reverse the indexer. Only used in case of a jam
+   * 
+   * @return Command
+   */
+  public Command reverse() {
+    return this.runOnce(() -> this.setSpeed(-kLoadSpeed));
+  }
+
+  /**
    * @brief Stop the indexer motors
    * 
    */
   public Command stop() {
-    return this.runOnce(() -> setSpeed(0));
+    return this.runOnce(() -> {
+      m_output.Output = 0;
+      m_motor.setControl(m_output);
+      m_motor.setControl(new StaticBrake());
+    });
   }
 
   /**

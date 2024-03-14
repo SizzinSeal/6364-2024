@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
   private final AnalogInput m_beamBreak = new AnalogInput(kBeamBreakPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // triggers and event loops
-  public final Trigger m_noteDetected = new Trigger(() -> m_beamBreak.getVoltage() > 0.83);
+  public final Trigger noteDetected = new Trigger(() -> m_beamBreak.getVoltage() > 0.83);
   private final EventLoop m_noteDetectedLoop = new EventLoop();
   // control outputs
   private final VoltageOut m_output = new VoltageOut(0);
@@ -52,6 +52,15 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putData("Intake", this.intake());
     SmartDashboard.putData("Outtake", this.outtake());
     SmartDashboard.putData("Stop", this.stop());
+  }
+
+  /**
+   * @brief Whether the note is detected or not
+   * 
+   * @return Boolean
+   */
+  public Boolean isNoteDetected() {
+    return m_beamBreak.getVoltage() > 0.83;
   }
 
   /**
@@ -87,6 +96,15 @@ public class Intake extends SubsystemBase {
    */
   public Command intake() {
     return this.runOnce(() -> this.setSpeed(kIntakeSpeed));
+  }
+
+  /**
+   * @brief Spin the intake motors to intake notes slowly
+   * 
+   * @return Command
+   */
+  public Command slowIntake() {
+    return this.runOnce(() -> this.setSpeed(kSlowIntakeSpeed));
   }
 
   /**
