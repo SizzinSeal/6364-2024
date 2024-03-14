@@ -34,10 +34,10 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
 
   // 6 meters per second desired top speed.
-  private static final double kMaxSpeed = 4.0;
+  private static final double kMaxSpeed = 0.5;
 
   // Half a rotation per second max angular velocity.
-  private static final double kMaxAngularRate = 1.5 * Math.PI;
+  private static final double kMaxAngularRate = 0.3 * Math.PI;
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
@@ -97,7 +97,8 @@ public class RobotContainer {
       .andThen(Commands.runOnce(() -> {
         m_intake.setSpeed(5.0);
       }))
-      .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_intake.stop()).andThen(m_indexer.stop());
+      .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_intake.stop()).andThen(m_indexer.stop())
+      .andThen(m_deployer.retract()).andThen(m_angler.goToShoot()).andThen(m_flywheel.forwards());
 
   private Command e() {
     if (m_flywheel.isAtSpeed()) {
@@ -108,10 +109,9 @@ public class RobotContainer {
   }
 
   // command to shoot
-  private final SequentialCommandGroup m_shootCommand = new SequentialCommandGroup(
-      m_flywheel.forwards().andThen(m_angler.goToShoot()).andThen(e())
-          .andThen(m_indexer.eject()).andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop())
-          .andThen(m_indexer.stop()).andThen(m_angler.goToLoad()));
+  private final SequentialCommandGroup m_shootCommand = m_indexer.eject().andThen(Commands.waitSeconds(1))
+      .andThen(m_indexer.stop()).andThen(m_flywheel.stop())
+      .andThen(m_angler.goToLoad());
 
   // command to calibrate angler
   private final SequentialCommandGroup m_calibrateCommand = new SequentialCommandGroup(m_angler.setSpeed(-3))
@@ -163,71 +163,48 @@ public class RobotContainer {
    * @brief Configure the controller bindings for teleop
    */
   private void configureBindings() {
-    /*
-     * m_drivetrain.setDefaultCommand( // Drivetrain will execute this command
-     * periodically
-     * m_drivetrain.applyRequest(() ->
-     * m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-     * .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
-     * .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
-     * 
-     * // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
-     * 
-     * // m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
-     * // .generate(new Pose2d(new Translation2d(3, 5),
-     * // Rotation2d.fromDegrees(90)))));
-     * 
-     * // m_controller.a().whileTrue(m_drivetrain
-     * // .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5),
-     * // Rotation2d.fromDegrees(180)))));
-     * 
-     * // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
-     * // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
-     * // -m_controller.getLeftX()))));
-     * 
-     * m_controller.rightTrigger().whileTrue(m_intakeCommand2);
-     * m_controller.rightTrigger().onTrue(NamedCommands.getCommand("DeployerDown"));
-     * m_controller.rightTrigger().onFalse(m_indexer.stop().alongWith(m_intake.stop(
-     * ))
-     * .andThen(NamedCommands.getCommand("DeployerUp")));
-     * //
-     * m_controller.rightBumper().whileTrue(NamedCommands.getCommand("DeployerUp"));
-     * 
-     * m_controller.leftBumper().whileTrue(NamedCommands.getCommand("ShootCommand"))
-     * ;
-     * m_controller.leftBumper()
-     * .onFalse(m_flywheel.stop().andThen(m_indexer.stop()).andThen(m_angler.
-     * goToLoad()));
-     * 
-     * // secondary controller manual overrides
-     * m_secondary.a().onTrue(m_flywheel.forwards());
-     * 
-     * // manual indexer load
-     * m_controller.b().onTrue(NamedCommands.getCommand("ManualLoad"));
-     * // reset robot position
-     * m_controller.a().onTrue(Commands.runOnce(() ->
-     * m_drivetrain.seedFieldRelative()));
-     * // outtake
-     * m_controller.x().whileTrue(Commands.runOnce(() -> m_indexer.setSpeed(-5))
-     * .andThen(() ->
-     * m_intake.setSpeed(-8)).andThen(NamedCommands.getCommand("DeployerDown")));
-     * m_controller.x().onFalse(
-     * m_intake.stop().andThen(m_indexer.stop()).andThen(NamedCommands.getCommand(
-     * "DeployerUp")));
-     * 
-     * // secondary controller climber controls
-     * m_secondary.povUp().whileTrue(m_climber.up());
-     * m_secondary.povUp().onFalse(m_climber.stop());
-     * m_secondary.povDown().whileTrue(m_climber.down());
-     * m_secondary.povDown().onFalse(m_climber.stop());
-     * 
-     * // move to the Amp
-     * // m_controller.a().whileTrue(new MoveToPose(Field.getAmpLineupPose(),
-     * // m_drivetrain));
-     */
-    m_controller.a().onTrue(m_intakeCommand2);
-    m_controller.a().onFalse(m_deployer.retract());
-    m_controller.a().onFalse(m_indexer.stop().alongWith(m_intake.stop()));
+    m_drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
+            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
+            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
+
+    // m_controller.a().whileTrue(m_drivetrain.applyRequest(() -> m_brake));
+
+    // m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
+    // .generate(new Pose2d(new Translation2d(3, 5),
+    // Rotation2d.fromDegrees(90)))));
+
+    // m_controller.a().whileTrue(m_drivetrain
+    // .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5),
+    // Rotation2d.fromDegrees(180)))));
+
+    // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
+    // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
+    // -m_controller.getLeftX()))));
+
+    m_controller.rightTrigger().onTrue(m_intakeCommand2);
+
+    m_controller.leftBumper().whileTrue(NamedCommands.getCommand("ShootCommand"));
+
+    // secondary controller manual overrides
+    m_secondary.a().onTrue(m_flywheel.forwards());
+
+    // manual indexer load
+    m_controller.b().onTrue(NamedCommands.getCommand("ManualLoad"));
+    // reset robot position
+    m_controller.a().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
+    // outtake
+    m_controller.x().whileTrue(Commands.runOnce(() -> m_indexer.setSpeed(-5))
+        .andThen(() -> m_intake.setSpeed(-8)).andThen(NamedCommands.getCommand("DeployerDown")));
+    m_controller.x().onFalse(
+        m_intake.stop().andThen(m_indexer.stop()).andThen(NamedCommands.getCommand(
+            "DeployerUp")));
+
+    // secondary controller climber controls
+    m_secondary.povUp().whileTrue(m_climber.up());
+    m_secondary.povUp().onFalse(m_climber.stop());
+    m_secondary.povDown().whileTrue(m_climber.down());
+    m_secondary.povDown().onFalse(m_climber.stop());
 
     // test new intake command
 

@@ -60,7 +60,7 @@ public class Constants {
     // positions (in rotations)
     public static final double kMaxPosition = 150;
     public static final double kMinPosition = 0;
-    public static final double kShootingPosition = 50;
+    public static final double kShootingPosition = 35;
     public static final double kLoadingPosition = 10;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 120;
