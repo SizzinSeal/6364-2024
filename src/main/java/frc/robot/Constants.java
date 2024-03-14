@@ -61,8 +61,9 @@ public class Constants {
     // positions (in rotations)
     public static final double kMaxPosition = 150;
     public static final double kMinPosition = 0;
-    public static final double kShootingPosition = 20;
-    public static final double kLoadingPosition = 10;
+    public static final double kZeroPosition = 26;
+    public static final double kShootingPosition = 35;
+    public static final double kLoadingPosition = 50;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 0.2;
     public static final double kProbeInitialSpeed = 1;
@@ -74,8 +75,7 @@ public class Constants {
     // tolerances (in rotations)
     public static final double kTolerance = 5; // 5 degrees
     // ratios (driven/driver)
-    public static final double kRatio = 500; // in reality this is a 1500 to 1 gear ratio, but
-    // for some reason TalonFX doesn't support gear ratios higher than 1000 to 1
+    public static final double kRatio = 500;
     // sysid constants
     public static final double kRampRate = 0.2;
     public static final double kStepVoltage = 8.0;
