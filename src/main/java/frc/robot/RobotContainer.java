@@ -124,8 +124,8 @@ public class RobotContainer {
         m_deployer.retract(), m_angler.goToShoot()));
 
     // note left the indexer
-    m_indexer.noteDetected.debounce(0.5).onFalse(
-        Commands.sequence(Commands.waitSeconds(0.5), m_indexer.stop(), m_angler.goToLoad()));
+    m_indexer.noteDetected.debounce(0.5)
+        .onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
 
     // reset position if in simulation
     if (Utils.isSimulation()) {
