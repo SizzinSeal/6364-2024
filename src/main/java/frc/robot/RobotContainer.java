@@ -63,9 +63,16 @@ public class RobotContainer {
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   // command to intake
-  private final Command m_intakeCommand =
-      Commands.sequence(m_angler.goToLoad(), m_deployer.deploy(),
-          Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.intake(), m_indexer.load());
+  private final Command m_intakeCommand = Commands
+      .sequence(m_angler.goToLoad(), m_deployer.deploy(),
+          Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.intake(), m_indexer.load())
+      .finallyDo((boolean interrupted) -> {
+        if (!interrupted) {
+          m_deployer.retract().schedule();
+          m_intake.stop().schedule();
+          m_indexer.stop().schedule();
+        }
+      }).onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to shoot
   private final Command m_shootCommand = Commands.sequence(m_angler.goToShoot(),
