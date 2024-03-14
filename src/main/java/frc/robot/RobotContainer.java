@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
@@ -64,14 +65,14 @@ public class RobotContainer {
 
   // command to intake
   private final Command m_intakeCommand = Commands
-      .sequence(m_angler.goToLoad(), m_deployer.deploy(),
+      .sequence(m_angler.goToLoad(), m_deployer.deploy(), m_flywheel.forwards(),
           Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.intake(), m_indexer.load())
       .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to shoot
   private final Command m_shootCommand =
-      Commands.sequence(m_angler.goToShoot(), Commands.waitUntil(() -> m_angler.atTarget()),
-          m_indexer.eject(), Commands.waitSeconds(1.0), m_angler.goToLoad());
+      Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5))
+          .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
 
   // command to calibrate angler
   private final SequentialCommandGroup m_calibrateCommand =
@@ -132,8 +133,11 @@ public class RobotContainer {
 
     // intake button pressed
     m_controller.rightTrigger().whileTrue(m_intakeCommand);
+    // intake button released;
+    m_controller.rightTrigger()
+        .onFalse(Commands.sequence(m_intake.stop(), m_indexer.stop(), m_deployer.retract()));
     // shoot button pressed
-    m_controller.leftTrigger().onTrue(m_shootCommand);
+    m_controller.leftBumper().onTrue(m_shootCommand);
 
     // reset position if in simulation
     if (Utils.isSimulation()) {

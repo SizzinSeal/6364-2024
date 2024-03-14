@@ -43,7 +43,8 @@ public class Angler extends SubsystemBase {
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
   private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage), Seconds.of(kTimeout)),
+      new SysIdRoutine.Config(Volts.of(kRampRate).per(Second), Volts.of(kStepVoltage),
+          Seconds.of(kTimeout)),
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         m_motor.setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
       }, log -> {
@@ -59,18 +60,16 @@ public class Angler extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so
-   *        that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix
-   *        Tuner.
+   *        This is where the motors are configured. We configure them here so that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
   public Angler() {
     super();
     // configure motors
     final TalonFXConfiguration config = new TalonFXConfiguration();
     // set controller gains
-    config.Slot0 = new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV).withKA(kA).withKG(kG)
-        .withGravityType(kGravityType);
+    config.Slot0 = new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV)
+        .withKA(kA).withKG(kG).withGravityType(kGravityType);
     // invert motors
     config.MotorOutput.Inverted = kMotorInverted;
     // set motor ratios
@@ -107,13 +106,11 @@ public class Angler extends SubsystemBase {
   public Command calibrate() {
     return this.runOnce(() -> {
       m_motor.setControl(new VelocityVoltage(-kProbeInitialSpeed));
-    })
-        .andThen(Commands.waitUntil(() -> m_limit.get()))
+    }).andThen(Commands.waitUntil(() -> m_limit.get()))
         .andThen(() -> m_motor.setControl(new VelocityVoltage(kProbeInitialSpeed))).withTimeout(0.5)
         .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeFinalSpeed)))
         .andThen(Commands.waitUntil(() -> m_limit.get()))
-        .andThen(() -> m_motor.setControl(new VoltageOut(0)))
-        .andThen(() -> m_motor.setPosition(0));
+        .andThen(() -> m_motor.setControl(new VoltageOut(0))).andThen(() -> m_motor.setPosition(0));
   }
 
   public Command setSpeed(double speed) {
@@ -164,10 +161,8 @@ public class Angler extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static
-   *        friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is
-   *        negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -179,8 +174,7 @@ public class Angler extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic
-   *        friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -193,12 +187,9 @@ public class Angler extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We
-   *        use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the
-   *        motors. This
-   *        allows us to tune intake speed in real time, without having to
-   *        re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the motors. This
+   *        allows us to tune intake speed in real time, without having to re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */
