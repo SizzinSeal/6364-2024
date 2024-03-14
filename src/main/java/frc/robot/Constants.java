@@ -34,8 +34,9 @@ public class Constants {
     public static final double kBotWidth = 0.7; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-        .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
+        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+            .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
   }
 
   public class Angler {
@@ -58,11 +59,11 @@ public class Constants {
     public static final double kA = 0.95165;
     public static final double kG = 0.14449;
     // positions (in rotations)
-    public static final double kZeroPosition = 0.07222222222; // 26 degrees
-    public static final double kMaxPosition = 0.10;
-    public static final double kMinPosition = 0.09;
-    public static final double kShootingPosition = 0.12;
-    public static final double kLoadingPosition = 0.09;
+    public static final double kMaxPosition = 150;
+    public static final double kMinPosition = 0;
+    public static final double kZeroPosition = 26;
+    public static final double kShootingPosition = 35;
+    public static final double kLoadingPosition = 50;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 0.2;
     public static final double kProbeInitialSpeed = 1;
@@ -72,10 +73,9 @@ public class Constants {
     // jerk (in rotations per second cubed)
     public static final double kJerk = 2;
     // tolerances (in rotations)
-    public static final double kTolerance = 0.013889; // 5 degrees
+    public static final double kTolerance = 5; // 5 degrees
     // ratios (driven/driver)
-    public static final double kRatio = 500; // in reality this is a 1500 to 1 gear ratio, but
-    // for some reason TalonFX doesn't support gear ratios higher than 1000 to 1
+    public static final double kRatio = 500;
     // sysid constants
     public static final double kRampRate = 0.2;
     public static final double kStepVoltage = 8.0;
@@ -129,35 +129,37 @@ public class Constants {
     // CAN bus name
     public static final String kMotorBus = "rio";
     // motor inversion
-    public static final InvertedValue kMotorInverted = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
     // gravity type
-    public static final GravityTypeValue kGravityType = GravityTypeValue.Elevator_Static;
+    public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
     // controller constants
-    public static final double kP = 0;
+    public static final double kP = 20;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static final double kS = 0;
-    public static final double kV = 0;
-    public static final double kA = 0;
-    public static final double kG = 0;
+    public static final double kS = 0.33237;
+    public static final double kV = 2.0077;
+    public static final double kA = 1.4688;
+    public static final double kG = 0.0;
     // positions (rotations) TODO: tune this so 90 degrees is up relative to the
     // ground
-    public static final double kMaxPosition = 0;
-    public static final double kMinPosition = 1;
+    public static final double kMaxPosition = 0.49;
+    public static final double kMinPosition = 0;
     // speeds (rotations per second)
-    public static final double kSpeed = 80; // TODO: find this value
+    public static final double kSpeed = 0.7; // TODO: find this value
     // acceleration (rotations per second squared)
-    public static final double kAccel = 0; // TODO: find this value
+    public static final double kAccel = 0.4; // TODO: find this value
     // jerk (rotations per second cubed)
     public static final double kJerk = 0; // TODO: find this value
     // tolerances (rotations)
-    public static final double kTolerance = 0; // TODO: find this value
+    public static final double kTolerance = 0.1; // TODO: find this value
     // ratios (driven/driver)
-    public static final double kRatio = 90;
+    public static final double kRatio = 32.5;
+    // current limit (we use this to limit accel)
+    public static final double kCurrentLimit = 15;
     // SysId constants
-    public static final double kRampRate = 5.0;
-    public static final double kStepVoltage = 2.0;
-    public static final double kTimeout = 5.0;
+    public static final double kRampRate = 0.2;
+    public static final double kStepVoltage = 2.5;
+    public static final double kTimeout = 20.0;
   }
 
   public class Flywheel {
@@ -213,7 +215,7 @@ public class Constants {
     // motor ids
     public static final int kMotorId = 19;
     // sensor ids
-    public static final int kNoteDetectorPort = 1; // TODO: find this value
+    public static final int kBeamBreakPort = 1;
     // motor CAN bus names
     public static final String kMotorBus = "rio";
     // motor inversion
@@ -226,8 +228,9 @@ public class Constants {
     public static final double kV = 0;
     public static final double kA = 0;
     // speeds (rotations per second)
-    public static final double kEjectSpeed = 2; // TODO: find this value
-    public static final double kLoadSpeed = 3; // TODO: find this value
+    public static final double kEjectSpeed = 3;
+    public static final double kLoadSpeed = 3;
+    public static final double kSlowLoadSpeed = 2.0;
     // ratios
     public static final double kRatio = 1;
   }
@@ -235,6 +238,8 @@ public class Constants {
   public class Intake {
     // sim loop period (seconds)
     public static final double kSimLoopPeriod = 0.005;
+    // sensor ids
+    public static final int kBeamBreakPort = 0;
     // motor ids
     public static final int kMotorId = 20;
     // CAN bus name
@@ -242,7 +247,8 @@ public class Constants {
     // motor inversion
     public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
     // speeds (voltage)
-    public static final double kIntakeSpeed = 7;
+    public static final double kIntakeSpeed = 8;
+    public static final double kSlowIntakeSpeed = 5;
     public static final double kOuttakeSpeed = 8;
     // ratios (driven/driver)
     public static final double kRatio = 1;
@@ -264,16 +270,16 @@ public class Constants {
     // Blue Amp Lineup Pos
     public static final double kBlueAmpLineupX = 3;
     public static final double kBlueAmpLineupY = 5;
-    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
-        kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupTheta =
+        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 14;
     public static final double kRedAmpLineupY = 5;
-    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
-        .getRadians();
+    public static final double kRedAmpLineupTheta =
+        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()

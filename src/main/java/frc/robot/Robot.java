@@ -8,7 +8,6 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -22,6 +21,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     m_robotContainer.limelight1.init();
+    this.addPeriodic(() -> m_robotContainer.pollBeamBreaks(), 0.005);
     PortForwarder.add(5800, "photonvision.local", 5800);
 
     autoChooser.addOption("Auto1", 1);
@@ -83,9 +83,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic() {
-    System.out.println(m_robotContainer.m_indexer.noteDetected());
-  }
+  public void testPeriodic() {}
 
   @Override
   public void testExit() {}

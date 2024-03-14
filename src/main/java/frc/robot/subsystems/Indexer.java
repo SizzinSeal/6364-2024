@@ -3,16 +3,19 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static frc.robot.Constants.Indexer.*;
 
@@ -22,8 +25,11 @@ import static frc.robot.Constants.Indexer.*;
  */
 public class Indexer extends SubsystemBase {
   // init devices
-  private final AnalogInput m_noteDetector = new AnalogInput(kNoteDetectorPort);
+  private final AnalogInput m_beamBreak = new AnalogInput(kBeamBreakPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
+  // triggers and event loops
+  public final Trigger noteDetected = new Trigger(() -> m_beamBreak.getVoltage() > 0.83);
+  private final EventLoop m_noteDetectedLoop = new EventLoop();
   // control output objects
   private final VoltageOut m_output = new VoltageOut(0);
   // simulation objects
@@ -33,10 +39,8 @@ public class Indexer extends SubsystemBase {
   /**
    * @brief IndexerSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so
-   *        that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix
-   *        Tuner.
+   *        This is where the motors are configured. We configure them here so that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
   public Indexer() {
     super();
@@ -46,20 +50,28 @@ public class Indexer extends SubsystemBase {
     motorConfig.MotorOutput.Inverted = kInverted;
     // set gear ratio
     motorConfig.Feedback.SensorToMechanismRatio = kRatio;
-    // one shot the motor
-    // m_output.withUpdateFreqHz(0);
+    // set brake
+    m_motor.setNeutralMode(NeutralModeValue.Brake);
     // apply configuration
     m_motor.getConfigurator().apply((motorConfig));
-    m_motor.setNeutralMode(NeutralModeValue.Brake);
+    // brake the motor
+    m_motor.setControl(new StaticBrake());
   }
 
   /**
-   * @brief whether a note is detected in the indexer or not
+   * @brief Whether the note is detected or not
    * 
-   * @return true if not detected, false otherwise
+   * @return Boolean
    */
-  public Boolean noteDetected() {
-    return m_noteDetector.getVoltage() > 0.83;
+  public Boolean isNoteDetected() {
+    return m_beamBreak.getVoltage() > 0.83;
+  }
+
+  /**
+   * @brief Poll the note detector
+   */
+  public void pollNoteDetector() {
+    m_noteDetectedLoop.poll();
   }
 
   /**
@@ -82,8 +94,13 @@ public class Indexer extends SubsystemBase {
     return Commands.runOnce(() -> this.setSpeed(kLoadSpeed));
   }
 
+  /**
+   * @brief Spin the indexer motors to load a note slowly
+   * 
+   * @return Command
+   */
   public Command slowLoad() {
-    return Commands.runOnce(() -> this.setSpeed(-2));
+    return Commands.runOnce(() -> this.setSpeed(kSlowLoadSpeed));
   }
 
   /**
@@ -96,18 +113,30 @@ public class Indexer extends SubsystemBase {
   }
 
   /**
+   * @brief Reverse the indexer. Only used in case of a jam
+   * 
+   * @return Command
+   */
+  public Command reverse() {
+    return this.runOnce(() -> this.setSpeed(-kLoadSpeed));
+  }
+
+  /**
    * @brief Stop the indexer motors
    * 
    */
   public Command stop() {
-    return this.runOnce(() -> setSpeed(0));
+    return this.runOnce(() -> {
+      m_output.Output = 0;
+      m_motor.setControl(m_output);
+      m_motor.setControl(new StaticBrake());
+    });
   }
 
   /**
    * @brief periodic update method
    * 
-   *        This method is called periodically by the scheduler. We use it to
-   *        update the simulated
+   *        This method is called periodically by the scheduler. We use it to update the simulated
    *        motors.
    */
   @Override
@@ -129,12 +158,9 @@ public class Indexer extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We
-   *        use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the
-   *        motors. This
-   *        allows us to tune intake speed in real time, without having to
-   *        re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the motors. This
+   *        allows us to tune intake speed in real time, without having to re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */
@@ -147,6 +173,6 @@ public class Indexer extends SubsystemBase {
     // add measured velocity property
     builder.addDoubleProperty("Measured Velocity", () -> m_motor.getVelocity().getValueAsDouble(),
         null);
-    builder.addBooleanProperty("Note Detected", () -> this.noteDetected(), null);
+    builder.addBooleanProperty("Note Detected", () -> m_beamBreak.getVoltage() > 0.83, null);
   }
 }
