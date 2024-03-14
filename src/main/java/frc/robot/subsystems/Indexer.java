@@ -83,7 +83,7 @@ public class Indexer extends SubsystemBase {
   }
 
   public Command slowLoad() {
-    return Commands.runOnce(() -> this.setSpeed(-2));
+    return Commands.runOnce(() -> this.setSpeed(2.0));
   }
 
   /**

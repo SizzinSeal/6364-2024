@@ -92,8 +92,12 @@ public class RobotContainer {
       .andThen(Commands.waitUntil(() -> m_deployer.isDeployed()))
       .andThen(Commands.waitUntil(() -> m_angler.atTarget())).andThen(m_intake.intake())
       .andThen(m_indexer.load())
-      .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_intake.stop()).andThen(m_indexer.stop())
-      .andThen(m_deployer.retract()).andThen(m_angler.goToShoot());
+      .andThen(Commands.waitUntil(() -> m_intake.noteDetected())).andThen(Commands.waitSeconds(0.100))
+      .andThen(m_indexer.slowLoad())
+      .andThen(Commands.runOnce(() -> {
+        m_intake.setSpeed(5.0);
+      }))
+      .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_intake.stop()).andThen(m_indexer.stop());
 
   private Command e() {
     if (m_flywheel.isAtSpeed()) {
