@@ -69,8 +69,9 @@ public class RobotContainer {
       .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to shoot
-  private final Command m_shootCommand = Commands.sequence(m_angler.goToShoot(),
-      Commands.waitUntil(() -> m_angler.atTarget()), m_indexer.eject());
+  private final Command m_shootCommand =
+      Commands.sequence(m_angler.goToShoot(), Commands.waitUntil(() -> m_angler.atTarget()),
+          m_indexer.eject(), Commands.waitSeconds(1.0), m_angler.goToLoad());
 
   // command to calibrate angler
   private final SequentialCommandGroup m_calibrateCommand =
