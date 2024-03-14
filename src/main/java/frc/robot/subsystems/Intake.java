@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,7 +20,8 @@ import static frc.robot.Constants.Intake.*;
  * 
  */
 public class Intake extends SubsystemBase {
-  // init motors
+  // init devices
+  private final AnalogInput m_noteDetector = new AnalogInput(kNoteDetectorPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // control outputs
   private final VoltageOut m_output = new VoltageOut(0);
@@ -30,12 +32,13 @@ public class Intake extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Intake() {
     super();
-    // configure motors
     final TalonFXConfiguration config = new TalonFXConfiguration();
     // set motor inversions
     config.MotorOutput.Inverted = kMotorInverted;
@@ -56,6 +59,15 @@ public class Intake extends SubsystemBase {
   public void setSpeed(double speed) {
     m_output.Output = speed;
     m_motor.setControl(m_output);
+  }
+
+  /**
+   * @brief whether a note is detected in the indexer or not
+   * 
+   * @return true if not detected, false otherwise
+   */
+  public Boolean noteDetected() {
+    return m_noteDetector.getVoltage() > 0.83;
   }
 
   /**
@@ -88,7 +100,8 @@ public class Intake extends SubsystemBase {
   /**
    * @brief periodic update method
    * 
-   *        This method is called periodically by the scheduler. We use it to update the simulated
+   *        This method is called periodically by the scheduler. We use it to
+   *        update the simulated
    *        motors.
    */
   @Override
@@ -110,9 +123,12 @@ public class Intake extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */
@@ -125,5 +141,6 @@ public class Intake extends SubsystemBase {
     // target velocity
     builder.addDoubleProperty("Target Velocity", () -> m_output.Output,
         (double target) -> this.setSpeed(target));
+    builder.addBooleanProperty("Note Detected", () -> this.noteDetected(), null);
   }
 }

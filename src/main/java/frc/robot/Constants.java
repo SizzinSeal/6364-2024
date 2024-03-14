@@ -214,7 +214,7 @@ public class Constants {
     // motor ids
     public static final int kMotorId = 19;
     // sensor ids
-    public static final int kNoteDetectorPort = 1; // TODO: find this value
+    public static final int kNoteDetectorPort = 1;
     // motor CAN bus names
     public static final String kMotorBus = "rio";
     // motor inversion
@@ -236,6 +236,8 @@ public class Constants {
   public class Intake {
     // sim loop period (seconds)
     public static final double kSimLoopPeriod = 0.005;
+    // sensor ids
+    public static final int kNoteDetectorPort = 0;
     // motor ids
     public static final int kMotorId = 20;
     // CAN bus name
