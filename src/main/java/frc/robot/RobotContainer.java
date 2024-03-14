@@ -63,9 +63,13 @@ public class RobotContainer {
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   // command to intake
-  private final Command m_intakeCommand = Commands.sequence();
+  private final Command m_intakeCommand =
+      Commands.sequence(m_angler.goToLoad(), m_deployer.deploy(),
+          Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.intake(), m_indexer.load());
+
   // command to shoot
-  private final Command m_shootCommand = Commands.sequence();
+  private final Command m_shootCommand = Commands.sequence(m_angler.goToShoot(),
+      Commands.waitUntil(() -> m_angler.atTarget()), m_indexer.eject());
 
   // command to calibrate angler
   private final SequentialCommandGroup m_calibrateCommand =
@@ -126,6 +130,11 @@ public class RobotContainer {
     // note left the indexer
     m_indexer.noteDetected.debounce(0.5)
         .onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
+
+    // intake button pressed
+    m_controller.rightTrigger().onTrue(m_intakeCommand);
+    // shoot button pressed
+    m_controller.leftTrigger().onTrue(m_shootCommand);
 
     // reset position if in simulation
     if (Utils.isSimulation()) {
