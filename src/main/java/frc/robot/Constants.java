@@ -34,8 +34,9 @@ public class Constants {
     public static final double kBotWidth = 0.7; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-        .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
+        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+            .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
   }
 
   public class Angler {
@@ -214,7 +215,7 @@ public class Constants {
     // motor ids
     public static final int kMotorId = 19;
     // sensor ids
-    public static final int kNoteDetectorPort = 1;
+    public static final int kBeamBreakPort = 1;
     // motor CAN bus names
     public static final String kMotorBus = "rio";
     // motor inversion
@@ -227,8 +228,9 @@ public class Constants {
     public static final double kV = 0;
     public static final double kA = 0;
     // speeds (rotations per second)
-    public static final double kEjectSpeed = 2; // TODO: find this value
-    public static final double kLoadSpeed = 3; // TODO: find this value
+    public static final double kEjectSpeed = 3;
+    public static final double kLoadSpeed = 3;
+    public static final double kSlowLoadSpeed = 2;
     // ratios
     public static final double kRatio = 1;
   }
@@ -237,7 +239,7 @@ public class Constants {
     // sim loop period (seconds)
     public static final double kSimLoopPeriod = 0.005;
     // sensor ids
-    public static final int kNoteDetectorPort = 0;
+    public static final int kBeamBreakPort = 0;
     // motor ids
     public static final int kMotorId = 20;
     // CAN bus name
@@ -267,16 +269,16 @@ public class Constants {
     // Blue Amp Lineup Pos
     public static final double kBlueAmpLineupX = 3;
     public static final double kBlueAmpLineupY = 5;
-    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
-        kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupTheta =
+        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 14;
     public static final double kRedAmpLineupY = 5;
-    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
-        .getRadians();
+    public static final double kRedAmpLineupTheta =
+        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()
