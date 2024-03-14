@@ -66,13 +66,7 @@ public class RobotContainer {
   private final Command m_intakeCommand = Commands
       .sequence(m_angler.goToLoad(), m_deployer.deploy(),
           Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.intake(), m_indexer.load())
-      .finallyDo((boolean interrupted) -> {
-        if (!interrupted) {
-          m_deployer.retract().schedule();
-          m_intake.stop().schedule();
-          m_indexer.stop().schedule();
-        }
-      }).onlyIf(() -> !m_indexer.isNoteDetected());
+      .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to shoot
   private final Command m_shootCommand = Commands.sequence(m_angler.goToShoot(),
@@ -125,21 +119,19 @@ public class RobotContainer {
             .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
     // note detected in the intake
-    m_intake.noteDetected.debounce(0.5)
-        .onTrue(Commands
-            .sequence(Commands.waitSeconds(0.1), m_intake.slowIntake(), m_indexer.slowLoad())
+    m_intake.noteDetected.onTrue(
+        Commands.sequence(Commands.waitSeconds(0.1), m_intake.slowIntake(), m_indexer.slowLoad())
             .onlyIf(() -> !m_indexer.isNoteDetected()));
 
     // note detected in the indexer
-    m_indexer.noteDetected.debounce(0.5).onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
+    m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
         m_deployer.retract(), m_angler.goToShoot()));
 
     // note left the indexer
-    m_indexer.noteDetected.debounce(0.5)
-        .onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
+    m_indexer.noteDetected.onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
 
     // intake button pressed
-    m_controller.rightTrigger().onTrue(m_intakeCommand);
+    m_controller.rightTrigger().whileTrue(m_intakeCommand);
     // shoot button pressed
     m_controller.leftTrigger().onTrue(m_shootCommand);
 
