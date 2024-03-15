@@ -3,7 +3,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
-import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -22,7 +21,8 @@ import frc.robot.util.AprilTagInfo;
  */
 public class LimelightHandler {
 
-  private static final NetworkTable kTable = NetworkTableInstance.getDefault().getTable("limelight");;
+  private static final NetworkTable kTable =
+      NetworkTableInstance.getDefault().getTable("limelight");;
   private static DoubleArraySubscriber m_poseSubscriber;
   private static final double limelightMountAngleDegrees = -0.0; // SHOULD BE NEGATIVE
   private static final double limelightLensHeightInches = 20.0;
@@ -46,8 +46,7 @@ public class LimelightHandler {
   }
 
   /**
-   * @brief Class ID of primary neural detector result. Only applies to "Detector"
-   *        pipeline.
+   * @brief Class ID of primary neural detector result. Only applies to "Detector" pipeline.
    * 
    * @return Class ID.
    */
@@ -85,8 +84,7 @@ public class LimelightHandler {
   }
 
   /**
-   * @brief Subscribe! Check for connection then subscribe to NetworkTable topic.
-   *        Prints err message
+   * @brief Subscribe! Check for connection then subscribe to NetworkTable topic. Prints err message
    *        to console otherwise.
    */
   public static void SubscribeToRobotPose() {
