@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -89,9 +88,10 @@ public class Angler extends SubsystemBase {
     m_motor.setPosition(kZeroPosition);
     // start braking
     m_motor.setControl(new StaticBrake());
-    // post commands to smart dashboard
-    SmartDashboard.putData("Shooting Angle", this.goToShoot());
-    SmartDashboard.putData("Loading Angle", this.goToLoad());
+    // commands
+    SmartDashboard.putData("Angler To Shoot", this.goToShoot());
+    SmartDashboard.putData("Angler To Load", this.goToLoad());
+    SmartDashboard.putData("Angler Calibrate", this.calibrate());
   }
 
   /**
@@ -108,28 +108,21 @@ public class Angler extends SubsystemBase {
    * 
    * @return Command
    */
-  public Command calibrate() {
-    return this.runOnce(() -> {
-      m_motor.setControl(new VelocityVoltage(-kProbeInitialSpeed));
-    }).andThen(Commands.waitUntil(() -> m_limit.get()))
-        .andThen(() -> m_motor.setControl(new VelocityVoltage(kProbeInitialSpeed))).withTimeout(0.5)
-        .andThen(() -> m_motor.setControl(new VelocityVoltage(-kProbeFinalSpeed)))
-        .andThen(Commands.waitUntil(() -> m_limit.get()))
-        .andThen(() -> m_motor.setControl(new VoltageOut(0))).andThen(() -> m_motor.setPosition(0));
+  private Command calibrate() {
+    return Commands.sequence(setVoltage(kProbeFastSpeed), Commands.waitUntil(() -> m_limit.get()),
+        setVoltage(-kProbeFastSpeed), Commands.waitSeconds(0.3), setVoltage(kProbeSlowSpeed),
+        Commands.waitUntil(() -> m_limit.get()), this.setVoltage(0), Commands.waitSeconds(1.0),
+        Commands.runOnce(() -> m_motor.setPosition(kZeroPosition)));
   }
 
-  public Command setSpeed(double speed) {
-    return this.runOnce(() -> {
-      m_motor.setControl(new VoltageOut(speed));
-    });
-  }
-
-  public Boolean getLimit() {
-    return m_limit.get();
-  }
-
-  public Command zero() {
-    return this.runOnce(() -> m_motor.setPosition(0));
+  /**
+   * @brief set the voltage of the angler
+   * 
+   * @param voltage the voltage the angler should be set to
+   * @return Command
+   */
+  private Command setVoltage(double voltage) {
+    return this.runOnce(() -> m_motor.setControl(new VoltageOut(voltage)));
   }
 
   /**

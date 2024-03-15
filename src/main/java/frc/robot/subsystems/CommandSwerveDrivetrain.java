@@ -14,6 +14,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
@@ -41,11 +42,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog.MotorLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
 import frc.robot.SimConstants;
+import frc.robot.Constants.Drivetrain;
+import frc.robot.Constants.PathPlanner;
 import me.nabdev.pathfinding.structures.Path;
 
 /**
@@ -55,55 +59,150 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
-  public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(0.2).per(Second);
-  public static final Measure<Voltage> kStepVoltage = Volts.of(7.0);
-  public static final Measure<Time> kTimeout = Seconds.of(15.0);
 
   // sysid routine
-  private final VoltageOut m_sysIdOutput = new VoltageOut(0);
+  private final SwerveRequest.SysIdSwerveTranslation m_sysIdDrive =
+      new SwerveRequest.SysIdSwerveTranslation();
+  private final SwerveRequest.SysIdSwerveSteerGains m_sysIdSteer =
+      new SwerveRequest.SysIdSwerveSteerGains();
+  private final SwerveRequest.SysIdSwerveRotation m_sysIdSwerveRotation =
+      new SwerveRequest.SysIdSwerveRotation();
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
-  private final SysIdRoutine m_sysIdRoutine =
-      new SysIdRoutine(new SysIdRoutine.Config(kRampRate, kStepVoltage, kTimeout),
-          new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            for (int i = 0; i < Modules.length; i++) {
-              Modules[i].getDriveMotor().setControl(m_sysIdOutput.withOutput(volts.in(Volts)));
-            }
-          }, log -> {
-            log.motor("Front Left")
-                .voltage(m_appliedVoltage.mut_replace(
-                    Modules[0].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
-                .angularPosition(m_angle.mut_replace(
-                    Modules[0].getDriveMotor().getPosition().getValueAsDouble(), Rotations))
-                .angularVelocity(m_velocity.mut_replace(
-                    Modules[0].getDriveMotor().getVelocity().getValueAsDouble(),
-                    RotationsPerSecond));
-            log.motor("Front Right")
-                .voltage(m_appliedVoltage.mut_replace(
-                    Modules[1].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
-                .angularPosition(m_angle.mut_replace(
-                    Modules[1].getDriveMotor().getPosition().getValueAsDouble(), Rotations))
-                .angularVelocity(m_velocity.mut_replace(
-                    Modules[1].getDriveMotor().getVelocity().getValueAsDouble(),
-                    RotationsPerSecond));
-            log.motor("Back Left")
-                .voltage(m_appliedVoltage.mut_replace(
-                    Modules[2].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
-                .angularPosition(m_angle.mut_replace(
-                    Modules[2].getDriveMotor().getPosition().getValueAsDouble(), Rotations))
-                .angularVelocity(m_velocity.mut_replace(
-                    Modules[2].getDriveMotor().getVelocity().getValueAsDouble(),
-                    RotationsPerSecond));
-            log.motor("Back Right")
-                .voltage(m_appliedVoltage.mut_replace(
-                    Modules[3].getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
-                .angularPosition(m_angle.mut_replace(
-                    Modules[3].getDriveMotor().getPosition().getValueAsDouble(), Rotations))
-                .angularVelocity(m_velocity.mut_replace(
-                    Modules[3].getDriveMotor().getVelocity().getValueAsDouble(),
-                    RotationsPerSecond));
-          }, this));
+  // sysid routine for characterizing swerve drive translation
+  private final SysIdRoutine m_translationSysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(Volts.of(Drivetrain.kTranslationalRampRate).per(Second),
+          Volts.of(Drivetrain.kTranslationalStepVoltage),
+          Seconds.of(Drivetrain.kTranslationalTimeout)),
+      new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+        this.applyRequest(() -> m_sysIdDrive.withVolts(volts));
+      }, log -> {
+        getDriveMotorLog("Front Left", log, Modules[0]);
+        getDriveMotorLog("Front Right", log, Modules[1]);
+        getDriveMotorLog("Back Left", log, Modules[2]);
+        getDriveMotorLog("Back Right", log, Modules[3]);
+      }, this));
+  // sysid routine for characterizing swerve module steer
+  private final SysIdRoutine m_steerSysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(Volts.of(Drivetrain.kSteerRampRate).per(Second),
+          Volts.of(Drivetrain.kSteerStepVoltage), Seconds.of(Drivetrain.kSteerTimeout)),
+      new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+        this.applyRequest(() -> m_sysIdSteer.withVolts(volts));
+      }, log -> {
+        getSteerMotorLog("Front Left", log, Modules[0]);
+        getSteerMotorLog("Front Right", log, Modules[1]);
+        getSteerMotorLog("Back Left", log, Modules[2]);
+        getSteerMotorLog("Back Right", log, Modules[3]);
+      }, this));
+  // sysid routine for characterizing swerve module steer
+  private final SysIdRoutine m_rotationSysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(Volts.of(Drivetrain.kSteerRampRate).per(Second),
+          Volts.of(Drivetrain.kSteerStepVoltage), Seconds.of(Drivetrain.kSteerTimeout)),
+      new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+        this.applyRequest(() -> m_sysIdSwerveRotation.withVolts(volts));
+      }, log -> {
+        getDriveMotorLog("Front Left", log, Modules[0]);
+        getDriveMotorLog("Front Right", log, Modules[1]);
+        getDriveMotorLog("Back Left", log, Modules[2]);
+        getDriveMotorLog("Back Right", log, Modules[3]);
+      }, this));
+
+  /**
+   * @brief Dynamic drive SysID routine
+   * 
+   * @param direction the direction of travel
+   * @return Command
+   */
+  public final Command driveDynamic(SysIdRoutine.Direction direction) {
+    return m_translationSysIdRoutine.dynamic(direction);
+  }
+
+  /**
+   * @brief Quasistatic drive SysID routine
+   * 
+   * @param direction the direction of travel
+   * @return Command
+   */
+  public final Command driveQuasistatic(SysIdRoutine.Direction direction) {
+    return m_translationSysIdRoutine.quasistatic(direction);
+  }
+
+  /**
+   * @brief Dynamic steer SysID routine
+   * 
+   * @param direction the direction of travel
+   * @return Command
+   */
+  public final Command steerDynamic(SysIdRoutine.Direction direction) {
+    return m_steerSysIdRoutine.dynamic(direction);
+  }
+
+  /**
+   * @brief Quasistatic steer SysID routine
+   * 
+   * @param direction the direction of travel
+   * @return Command
+   */
+  public final Command steerQuasistatic(SysIdRoutine.Direction direction) {
+    return m_steerSysIdRoutine.quasistatic(direction);
+  }
+
+  /**
+   * @brief Dynamic rotation SysID routine
+   * 
+   * @param direction the direction of travel
+   * @return Command
+   */
+  public final Command rotationDynamic(SysIdRoutine.Direction direction) {
+    return m_rotationSysIdRoutine.dynamic(direction);
+  }
+
+  /**
+   * @brief Quasistatic rotation SysID routine
+   * 
+   * @param direction the direction of travel
+   * @return Command
+   */
+  public final Command rotationQuasistatic(SysIdRoutine.Direction direction) {
+    return m_rotationSysIdRoutine.quasistatic(direction);
+  }
+
+  /**
+   * @brief log the drive motor of a module
+   * 
+   * @param name Name of the module
+   * @param log the log
+   * @param module the module
+   * @return MotorLog
+   */
+  private MotorLog getDriveMotorLog(String name, SysIdRoutineLog log, SwerveModule module) {
+    return log.motor(name)
+        .voltage(m_appliedVoltage
+            .mut_replace(module.getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+        .angularPosition(
+            m_angle.mut_replace(module.getDriveMotor().getPosition().getValueAsDouble(), Rotations))
+        .angularVelocity(m_velocity.mut_replace(
+            module.getDriveMotor().getVelocity().getValueAsDouble(), RotationsPerSecond));
+  }
+
+  /**
+   * @brief log the drive motor of a module
+   * 
+   * @param name Name of the module
+   * @param log the log
+   * @param module the module
+   * @return MotorLog
+   */
+  private MotorLog getSteerMotorLog(String name, SysIdRoutineLog log, SwerveModule module) {
+    return log.motor(name)
+        .voltage(m_appliedVoltage
+            .mut_replace(module.getSteerMotor().get() * RobotController.getBatteryVoltage(), Volts))
+        .angularPosition(
+            m_angle.mut_replace(module.getSteerMotor().getPosition().getValueAsDouble(), Rotations))
+        .angularVelocity(m_velocity.mut_replace(
+            module.getSteerMotor().getVelocity().getValueAsDouble(), RotationsPerSecond));
+  }
 
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
       SwerveModuleConstants... modules) {
@@ -119,9 +218,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                                  // pose).
         this::getChassisSpeeds, // Supply robot relative chassis speed.
         this::driveRobotRelative, // Drive the robot given robot relative chassis speeds.
-        new HolonomicPathFollowerConfig(Constants.PathPlanner.kTranslationalPIDConstants,
-            Constants.PathPlanner.kRotationalPIDConstants, Constants.PathPlanner.kMaxModuleSpeed,
-            Constants.PathPlanner.kDriveBaseRadius, Constants.PathPlanner.kReplanningConfig),
+        new HolonomicPathFollowerConfig(PathPlanner.kTranslationalPIDConstants,
+            PathPlanner.kRotationalPIDConstants, PathPlanner.kMaxModuleSpeed,
+            PathPlanner.kDriveBaseRadius, PathPlanner.kReplanningConfig),
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red
           // alliance.
@@ -219,9 +318,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command findAndFollowPath(final Pose2d targetPose) {
 
-    PathConstraints pathConstraints = new PathConstraints(Constants.Drivetrain.kMaxLateralSpeed,
-        Constants.Drivetrain.kMaxLateralAcceleration, Constants.Drivetrain.kMaxAngularSpeed,
-        Constants.Drivetrain.kMaxAngularAcceleration);
+    PathConstraints pathConstraints =
+        new PathConstraints(Drivetrain.kMaxLateralSpeed, Drivetrain.kMaxLateralAcceleration,
+            Drivetrain.kMaxAngularSpeed, Drivetrain.kMaxAngularAcceleration);
 
 
     if (DriverStation.getAlliance().equals(Alliance.Blue))

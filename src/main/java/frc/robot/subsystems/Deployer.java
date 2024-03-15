@@ -11,12 +11,11 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static edu.wpi.first.units.Units.Rotations;
@@ -58,10 +57,8 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so
-   *        that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix
-   *        Tuner.
+   *        This is where the motors are configured. We configure them here so that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
    */
   public Deployer() {
     super();
@@ -81,13 +78,15 @@ public class Deployer extends SubsystemBase {
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     // set brake
     m_motor.setNeutralMode(NeutralModeValue.Brake);
-
     // apply configuration
     m_motor.getConfigurator().apply(config);
     // set motor position to 0
     m_motor.setPosition(kMaxPosition);
     // set motor control mode
     m_motor.setControl(m_output);
+    // commands
+    SmartDashboard.putData("Deployer Deploy", deploy());
+    SmartDashboard.putData("Deployer Retract", retract());
   }
 
   /**
@@ -108,6 +107,12 @@ public class Deployer extends SubsystemBase {
     return m_motor.getPosition().getValueAsDouble() + kTolerance > kMaxPosition;
   }
 
+  /**
+   * @brief move the deployer to a specific angle
+   * 
+   * @param position angle in rotations
+   * @return Command
+   */
   public Command goToAngle(double position) {
     return this.runOnce(() -> {
       m_output.Position = position;
@@ -115,13 +120,23 @@ public class Deployer extends SubsystemBase {
     });
   }
 
+  /**
+   * @brief deploy the deployer
+   * 
+   * @return Command
+   */
   public Command deploy() {
     return this.runOnce(() -> {
-      m_output.Position = 0;
+      m_output.Position = kMinPosition;
       m_motor.setControl(m_output);
     });
   }
 
+  /**
+   * @brief retract the deployer
+   * 
+   * @return Command
+   */
   public Command retract() {
     return this.runOnce(() -> {
       m_output.Position = kMaxPosition;
@@ -130,49 +145,10 @@ public class Deployer extends SubsystemBase {
   }
 
   /**
-   * @brief move the deployer down
-   * 
-   * @return Command
-   */
-  public Command down() {
-    return this.runOnce(() -> {
-      // m_output.Position = -kSpeed;
-      m_motor.setControl(m_output);
-    });
-  }
-
-  /**
-   * @brief move the deployer up
-   * 
-   * @return Command
-   */
-  public Command up() {
-    return this.runOnce(() -> {
-      // m_output.Output = kSpeed;
-      m_motor.setControl(m_output);
-    });
-  }
-
-  /**
-   * @brief stop the deployer from moving
-   * 
-   * @return Command
-   */
-  public Command stop() {
-    return this.runOnce(() -> {
-      // m_output.Output = 0;
-      m_motor.setControl(m_output);
-      m_motor.setNeutralMode(NeutralModeValue.Brake);
-    });
-  }
-
-  /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static
-   *        friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is
-   *        negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -184,8 +160,7 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic
-   *        friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -198,12 +173,9 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We
-   *        use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the
-   *        motors. This
-   *        allows us to tune intake speed in real time, without having to
-   *        re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the motors. This
+   *        allows us to tune intake speed in real time, without having to re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */

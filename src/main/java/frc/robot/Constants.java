@@ -14,7 +14,18 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class Constants {
   public class Drivetrain {
-    // feedforward gains
+    // translation sysid constants
+    public static final double kTranslationalRampRate = 0.2;
+    public static final double kTranslationalStepVoltage = 7.0;
+    public static final double kTranslationalTimeout = 15.0;
+    // steer sysid constants
+    public static final double kSteerRampRate = 0.2;
+    public static final double kSteerStepVoltage = 7.0;
+    public static final double kSteerTimeout = 15.0;
+    // rotational sysid constants
+    public static final double kRotationRampRate = 0.2;
+    public static final double kRotationStepVoltage = 7.0;
+    public static final double kRotationTimeout = 15.0;
     // lateral position controller
     public static final double kLateralPositionP = 10;
     public static final double kLateralPositionD = 0;
@@ -34,9 +45,8 @@ public class Constants {
     public static final double kBotWidth = 0.7; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-            .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+        .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
   }
 
   public class Angler {
@@ -51,29 +61,29 @@ public class Constants {
     // gravity type
     public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
     // controller constants
-    public static final double kP = 1.358;
+    public static final double kP = 50;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static final double kS = 0.27194;
-    public static final double kV = 48.377;
-    public static final double kA = 0.95165;
-    public static final double kG = 0.14449;
+    public static final double kS = 0.28898;
+    public static final double kV = 51.452;
+    public static final double kA = 0.82497;
+    public static final double kG = 0.20358;
     // positions (in rotations)
-    public static final double kMaxPosition = 150;
-    public static final double kMinPosition = 0;
-    public static final double kZeroPosition = 26;
-    public static final double kShootingPosition = 35;
-    public static final double kLoadingPosition = 50;
+    public static final double kMaxPosition = 0.211111; // 76 degrees
+    public static final double kMinPosition = 0.083333; // 30 degrees
+    public static final double kZeroPosition = 0.2111111; // 76 degrees
+    public static final double kShootingPosition = 0.16;
+    public static final double kLoadingPosition = 0.09;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 0.2;
-    public static final double kProbeInitialSpeed = 1;
-    public static final double kProbeFinalSpeed = 1;
+    public static final double kProbeFastSpeed = 3; // volts
+    public static final double kProbeSlowSpeed = 1; // volts
     // acceleration (in rotations per second squared)
     public static final double kAcceleration = 1;
     // jerk (in rotations per second cubed)
     public static final double kJerk = 2;
     // tolerances (in rotations)
-    public static final double kTolerance = 5; // 5 degrees
+    public static final double kTolerance = 0.013889; // 5 degrees
     // ratios (driven/driver)
     public static final double kRatio = 500;
     // sysid constants
@@ -270,16 +280,16 @@ public class Constants {
     // Blue Amp Lineup Pos
     public static final double kBlueAmpLineupX = 3;
     public static final double kBlueAmpLineupY = 5;
-    public static final double kBlueAmpLineupTheta =
-        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
+        kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 14;
     public static final double kRedAmpLineupY = 5;
-    public static final double kRedAmpLineupTheta =
-        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
+    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
+        .getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()

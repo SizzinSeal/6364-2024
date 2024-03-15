@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -28,7 +29,7 @@ public class Indexer extends SubsystemBase {
   private final AnalogInput m_beamBreak = new AnalogInput(kBeamBreakPort);
   private final TalonFX m_motor = new TalonFX(kMotorId, kMotorBus);
   // triggers and event loops
-  public final Trigger noteDetected = new Trigger(() -> m_beamBreak.getVoltage() > 0.83);
+  public final Trigger noteDetected = new Trigger(() -> m_beamBreak.getVoltage() < 0.83);
   private final EventLoop m_noteDetectedLoop = new EventLoop();
   // control output objects
   private final VoltageOut m_output = new VoltageOut(0);
@@ -56,6 +57,12 @@ public class Indexer extends SubsystemBase {
     m_motor.getConfigurator().apply((motorConfig));
     // brake the motor
     m_motor.setControl(new StaticBrake());
+    // commands
+    SmartDashboard.putData("Indexer Load", this.load());
+    SmartDashboard.putData("Indexer Slow Load", this.slowLoad());
+    SmartDashboard.putData("Indexer Eject", this.eject());
+    SmartDashboard.putData("Indexer Reverse", this.reverse());
+    SmartDashboard.putData("Indexer Stop", this.stop());
   }
 
   /**
@@ -64,7 +71,7 @@ public class Indexer extends SubsystemBase {
    * @return Boolean
    */
   public Boolean isNoteDetected() {
-    return m_beamBreak.getVoltage() > 0.83;
+    return m_beamBreak.getVoltage() < 0.83;
   }
 
   /**
@@ -173,6 +180,6 @@ public class Indexer extends SubsystemBase {
     // add measured velocity property
     builder.addDoubleProperty("Measured Velocity", () -> m_motor.getVelocity().getValueAsDouble(),
         null);
-    builder.addBooleanProperty("Note Detected", () -> m_beamBreak.getVoltage() > 0.83, null);
+    builder.addBooleanProperty("Note Detected", () -> m_beamBreak.getVoltage() < 0.83, null);
   }
 }

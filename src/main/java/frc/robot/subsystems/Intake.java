@@ -49,9 +49,11 @@ public class Intake extends SubsystemBase {
     config.Feedback.SensorToMechanismRatio = kRatio;
     // apply configuration
     m_motor.getConfigurator().apply(config);
-    SmartDashboard.putData("Intake", this.intake());
-    SmartDashboard.putData("Outtake", this.outtake());
-    SmartDashboard.putData("Stop", this.stop());
+    // commands
+    SmartDashboard.putData("Intake Intake", this.intake());
+    SmartDashboard.putData("Intake Slow Intake", this.slowIntake());
+    SmartDashboard.putData("Intake Outtake", this.outtake());
+    SmartDashboard.putData("Intake Stop", this.stop());
   }
 
   /**

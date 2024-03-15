@@ -42,6 +42,7 @@ public class Telemetry {
   DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
   DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();
   DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
+  DoublePublisher gyroAngle = driveStats.getDoubleTopic("Gyro Angle").publish();
 
   /* Keep a reference of the last pose to calculate the speeds */
   Pose2d m_lastPose = new Pose2d();
@@ -96,6 +97,7 @@ public class Telemetry {
     speed.set(velocities.getNorm());
     velocityX.set(velocities.getX());
     velocityY.set(velocities.getY());
+    gyroAngle.set(pose.getRotation().getDegrees());
     odomPeriod.set(state.OdometryPeriod);
 
     /* Telemeterize the module's states */

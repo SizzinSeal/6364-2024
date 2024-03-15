@@ -5,8 +5,6 @@
 package frc.robot;
 
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.controls.StaticBrake;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -20,10 +18,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
 import frc.robot.generated.TunerConstants;
@@ -73,25 +69,8 @@ public class RobotContainer {
       .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to shoot
-  private final Command m_shootCommand =
-      Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5))
-          .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
-
-  // command to calibrate angler
-  private final SequentialCommandGroup m_calibrateCommand =
-      new SequentialCommandGroup(m_angler.setSpeed(-3))
-          .andThen(Commands.waitUntil(() -> m_angler.getLimit())).andThen(m_angler.setSpeed(5))
-          .andThen(Commands.waitSeconds(0.2)).andThen(m_angler.setSpeed(-1))
-          .andThen(Commands.waitUntil(() -> m_angler.getLimit())).andThen(m_angler.setSpeed(0))
-          .andThen(Commands.waitSeconds(1)).andThen(m_angler.zero());
-
-  // command to prepare climber
-  private final SequentialCommandGroup m_climberUp = new SequentialCommandGroup(m_climber.up()
-      .andThen(Commands.waitUntil(() -> m_climber.isRetracted())).andThen(m_climber.stop()));
-
-  // command to climb
-  private final SequentialCommandGroup m_climberDown = new SequentialCommandGroup(m_climber.down()
-      .andThen(Commands.waitUntil(() -> m_climber.isDeployed())).andThen(m_deployer.stop()));
+  private final Command m_shootCommand = Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5))
+      .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
 
   /**
    * @brief Poll the beam break sensors
@@ -105,12 +84,10 @@ public class RobotContainer {
    * @brief Configure Named Commands
    */
   private void ConfigureCommands() {
-    NamedCommands.registerCommand("IntakeCommand", m_intakeCommand);
-    NamedCommands.registerCommand("ShootCommand", m_shootCommand);
-    NamedCommands.registerCommand("CalibrateAngler", m_calibrateCommand);
-    NamedCommands.registerCommand("ClimberDown", m_climberDown);
-    NamedCommands.registerCommand("ClimberUp", m_climberUp);
-
+    NamedCommands.registerCommand("Intake", m_intakeCommand);
+    NamedCommands.registerCommand("Shoot", m_shootCommand);
+    NamedCommands.registerCommand("Deploy", m_deployer.deploy());
+    NamedCommands.registerCommand("Retract", m_deployer.retract());
   }
 
   /**
@@ -124,8 +101,8 @@ public class RobotContainer {
             .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
     // note detected in the intake
-    m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(), m_indexer.slowLoad())
-        .onlyIf(() -> !m_indexer.isNoteDetected()));
+    m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(), m_indexer.slowLoad(),
+        Commands.waitSeconds(0.5), m_deployer.retract()).onlyIf(() -> !m_indexer.isNoteDetected()));
 
     // note detected in the indexer
     m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
@@ -187,7 +164,8 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon startup
+   * @brief Construct the container for the robot. This will be called upon
+   *        startup
    */
   public RobotContainer() {
     ConfigureCommands();
@@ -200,13 +178,6 @@ public class RobotContainer {
     SmartDashboard.putData("Flywheel", m_flywheel);
     SmartDashboard.putData("Deployer", m_deployer);
     SmartDashboard.putData("Angler", m_angler);
-    SmartDashboard.putData("Deployer Down", m_deployer.down()
-        .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
-    SmartDashboard.putData("Deployer Up", m_deployer.up()
-        .andThen(Commands.waitUntil(() -> m_deployer.isRetracted())).andThen(m_deployer.stop()));
-    SmartDashboard.putData("CalibrateAngler", m_calibrateCommand);
-    SmartDashboard.putData("Climber Up", m_climberUp);
-    SmartDashboard.putData("Climber Down", m_climberDown);
   }
 
   /**
