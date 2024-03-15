@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    m_robotContainer.limelight1.init();
+    LimelightHandler.SubscribeToRobotPose();
     this.addPeriodic(() -> m_robotContainer.pollBeamBreaks(), 0.005);
     PortForwarder.add(5800, "photonvision.local", 5800);
 

@@ -1,4 +1,4 @@
-package frc.robot.autonomous;
+package frc.robot.commands;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;

@@ -53,13 +53,16 @@ import me.nabdev.pathfinding.structures.Path;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
+  // Simulation.
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
+
+  // Sysid constants.
   public static final Measure<Velocity<Voltage>> kRampRate = Volts.of(0.2).per(Second);
   public static final Measure<Voltage> kStepVoltage = Volts.of(7.0);
   public static final Measure<Time> kTimeout = Seconds.of(15.0);
 
-  // sysid routine
+  // Sysid routine.
   private final VoltageOut m_sysIdOutput = new VoltageOut(0);
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
@@ -105,14 +108,19 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                     RotationsPerSecond));
           }, this));
 
+  /**
+   * @brief Class constructor.
+   */
   public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
       SwerveModuleConstants... modules) {
     super(driveTrainConstants, modules);
 
+    // Simulation.
     if (Utils.isSimulation()) {
       startSimThread();
     }
 
+    // Autonomous builder.
     AutoBuilder.configureHolonomic(this::getPose, // Supply robot pose. See SwerveDrivetrain
                                                   // superclass.
         this::seedFieldRelative, // Reset odometry (only called if auto has a set starting

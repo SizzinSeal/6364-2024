@@ -5,8 +5,6 @@
 package frc.robot;
 
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.controls.StaticBrake;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -23,8 +21,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -33,6 +29,7 @@ import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.util.AprilTagInfo;
 
 public class RobotContainer {
 
@@ -41,9 +38,6 @@ public class RobotContainer {
 
   // Half a rotation per second max angular velocity.
   private static final double kMaxAngularRate = 0.3 * Math.PI;
-
-  // Vision - Limelight - initialization.
-  public final Vision limelight1 = new Vision("limelight");
 
   // Subsystems initialization
   private final Angler m_angler = new Angler();
@@ -157,13 +151,14 @@ public class RobotContainer {
   public void updatePoseEstimator() {
     double lateralDeviation; // standard deviation of the x and y measurements
     double angularDeviation; // standard deviation of the angle measurement
-    final MeasurementInfo internalTag = limelight1.tagDetector();
-    final double posDiff = m_drivetrain.getPoseDifference(limelight1.getPos2D());
+    final AprilTagInfo internalTag = LimelightHandler.detectTag();
+    final double posDiff =
+        m_drivetrain.getPoseDifference(LimelightHandler.getLimelightFieldPose2DEstimate());
     // return if no tag detected
-    if (internalTag.tagId == -1)
+    if (internalTag.primaryTagId == -1)
       return;
     // more than 1 tag in view
-    if (internalTag.tagCount > 1) {
+    if (internalTag.numTagInView > 1) {
       lateralDeviation = 0.5;
       angularDeviation = 6;
     }
@@ -181,8 +176,8 @@ public class RobotContainer {
     else
       return;
     // update the pose estimator
-    m_drivetrain.addVisionMeasurement(limelight1.getPos2D(),
-        limelight1.getLatestLatencyAdjustedTimeStamp(), VecBuilder.fill(lateralDeviation,
+    m_drivetrain.addVisionMeasurement(LimelightHandler.getLimelightFieldPose2DEstimate(),
+        LimelightHandler.getLatestLatencyAdjustedTimestamp(), VecBuilder.fill(lateralDeviation,
             lateralDeviation, Units.degreesToRadians(angularDeviation)));
   }
 
@@ -193,7 +188,7 @@ public class RobotContainer {
     ConfigureCommands();
     autoChooser = AutoBuilder.buildAutoChooser();
     configureBindings();
-    limelight1.init();
+    LimelightHandler.SubscribeToRobotPose();
     SmartDashboard.putData("Auto Chooser", autoChooser);
     SmartDashboard.putData("Intake", m_intake);
     SmartDashboard.putData("Indexer", m_indexer);

@@ -14,6 +14,17 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class Constants {
   public class Drivetrain {
+
+    // TODO
+    public static final double driveKP = 0.0;
+    public static final double driveKI = 0.0;
+    public static final double driveKD = 0.0;
+
+    // TODO
+    public static final double turningKP = 0.0;
+    public static final double turningKI = 0.0;
+    public static final double turningKD = 0.0;
+
     // feedforward gains
     // lateral position controller
     public static final double kLateralPositionP = 10;
