@@ -24,7 +24,7 @@ public class Constants {
     public static final double kSteerTimeout = 15.0;
     // rotational sysid constants
     public static final double kRotationRampRate = 0.2;
-    public static final double kRotationStepVoltage = 7.0;
+    public static final double kRotationStepVoltage = 3.0;
     public static final double kRotationTimeout = 15.0;
     // lateral position controller
     public static final double kLateralPositionP = 10;
