@@ -58,7 +58,7 @@ public class RobotContainer {
   public final Vision limelight1 = new Vision("limelight");
 
   // photonvision camera initialization
-
+  public final PhotonVisionHandler Photon = new PhotonVisionHandler("Photon");
   AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
   Vision visionInstance;
@@ -243,7 +243,7 @@ public class RobotContainer {
     final MeasurementInfo internalTag = visionInstance.new MeasurementInfo(PhotonVisionHandler.getAprilTagID(),
         PhotonVisionHandler.getNumberofTags(), PhotonVisionHandler.areaOfAprilTag());
 
-    final double posDiff = m_drivetrain.getPoseDifference(PhotonVisionHandler.getPos2D());
+    final double posDiff = m_drivetrain.getPoseDifference(PhotonVisionHandler.k3Dto2D());
 
     // return if no tag detected
     if (internalTag.tagId == -1)
@@ -267,7 +267,7 @@ public class RobotContainer {
     else
       return;
     // update the pose estimator
-    m_drivetrain.addVisionMeasurement(PhotonVisionHandler.getPos2D(),
+    m_drivetrain.addVisionMeasurement(PhotonVisionHandler.k3Dto2D(),
         limelight1.getLatestLatencyAdjustedTimeStamp(), VecBuilder.fill(lateralDeviation,
             lateralDeviation, Units.degreesToRadians(angularDeviation)));
   }
