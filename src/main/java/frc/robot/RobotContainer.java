@@ -60,6 +60,7 @@ public class RobotContainer {
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
       .withDeadband(kMaxSpeed * 0.05).withRotationalDeadband(kMaxAngularRate * 0.05) // 20% deadband
       .withDriveRequestType(DriveRequestType.Velocity); // closed loop velocity control
+  private final SwerveRequest.PointWheelsAt m_PointWheelsAt = new SwerveRequest.PointWheelsAt();
 
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
@@ -133,10 +134,10 @@ public class RobotContainer {
      * Rotation2d.fromDegrees(90)));
      * }
      */
-    m_controller.a().whileTrue(m_drivetrain.steerDynamic(Direction.kForward));
-    m_controller.b().whileTrue(m_drivetrain.steerDynamic(Direction.kReverse));
-    m_controller.x().whileTrue(m_drivetrain.steerQuasistatic(Direction.kForward));
-    m_controller.y().whileTrue(m_drivetrain.steerQuasistatic(Direction.kReverse));
+    m_controller.a().whileTrue(m_drivetrain.rotationDynamic(Direction.kForward));
+    m_controller.b().whileTrue(m_drivetrain.rotationDynamic(Direction.kReverse));
+    m_controller.x().whileTrue(m_drivetrain.rotationQuasistatic(Direction.kForward));
+    m_controller.y().whileTrue(m_drivetrain.rotationQuasistatic(Direction.kReverse));
 
     // register telemetry
     m_drivetrain.registerTelemetry(m_logger::telemeterize);

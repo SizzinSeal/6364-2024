@@ -16,7 +16,7 @@ public class Constants {
   public class Drivetrain {
     // translation sysid constants
     public static final double kTranslationalRampRate = 0.5;
-    public static final double kTranslationalStepVoltage = 7.0;
+    public static final double kTranslationalStepVoltage = 4.0;
     public static final double kTranslationalTimeout = 15.0;
     // steer sysid constants
     public static final double kSteerRampRate = 0.5;

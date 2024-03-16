@@ -96,10 +96,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   // sysid routine for characterizing swerve module steer
   private final SysIdRoutine m_rotationSysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(Volts.of(Drivetrain.kSteerRampRate).per(Second),
-          Volts.of(Drivetrain.kSteerStepVoltage), Seconds.of(Drivetrain.kSteerTimeout)),
+      new SysIdRoutine.Config(Volts.of(Drivetrain.kRotationRampRate).per(Second),
+          Volts.of(Drivetrain.kRotationStepVoltage), Seconds.of(Drivetrain.kRotationTimeout)),
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-        this.setControl(m_sysIdSteer.withVolts(volts));
+        this.setControl(m_sysIdSwerveRotation.withVolts(volts));
+        System.out.println(volts.magnitude());
       }, log -> {
         getDriveMotorLog("Front Left", log, Modules[0]);
         getDriveMotorLog("Front Right", log, Modules[1]);
