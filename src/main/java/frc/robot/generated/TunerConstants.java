@@ -60,18 +60,18 @@ public class TunerConstants {
   private static final double kSteerInertia = 0.05;
   private static final double kDriveInertia = 0.08;
 
-  private static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
-      .withPigeon2Id(kPigeonId).withCANbusName(kCANbusName);
+  private static final SwerveDrivetrainConstants DrivetrainConstants =
+      new SwerveDrivetrainConstants().withPigeon2Id(kPigeonId).withCANbusName(kCANbusName);
 
-  private static final SwerveModuleConstantsFactory ConstantCreator = new SwerveModuleConstantsFactory()
-      .withDriveMotorGearRatio(kDriveGearRatio)
-      .withSteerMotorGearRatio(kSteerGearRatio).withWheelRadius(kWheelRadiusInches)
-      .withSlipCurrent(kSlipCurrentA).withSteerMotorGains(steerGains)
-      .withDriveMotorGains(driveGains).withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
-      .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
-      .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps).withSteerInertia(kSteerInertia)
-      .withDriveInertia(kDriveInertia).withFeedbackSource(SteerFeedbackType.FusedCANcoder)
-      .withCouplingGearRatio(kCoupleRatio).withSteerMotorInverted(kSteerMotorReversed);
+  private static final SwerveModuleConstantsFactory ConstantCreator =
+      new SwerveModuleConstantsFactory().withDriveMotorGearRatio(kDriveGearRatio)
+          .withSteerMotorGearRatio(kSteerGearRatio).withWheelRadius(kWheelRadiusInches)
+          .withSlipCurrent(kSlipCurrentA).withSteerMotorGains(steerGains)
+          .withDriveMotorGains(driveGains).withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
+          .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
+          .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps).withSteerInertia(kSteerInertia)
+          .withDriveInertia(kDriveInertia).withFeedbackSource(SteerFeedbackType.FusedCANcoder)
+          .withCouplingGearRatio(kCoupleRatio).withSteerMotorInverted(kSteerMotorReversed);
 
   // Front Left
   private static final int kFrontLeftDriveMotorId = 3;
@@ -95,7 +95,7 @@ public class TunerConstants {
   private static final int kBackLeftDriveMotorId = 2;
   private static final int kBackLeftSteerMotorId = 6;
   private static final int kBackLeftEncoderId = 10;
-  private static final double kBackLeftEncoderOffset = 0.360595703125;
+  private static final double kBackLeftEncoderOffset = -0.138427734375;
 
   private static final double kBackLeftXPosInches = -11.3745;
   private static final double kBackLeftYPosInches = 10.3745;
@@ -137,6 +137,6 @@ public class TunerConstants {
       .withDriveMotorClosedLoopOutput(SwerveModule.ClosedLoopOutputType.Voltage)
       .withSteerMotorClosedLoopOutput(SwerveModule.ClosedLoopOutputType.Voltage);
 
-  public static final CommandSwerveDrivetrain DriveTrain = new CommandSwerveDrivetrain(DrivetrainConstants, FrontLeft,
-      FrontRight, BackLeft, BackRight);
+  public static final CommandSwerveDrivetrain DriveTrain =
+      new CommandSwerveDrivetrain(DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
 }
