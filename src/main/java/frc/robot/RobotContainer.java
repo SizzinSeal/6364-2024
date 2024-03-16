@@ -69,8 +69,9 @@ public class RobotContainer {
       .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to shoot
-  private final Command m_shootCommand = Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5))
-      .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+  private final Command m_shootCommand =
+      Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5))
+          .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
 
   /**
    * @brief Poll the beam break sensors
@@ -109,14 +110,13 @@ public class RobotContainer {
         m_deployer.retract(), m_angler.goToShoot()));
 
     // note left the indexer
-    m_indexer.noteDetected.onFalse(Commands.sequence(m_indexer.stop(),
-        m_angler.goToLoad()));
+    m_indexer.noteDetected.onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
 
     // intake button pressed
     m_controller.rightTrigger().whileTrue(m_intakeCommand);
     // intake button released;
-    m_controller.rightTrigger().onFalse(Commands.sequence(m_intake.stop(),
-        m_indexer.stop(), m_deployer.retract()));
+    m_controller.rightTrigger()
+        .onFalse(Commands.sequence(m_intake.stop(), m_indexer.stop(), m_deployer.retract()));
     // shoot button pressed
     m_controller.leftBumper().onTrue(m_shootCommand);
 
@@ -166,8 +166,7 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon
-   *        startup
+   * @brief Construct the container for the robot. This will be called upon startup
    */
   public RobotContainer() {
     ConfigureCommands();
@@ -188,7 +187,6 @@ public class RobotContainer {
    * @return Command
    */
   public Command getAutonomousCommand() {
-    return Commands.runOnce(() -> {
-    });
+    return autoChooser.getSelected();
   }
 }

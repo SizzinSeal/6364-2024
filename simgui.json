@@ -65,6 +65,11 @@
       "/SmartDashboard/calibrate": "Command"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Pose": {
         "bottom": 1476,
         "height": 8.210550308227539,
@@ -93,11 +98,6 @@
         }
       },
       "/SmartDashboard/Flywheel": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Indexer": {
         "window": {
           "visible": true
         }
@@ -163,6 +163,9 @@
       "open": true
     },
     "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
   },
   "Plot": {
     "Plot <0>": {
