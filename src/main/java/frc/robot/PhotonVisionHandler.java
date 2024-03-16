@@ -9,7 +9,11 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public class PhotonVisionHandler {
 
@@ -18,11 +22,19 @@ public class PhotonVisionHandler {
     return meter;
   }
 
+  AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+
   private static PhotonCamera vision = new PhotonCamera("photonvision");
   private static PhotonTrackedTarget target = vision.getLatestResult().getBestTarget();
   private final static double latencyMilis = vision.getLatestResult().getLatencyMillis() / 1000.0;
   private final static double kCameraHeight = inchToMeter(13.8);
-  AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+  private final static Pose3d camToTarget = aprilTagFieldLayout.getTagPose(target.getFiducialId());
+
+  // camera dimensions from center of robot (x, y, z) (10.4x, -6.5y, 13.8z) inches
+  // front is intake (y), pos x to the right of that, z right
+  private final static Transform3d robotToCam = new Transform3d(
+      new Translation3d(inchToMeter(10.4), inchToMeter(-6.5), inchToMeter(13.8)),
+      new Rotation3d(0, 0, 0));
 
   private final static HashMap<Integer, Double> kAprilTagHeights;
   static {
@@ -65,12 +77,10 @@ public class PhotonVisionHandler {
     return latencyMilis; // gets area of apriltag
   }
 
-  // camera dimensions from center of robot (x, y, z) (10.4x, -6.5y, 13.8z) inches
-  // front is intake (y), pos x to the right of that, z right
-  public static Pose2d getPos2D() {
-    return PhotonUtils.estimateFieldToRobot(kCameraHeight, kAprilTagHeights, kCameraPitch,
-        kTargetPitch, Rotation2d.fromDegrees(-target.getYaw()), gyro.getRotation2d(), targetPose,
-        cameraToRobot);
+  public final static Transform3d getPos3D() {
+    public Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(),
+        aprilTagFieldLayout.getTagPose(target.getFiducialId()).get(), robotToCam);
+
   }
 
 }
