@@ -15,11 +15,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class Constants {
   public class Drivetrain {
     // translation sysid constants
-    public static final double kTranslationalRampRate = 0.2;
+    public static final double kTranslationalRampRate = 0.5;
     public static final double kTranslationalStepVoltage = 7.0;
     public static final double kTranslationalTimeout = 15.0;
     // steer sysid constants
-    public static final double kSteerRampRate = 0.2;
+    public static final double kSteerRampRate = 0.5;
     public static final double kSteerStepVoltage = 7.0;
     public static final double kSteerTimeout = 15.0;
     // rotational sysid constants

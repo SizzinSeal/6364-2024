@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
 import frc.robot.generated.TunerConstants;
@@ -95,34 +96,47 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // drivetrain control
-    m_drivetrain.setDefaultCommand(
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
-            .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
-
-    // note detected in the intake
-    m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(), m_indexer.slowLoad(),
-        Commands.waitSeconds(0.5), m_deployer.retract()).onlyIf(() -> !m_indexer.isNoteDetected()));
-
-    // note detected in the indexer
-    m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
-        m_deployer.retract(), m_angler.goToShoot()));
-
-    // note left the indexer
-    m_indexer.noteDetected.onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
-
-    // intake button pressed
-    m_controller.rightTrigger().whileTrue(m_intakeCommand);
-    // intake button released;
-    m_controller.rightTrigger()
-        .onFalse(Commands.sequence(m_intake.stop(), m_indexer.stop(), m_deployer.retract()));
-    // shoot button pressed
-    m_controller.leftBumper().onTrue(m_shootCommand);
-
-    // reset position if in simulation
-    if (Utils.isSimulation()) {
-      m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-    }
+    /*
+     * m_drivetrain.setDefaultCommand(
+     * m_drivetrain.applyRequest(() ->
+     * m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
+     * .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
+     * .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
+     * 
+     * // note detected in the intake
+     * m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(),
+     * m_indexer.slowLoad(),
+     * Commands.waitSeconds(0.5), m_deployer.retract()).onlyIf(() ->
+     * !m_indexer.isNoteDetected()));
+     * 
+     * // note detected in the indexer
+     * m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(),
+     * m_intake.stop(),
+     * m_deployer.retract(), m_angler.goToShoot()));
+     * 
+     * // note left the indexer
+     * m_indexer.noteDetected.onFalse(Commands.sequence(m_indexer.stop(),
+     * m_angler.goToLoad()));
+     * 
+     * // intake button pressed
+     * m_controller.rightTrigger().whileTrue(m_intakeCommand);
+     * // intake button released;
+     * m_controller.rightTrigger()
+     * .onFalse(Commands.sequence(m_intake.stop(), m_indexer.stop(),
+     * m_deployer.retract()));
+     * // shoot button pressed
+     * m_controller.leftBumper().onTrue(m_shootCommand);
+     * 
+     * // reset position if in simulation
+     * if (Utils.isSimulation()) {
+     * m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(),
+     * Rotation2d.fromDegrees(90)));
+     * }
+     */
+    m_controller.a().whileTrue(m_drivetrain.steerDynamic(Direction.kForward));
+    m_controller.b().whileTrue(m_drivetrain.steerDynamic(Direction.kReverse));
+    m_controller.x().whileTrue(m_drivetrain.steerQuasistatic(Direction.kForward));
+    m_controller.y().whileTrue(m_drivetrain.steerQuasistatic(Direction.kReverse));
 
     // register telemetry
     m_drivetrain.registerTelemetry(m_logger::telemeterize);
