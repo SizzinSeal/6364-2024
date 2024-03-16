@@ -58,7 +58,7 @@ public class RobotContainer {
   public final Vision limelight1 = new Vision("limelight");
 
   // photonvision camera initialization
-  public final PhotonVisionHandler Photon = new PhotonVisionHandler("Photon");
+  public final PhotonVisionHandler visionHandler = new PhotonVisionHandler();
   AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
   Vision visionInstance;
@@ -240,10 +240,10 @@ public class RobotContainer {
   public void updatePoseEstimator() {
     double lateralDeviation; // standard deviation of the x and y measurements
     double angularDeviation; // standard deviation of the angle measurement
-    final MeasurementInfo internalTag = visionInstance.new MeasurementInfo(PhotonVisionHandler.getAprilTagID(),
-        PhotonVisionHandler.getNumberofTags(), PhotonVisionHandler.areaOfAprilTag());
+    final MeasurementInfo internalTag = visionInstance.new MeasurementInfo(visionHandler.getAprilTagID(),
+        visionHandler.getNumberofTags(), visionHandler.areaOfAprilTag());
 
-    final double posDiff = m_drivetrain.getPoseDifference(PhotonVisionHandler.k3Dto2D());
+    final double posDiff = m_drivetrain.getPoseDifference(visionHandler.k3Dto2D());
 
     // return if no tag detected
     if (internalTag.tagId == -1)
@@ -267,8 +267,8 @@ public class RobotContainer {
     else
       return;
     // update the pose estimator
-    m_drivetrain.addVisionMeasurement(PhotonVisionHandler.k3Dto2D(),
-        limelight1.getLatestLatencyAdjustedTimeStamp(), VecBuilder.fill(lateralDeviation,
+    m_drivetrain.addVisionMeasurement(visionHandler.k3Dto2D(),
+        visionHandler.getLatestLatencyAdjustedTimeStamp(), VecBuilder.fill(lateralDeviation,
             lateralDeviation, Units.degreesToRadians(angularDeviation)));
   }
 
