@@ -128,10 +128,10 @@ public class RobotContainer {
      * m_drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
      * }
      */
-    // m_controller.a().whileTrue(m_drivetrain.rotationDynamic(Direction.kForward));
-    // m_controller.b().whileTrue(m_drivetrain.rotationDynamic(Direction.kReverse));
-    // m_controller.x().whileTrue(m_drivetrain.rotationQuasistatic(Direction.kForward));
-    // m_controller.y().whileTrue(m_drivetrain.rotationQuasistatic(Direction.kReverse));
+    m_controller.a().whileTrue(m_drivetrain.rotationDynamic(Direction.kForward));
+    m_controller.b().whileTrue(m_drivetrain.rotationDynamic(Direction.kReverse));
+    m_controller.x().whileTrue(m_drivetrain.rotationQuasistatic(Direction.kForward));
+    m_controller.y().whileTrue(m_drivetrain.rotationQuasistatic(Direction.kReverse));
 
     // register telemetry
     m_drivetrain.registerTelemetry(m_logger::telemeterize);

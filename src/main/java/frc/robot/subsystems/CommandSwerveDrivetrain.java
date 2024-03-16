@@ -62,9 +62,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private double m_lastSimTime;
 
   // sysid routine
-  private final SwerveRequest.SysIdSwerveTranslation m_sysIdDrive = new SwerveRequest.SysIdSwerveTranslation();
-  private final SwerveRequest.SysIdSwerveSteerGains m_sysIdSteer = new SwerveRequest.SysIdSwerveSteerGains();
-  private final SwerveRequest.SysIdSwerveRotation m_sysIdSwerveRotation = new SwerveRequest.SysIdSwerveRotation();
+  private final SwerveRequest.SysIdSwerveTranslation m_sysIdDrive =
+      new SwerveRequest.SysIdSwerveTranslation();
+  private final SwerveRequest.SysIdSwerveSteerGains m_sysIdSteer =
+      new SwerveRequest.SysIdSwerveSteerGains();
+  private final SwerveRequest.SysIdSwerveRotation m_sysIdSwerveRotation =
+      new SwerveRequest.SysIdSwerveRotation();
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
   private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
   private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
@@ -84,8 +87,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   // sysid routine for characterizing steer motors
   private final SysIdRoutine m_steerSysIdRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(Volts.of(Drivetrain.kSteerRampRate).per(Second),
-          Volts.of(Drivetrain.kSteerStepVoltage),
-          Seconds.of(Drivetrain.kSteerTimeout)),
+          Volts.of(Drivetrain.kSteerStepVoltage), Seconds.of(Drivetrain.kSteerTimeout)),
       new SysIdRoutine.Mechanism(
           (Measure<Voltage> volts) -> this.setControl(m_sysIdSteer.withVolts(volts)), log -> {
             getSteerMotorLog("Front Left", log, Modules[0]);
@@ -170,15 +172,15 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
    * @return Command
    */
   public final Command rotationQuasistatic(SysIdRoutine.Direction direction) {
-    return Commands.startEnd(() -> m_rotationSysIdRoutine.dynamic(direction).schedule(),
+    return Commands.startEnd(() -> m_rotationSysIdRoutine.quasistatic(direction).schedule(),
         () -> applyRequest(() -> m_sysIdDrive.withVolts(Volts.of(0))).schedule());
   }
 
   /**
    * @brief log the drive motor of a module
    * 
-   * @param name   Name of the module
-   * @param log    the log
+   * @param name Name of the module
+   * @param log the log
    * @param module the module
    * @return MotorLog
    */
@@ -195,8 +197,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   /**
    * @brief log the drive motor of a module
    * 
-   * @param name   Name of the module
-   * @param log    the log
+   * @param name Name of the module
+   * @param log the log
    * @param module the module
    * @return MotorLog
    */
@@ -259,10 +261,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   }
 
   public PathPlannerPath GetPath(List<Translation2d> bezierPoints) {
-    final PathPlannerPath path = new PathPlannerPath(bezierPoints,
-        new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
-        new GoalEndState(0.0, Rotation2d.fromDegrees(90)) // goal end state
-    );
+    final PathPlannerPath path =
+        new PathPlannerPath(bezierPoints, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // constraints
+            new GoalEndState(0.0, Rotation2d.fromDegrees(90)) // goal end state
+        );
     return path;
   }
 
@@ -273,8 +275,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   }
 
   /**
-   * Calculate the scalar distance between the robot position and a given
-   * position.
+   * Calculate the scalar distance between the robot position and a given position.
    */
   public double getPoseDifference(final Pose2d pose) {
     try {
@@ -313,9 +314,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   /**
    * @brief update the odometry with a vision measurement
    * 
-   * @param pos       the position of the robot
-   * @param xyStds    the standard deviation of the x and y measurements
-   * @param degStds   the standard deviation of the angle measurement
+   * @param pos the position of the robot
+   * @param xyStds the standard deviation of the x and y measurements
+   * @param degStds the standard deviation of the angle measurement
    * @param timestamp the timestamp of the measurement
    */
   public void updateVision(Pose2d pos, double xyStds, double degStds, double timestamp) {
@@ -325,9 +326,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public Command findAndFollowPath(final Pose2d targetPose) {
 
-    PathConstraints pathConstraints = new PathConstraints(Drivetrain.kMaxLateralSpeed,
-        Drivetrain.kMaxLateralAcceleration,
-        Drivetrain.kMaxAngularSpeed, Drivetrain.kMaxAngularAcceleration);
+    PathConstraints pathConstraints =
+        new PathConstraints(Drivetrain.kMaxLateralSpeed, Drivetrain.kMaxLateralAcceleration,
+            Drivetrain.kMaxAngularSpeed, Drivetrain.kMaxAngularAcceleration);
 
     if (DriverStation.getAlliance().equals(Alliance.Blue))
       return AutoBuilder.pathfindToPose(targetPose, pathConstraints);
@@ -338,8 +339,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   public Command followPath(final PathPlannerPath path, boolean fromfile) {
 
     if (DriverStation.getAlliance().isPresent() == false)
-      return new Command() {
-      };
+      return new Command() {};
 
     if (DriverStation.getAlliance().equals(Alliance.Blue))
       return AutoBuilder.followPath(path);
