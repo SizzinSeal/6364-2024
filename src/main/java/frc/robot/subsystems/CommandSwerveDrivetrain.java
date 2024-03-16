@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
@@ -102,7 +101,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
           Volts.of(Drivetrain.kRotationStepVoltage), Seconds.of(Drivetrain.kRotationTimeout)),
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
         this.setControl(m_sysIdSwerveRotation.withVolts(volts));
-        System.out.println(volts.magnitude());
       }, log -> {
         getDriveMotorLog("Front Left", log, Modules[0]);
         getDriveMotorLog("Front Right", log, Modules[1]);
