@@ -93,12 +93,12 @@ public class RobotContainer {
    * @brief Configure Named Commands
    */
   private void ConfigureCommands() {
-    NamedCommands.registerCommand("Intake", m_intakeCommand);
-    NamedCommands.registerCommand("Shoot", m_shootCommand);
-    NamedCommands.registerCommand("Deploy", m_deployer.deploy());
-    NamedCommands.registerCommand("Retract", m_deployer.retract());
-    NamedCommands.registerCommand("SpinUp", m_flywheel.forwards());
-    NamedCommands.registerCommand("ToShoot", m_angler.goToShoot());
+    NamedCommands.registerCommand("Intake", Commands.runOnce(() -> m_intakeCommand.schedule()));
+    NamedCommands.registerCommand("Shoot", Commands.runOnce(() -> m_shootCommand.schedule()));
+    NamedCommands.registerCommand("Deploy", Commands.runOnce(() -> m_deployer.deploy().schedule()));
+    NamedCommands.registerCommand("Retract", Commands.runOnce(() -> m_deployer.retract().schedule()));
+    NamedCommands.registerCommand("SpinUp", Commands.runOnce(() -> m_flywheel.forwards().schedule()));
+    NamedCommands.registerCommand("ToShoot", Commands.runOnce(() -> m_angler.goToShoot().schedule()));
   }
 
   /**
