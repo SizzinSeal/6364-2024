@@ -45,12 +45,13 @@ public class Constants {
     public static final double kBotWidth = 0.7; // meters
     public static final double kBotLength = 1; // meters
 
-    public static TrajectoryConfig K_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
-            .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
+    public static TrajectoryConfig K_TRAJECTORY_CONFIG = new TrajectoryConfig(kMaxLateralSpeed, kMaxLateralAcceleration)
+        .setKinematics(RobotContainer.m_drivetrain.getKinematics()).setEndVelocity(0);
   }
 
   public class Angler {
+    // auto current limit
+    public static final double kAutoCurrentLimit = 30;
     // motor ids
     public static final int kMotorId = 17;
     // motor CAN bus names
@@ -73,8 +74,8 @@ public class Constants {
     public static final double kMaxPosition = 0.211111; // 76 degrees
     public static final double kMinPosition = 0.083333; // 30 degrees
     public static final double kZeroPosition = 0.2111111; // 76 degrees
-    public static final double kShootingPosition = 0.16;
-    public static final double kLoadingPosition = 0.09;
+    public static final double kShootingPosition = 0.15;
+    public static final double kLoadingPosition = 0.10;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 0.2;
     public static final double kProbeFastSpeed = 3; // volts
@@ -258,7 +259,7 @@ public class Constants {
     // motor inversion
     public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
     // speeds (voltage)
-    public static final double kIntakeSpeed = 8;
+    public static final double kIntakeSpeed = 5;
     public static final double kSlowIntakeSpeed = 5;
     public static final double kOuttakeSpeed = 8;
     // ratios (driven/driver)
@@ -267,7 +268,7 @@ public class Constants {
 
   public class PathPlanner {
     public static final PIDConstants kTranslationalPIDConstants = new PIDConstants(0.0, 0.0, 0.0);
-    public static final PIDConstants kRotationalPIDConstants = new PIDConstants(0.0, 0.0, 0.0);
+    public static final PIDConstants kRotationalPIDConstants = new PIDConstants(3.0, 0.0, 0.0);
     public static final double kMaxModuleSpeed = 4.5; // 4.5 m/s.
     public static final double kDriveBaseRadius = 0.4; // 0.4 m. Distance from robot center to
                                                        // furthest module.
@@ -281,16 +282,16 @@ public class Constants {
     // Blue Amp Lineup Pos
     public static final double kBlueAmpLineupX = 3;
     public static final double kBlueAmpLineupY = 5;
-    public static final double kBlueAmpLineupTheta =
-        new Rotation2d(kBlueAmpX - kBlueAmpLineupX, kBlueAmpY - kBlueAmpLineupY).getRadians();
+    public static final double kBlueAmpLineupTheta = new Rotation2d(kBlueAmpX - kBlueAmpLineupX,
+        kBlueAmpY - kBlueAmpLineupY).getRadians();
     // Red Amp Pos
     public static final double kRedAmpX = 5;
     public static final double kRedAmpY = 5;
     // Red Amp Lineup Pos
     public static final double kRedAmpLineupX = 14;
     public static final double kRedAmpLineupY = 5;
-    public static final double kRedAmpLineupTheta =
-        new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY).getRadians();
+    public static final double kRedAmpLineupTheta = new Rotation2d(kRedAmpX - kRedAmpLineupX, kRedAmpY - kRedAmpLineupY)
+        .getRadians();
 
     public static Translation2d getAmpPos() {
       if (DriverStation.getAlliance().isPresent()

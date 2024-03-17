@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,7 +24,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     m_robotContainer.limelight1.init();
-    this.addPeriodic(() -> m_robotContainer.pollBeamBreaks(), 0.005);
+    this.addPeriodic(() -> m_robotContainer.pollBeamBreaks(), 0.002);
     PortForwarder.add(5800, "photonvision.local", 5800);
 
     autoChooser.addOption("Auto1", 1);
@@ -37,14 +40,36 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+  }
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // limit motor currents
+    var m0Config = new TalonFXConfiguration();
+    var m1Config = new TalonFXConfiguration();
+    var m2Config = new TalonFXConfiguration();
+    var m3Config = new TalonFXConfiguration();
+    m_robotContainer.m_drivetrain.getModule(0).getDriveMotor().getConfigurator().refresh(m0Config);
+    m_robotContainer.m_drivetrain.getModule(1).getDriveMotor().getConfigurator().refresh(m1Config);
+    m_robotContainer.m_drivetrain.getModule(2).getDriveMotor().getConfigurator().refresh(m2Config);
+    m_robotContainer.m_drivetrain.getModule(3).getDriveMotor().getConfigurator().refresh(m3Config);
+    m0Config.CurrentLimits.StatorCurrentLimit = 30;
+    m1Config.CurrentLimits.StatorCurrentLimit = 30;
+    m2Config.CurrentLimits.StatorCurrentLimit = 30;
+    m3Config.CurrentLimits.StatorCurrentLimit = 30;
+    m0Config.CurrentLimits.StatorCurrentLimitEnable = true;
+    m1Config.CurrentLimits.StatorCurrentLimitEnable = true;
+    m2Config.CurrentLimits.StatorCurrentLimitEnable = true;
+    m3Config.CurrentLimits.StatorCurrentLimitEnable = true;
+    m_robotContainer.m_drivetrain.getModule(0).getDriveMotor().getConfigurator().apply(m0Config);
+    m_robotContainer.m_drivetrain.getModule(1).getDriveMotor().getConfigurator().apply(m1Config);
+    m_robotContainer.m_drivetrain.getModule(2).getDriveMotor().getConfigurator().apply(m2Config);
+    m_robotContainer.m_drivetrain.getModule(3).getDriveMotor().getConfigurator().apply(m3Config);
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -59,10 +84,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+  }
 
   @Override
   public void teleopInit() {
@@ -72,10 +99,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+  }
 
   @Override
   public void testInit() {
@@ -83,11 +112,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+  }
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }
