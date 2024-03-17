@@ -63,7 +63,7 @@ public class Constants {
     // gravity type
     public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
     // controller constants
-    public static final double kP = 50;
+    public static final double kP = 800;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double kS = 0.28898;
@@ -74,8 +74,8 @@ public class Constants {
     public static final double kMaxPosition = 0.211111; // 76 degrees
     public static final double kMinPosition = 0.083333; // 30 degrees
     public static final double kZeroPosition = 0.2111111; // 76 degrees
-    public static final double kShootingPosition = 0.15;
-    public static final double kLoadingPosition = 0.10;
+    public static final double kShootingPosition = 0.178;
+    public static final double kLoadingPosition = 0.1;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 0.2;
     public static final double kProbeFastSpeed = 3; // volts
@@ -240,9 +240,9 @@ public class Constants {
     public static final double kV = 0;
     public static final double kA = 0;
     // speeds (rotations per second)
-    public static final double kEjectSpeed = 3;
+    public static final double kEjectSpeed = 12;
     public static final double kLoadSpeed = 3;
-    public static final double kSlowLoadSpeed = 2.0;
+    public static final double kSlowLoadSpeed = 2.2;
     // ratios
     public static final double kRatio = 1;
   }
@@ -259,7 +259,7 @@ public class Constants {
     // motor inversion
     public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
     // speeds (voltage)
-    public static final double kIntakeSpeed = 5;
+    public static final double kIntakeSpeed = 8;
     public static final double kSlowIntakeSpeed = 5;
     public static final double kOuttakeSpeed = 8;
     // ratios (driven/driver)

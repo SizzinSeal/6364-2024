@@ -5,7 +5,6 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -61,8 +60,10 @@ public class Angler extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Angler() {
     super();
@@ -86,8 +87,6 @@ public class Angler extends SubsystemBase {
     m_motor.getConfigurator().apply(config);
     // set 0 position
     m_motor.setPosition(kZeroPosition);
-    // start braking
-    m_motor.setControl(new StaticBrake());
     // commands
     SmartDashboard.putData("Angler To Shoot", this.goToShoot());
     SmartDashboard.putData("Angler To Load", this.goToLoad());
@@ -159,8 +158,10 @@ public class Angler extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static
+   *        friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is
+   *        negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -172,7 +173,8 @@ public class Angler extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic
+   *        friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -185,9 +187,12 @@ public class Angler extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */

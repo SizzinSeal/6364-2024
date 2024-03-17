@@ -37,10 +37,10 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
 
   // 6 meters per second desired top speed.
-  private static final double kMaxSpeed = 0.5;
+  private static final double kMaxSpeed = 1.0;
 
   // Half a rotation per second max angular velocity.
-  private static final double kMaxAngularRate = 0.3 * Math.PI;
+  private static final double kMaxAngularRate = 0.8 * Math.PI;
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
@@ -78,8 +78,8 @@ public class RobotContainer {
       .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to shoot
-  private final Command m_shootCommand = Commands.sequence(m_indexer.eject(), Commands.waitSeconds(0.5),
-      m_indexer.stop(), m_angler.goToLoad());
+  private final Command m_shootCommand = Commands.sequence(m_indexer.eject(), Commands.waitSeconds(1.0),
+      m_indexer.stop());
 
   /**
    * @brief Poll the beam break sensors
@@ -114,12 +114,15 @@ public class RobotContainer {
     // note detected in the intake
     m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(),
         m_indexer.slowLoad(),
-        Commands.waitSeconds(0.8), m_deployer.retract()).onlyIf(() -> !m_indexer.isNoteDetected()));
+        Commands.waitSeconds(0.3), m_deployer.retract()).onlyIf(() -> !m_indexer.isNoteDetected()));
 
     // note detected in the indexer
     m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(),
         m_intake.stop(),
         m_deployer.retract(), m_angler.goToShoot()));
+
+    // note left the indexer
+    m_indexer.noteDetected.onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
 
     // intake button pressed
     m_controller.rightTrigger().whileTrue(m_intakeCommand);
@@ -129,6 +132,8 @@ public class RobotContainer {
             m_deployer.retract()));
     // shoot button pressed
     m_controller.leftBumper().onTrue(m_shootCommand);
+    // reset angle
+    m_controller.povUp().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
     // m_controller.povUp().onTrue(Commands.runOnce(() -> {
     // m_angleRequest.withTargetDirection(new Rotation2d(Degrees.of(0)));
     // m_drivetrain.setControl(m_angleRequest);
