@@ -4,11 +4,7 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static frc.robot.Constants.Angler.kZeroPosition;
-
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -22,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
@@ -113,8 +108,7 @@ public class RobotContainer {
 
     // note detected in the intake
     m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(),
-        m_indexer.slowLoad(),
-        Commands.waitSeconds(0.3), m_deployer.retract()).onlyIf(() -> !m_indexer.isNoteDetected()));
+        m_indexer.slowLoad()).onlyIf(() -> !m_indexer.isNoteDetected()));
 
     // note detected in the indexer
     m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(),
