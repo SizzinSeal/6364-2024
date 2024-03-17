@@ -24,7 +24,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     m_robotContainer.limelight1.init();
-    this.addPeriodic(() -> m_robotContainer.pollBeamBreaks(), 0.003);
+    this.addPeriodic(() -> m_robotContainer.pollBeamBreaks(), 0.002);
     // PortForwarder.add(5800, "photonvision.local", 5800);
 
     autoChooser.addOption("Auto1", 1);

@@ -74,7 +74,7 @@ public class Constants {
     public static final double kMaxPosition = 0.211111; // 76 degrees
     public static final double kMinPosition = 0.083333; // 30 degrees
     public static final double kZeroPosition = 0.2111111; // 76 degrees
-    public static final double kShootingPosition = 0.178;
+    public static final double kShootingPosition = 0.175;
     public static final double kLoadingPosition = 0.1;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 0.2;
@@ -204,8 +204,8 @@ public class Constants {
     public static final double kLowerKV = 0.10863;
     public static final double kLowerKA = 0.018805;
     // speeds (in rotations per second)
-    public static final double kUpperSpeed = 100; // TODO: find this value
-    public static final double kLowerSpeed = 100; // TODO: find this value
+    public static final double kUpperSpeed = 100 / 3; // AMP: 100/3
+    public static final double kLowerSpeed = 100; // AMP: 5
     // acceleration (in rotations per second squared)
     public static final double kUpperAccel = 0; // TODO: find this value
     public static final double kLowerAccel = 0; // TODO: find this value
@@ -242,7 +242,7 @@ public class Constants {
     // speeds (rotations per second)
     public static final double kEjectSpeed = 12;
     public static final double kLoadSpeed = 3;
-    public static final double kSlowLoadSpeed = 2.2;
+    public static final double kSlowLoadSpeed = 2.1;
     // ratios
     public static final double kRatio = 1;
   }
