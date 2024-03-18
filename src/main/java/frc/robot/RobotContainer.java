@@ -32,10 +32,10 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
 
   // 6 meters per second desired top speed.
-  private static final double kMaxSpeed = 1.0;
+  private static final double kMaxSpeed = 1.5;
 
   // Half a rotation per second max angular velocity.
-  private static final double kMaxAngularRate = 0.8 * Math.PI;
+  private static final double kMaxAngularRate = 1.0 * Math.PI;
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
