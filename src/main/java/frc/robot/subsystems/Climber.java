@@ -25,8 +25,10 @@ public class Climber extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Climber() {
     super();
@@ -78,7 +80,7 @@ public class Climber extends SubsystemBase {
    */
   public Command down() {
     return this.runOnce(() -> {
-      m_output.Output = kSpeed;
+      m_output.Output = -kSpeed;
       m_motor.setControl(m_output);
     });
   }
@@ -90,7 +92,7 @@ public class Climber extends SubsystemBase {
    */
   public Command up() {
     return this.runOnce(() -> {
-      m_output.Output = -kSpeed;
+      m_output.Output = kSpeed;
       m_motor.setControl(m_output);
     });
   }
@@ -111,9 +113,12 @@ public class Climber extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */

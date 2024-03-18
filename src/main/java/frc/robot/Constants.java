@@ -270,6 +270,12 @@ public class Constants {
     public static final double kRatio = 1;
   }
 
+  public class Releaser {
+    public static final int kServoPort = 7;
+    public static final int kReleaseAngle = 0;
+    public static final int kStableAngle = 1;
+  }
+
   public class PathPlanner {
     public static final PIDConstants kTranslationalPIDConstants = new PIDConstants(0.0, 0.0, 0.0);
     public static final PIDConstants kRotationalPIDConstants = new PIDConstants(3.0, 0.0, 0.0);

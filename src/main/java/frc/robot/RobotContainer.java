@@ -29,6 +29,7 @@ import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Releaser;
 
 public class RobotContainer {
 
@@ -48,6 +49,7 @@ public class RobotContainer {
   public final Indexer m_indexer = new Indexer();
   private final Flywheel m_flywheel = new Flywheel();
   private final Climber m_climber = new Climber();
+  private final Releaser m_releaser = new Releaser();
 
   // Setting up bindings for necessary control of the swerve drive platform
   private final CommandXboxController m_controller = new CommandXboxController(0);
@@ -141,6 +143,14 @@ public class RobotContainer {
     m_controller.b().onTrue(
         Commands.sequence(m_intake.ampShoot(), Commands.waitSeconds(1.0), m_intake.stop(), Commands.waitSeconds(1.0),
             m_deployer.retract()));
+    // climber controls
+    m_secondary.povDown().whileTrue(m_climber.down());
+    m_secondary.povDown().onFalse(m_climber.stop());
+    m_secondary.povUp().whileTrue(m_climber.up());
+    m_secondary.povUp().onFalse(m_climber.stop());
+    m_secondary.povRight().onTrue(m_releaser.release());
+    m_secondary.povLeft().onTrue(m_releaser.ready());
+
     // reset angle
     m_controller.povUp().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
     // m_controller.povUp().onTrue(Commands.runOnce(() -> {
