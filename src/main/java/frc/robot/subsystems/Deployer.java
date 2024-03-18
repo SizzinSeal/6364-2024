@@ -57,8 +57,10 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Deployer() {
     super();
@@ -121,6 +123,18 @@ public class Deployer extends SubsystemBase {
   }
 
   /**
+   * Move the deployer to the amp scoring position
+   * 
+   * @return Command
+   */
+  public Command toAmp() {
+    return this.runOnce(() -> {
+      m_output.Position = kAmpPosition;
+      m_motor.setControl(m_output);
+    });
+  }
+
+  /**
    * @brief deploy the deployer
    * 
    * @return Command
@@ -147,8 +161,10 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief quasistatic sysid routine
    * 
-   *        Quasistatic routines accelerate the motor slowly to measure static friction and other
-   *        non-linear effects. Acceleration is kept low so its effect is negligible.
+   *        Quasistatic routines accelerate the motor slowly to measure static
+   *        friction and other
+   *        non-linear effects. Acceleration is kept low so its effect is
+   *        negligible.
    * 
    * @param direction the direction of the sysid routine
    * @return Command
@@ -160,7 +176,8 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief dynamic sysid routine
    * 
-   *        Dynamic routines accelerate the motor quickly to measure dynamic friction and other
+   *        Dynamic routines accelerate the motor quickly to measure dynamic
+   *        friction and other
    *        non-linear effects.
    * 
    * @param direction the direction of the sysid routine
@@ -173,9 +190,12 @@ public class Deployer extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */

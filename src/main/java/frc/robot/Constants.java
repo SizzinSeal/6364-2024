@@ -155,6 +155,7 @@ public class Constants {
     // positions (rotations) TODO: tune this so 90 degrees is up relative to the
     // ground
     public static final double kMaxPosition = 0.49;
+    public static final double kAmpPosition = 0.465;
     public static final double kMinPosition = 0;
     // speeds (rotations per second)
     public static final double kSpeed = 0.7; // TODO: find this value
@@ -262,6 +263,9 @@ public class Constants {
     public static final double kIntakeSpeed = 8;
     public static final double kSlowIntakeSpeed = 3;
     public static final double kOuttakeSpeed = 8;
+    public static final double kAmpIntakeSpeed = 2;
+    public static final double kAmpLoadSpeed = 1;
+    public static final double kAmpShootSpeed = 6;
     // ratios (driven/driver)
     public static final double kRatio = 1;
   }

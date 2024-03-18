@@ -37,8 +37,10 @@ public class Intake extends SubsystemBase {
   /**
    * @brief IntakeSubsystem constructor
    * 
-   *        This is where the motors are configured. We configure them here so that we can swap
-   *        motors without having to worry about reconfiguring them in Phoenix Tuner.
+   *        This is where the motors are configured. We configure them here so
+   *        that we can swap
+   *        motors without having to worry about reconfiguring them in Phoenix
+   *        Tuner.
    */
   public Intake() {
     super();
@@ -110,6 +112,33 @@ public class Intake extends SubsystemBase {
   }
 
   /**
+   * @brief spin the intake motors to intake a note which will be shot in the amp
+   * 
+   * @return Command
+   */
+  public Command ampIntake() {
+    return this.runOnce(() -> this.setSpeed(kAmpIntakeSpeed));
+  }
+
+  /**
+   * @brief spin the intake to load the note into position
+   * 
+   * @return Command
+   */
+  public Command ampLoad() {
+    return this.runOnce(() -> this.setSpeed(-kAmpLoadSpeed));
+  }
+
+  /**
+   * @brief spin the intake to shoot the note into the amp
+   * 
+   * @return Command
+   */
+  public Command ampShoot() {
+    return this.runOnce(() -> this.setSpeed(-kAmpShootSpeed));
+  }
+
+  /**
    * @brief Stop the intake motors
    * 
    * @return Command
@@ -121,7 +150,8 @@ public class Intake extends SubsystemBase {
   /**
    * @brief periodic update method
    * 
-   *        This method is called periodically by the scheduler. We use it to update the simulated
+   *        This method is called periodically by the scheduler. We use it to
+   *        update the simulated
    *        motors.
    */
   @Override
@@ -143,9 +173,12 @@ public class Intake extends SubsystemBase {
   /**
    * @brief Send telemetry data to Shuffleboard
    * 
-   *        The SendableBuilder object is used to send data to Shuffleboard. We use it to send the
-   *        target velocity of the motors, as well as the measured velocity of the motors. This
-   *        allows us to tune intake speed in real time, without having to re-deploy code.
+   *        The SendableBuilder object is used to send data to Shuffleboard. We
+   *        use it to send the
+   *        target velocity of the motors, as well as the measured velocity of the
+   *        motors. This
+   *        allows us to tune intake speed in real time, without having to
+   *        re-deploy code.
    * 
    * @param builder the SendableBuilder object
    */

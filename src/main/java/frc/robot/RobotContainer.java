@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
@@ -71,6 +72,14 @@ public class RobotContainer {
       .sequence(m_angler.goToLoad(), m_deployer.deploy(), m_flywheel.forwards(),
           Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.intake(), m_indexer.load())
       .onlyIf(() -> !m_indexer.isNoteDetected());
+
+  // command to intake a note which will be shot in the amp
+  private final Command m_ampIntakeCommand = Commands.sequence(m_deployer.deploy(), m_angler.goToLoad(),
+      Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.ampIntake(),
+      Commands.waitUntil(() -> m_intake.isNoteDetected()), m_intake.ampLoad(),
+      Commands.waitUntil(() -> !m_intake.isNoteDetected()),
+      m_intake.stop(), m_deployer.toAmp(), Commands.waitSeconds(2.0))
+      .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
 
   // command to shoot
   private final Command m_shootCommand = Commands.sequence(m_indexer.eject(), Commands.waitSeconds(1.0),
@@ -126,6 +135,12 @@ public class RobotContainer {
             m_deployer.retract()));
     // shoot button pressed
     m_controller.leftBumper().onTrue(m_shootCommand);
+    // amp intake button pressed
+    m_controller.a().onTrue(m_ampIntakeCommand);
+    // outtake
+    m_controller.b().onTrue(
+        Commands.sequence(m_intake.ampShoot(), Commands.waitSeconds(1.0), m_intake.stop(), Commands.waitSeconds(1.0),
+            m_deployer.retract()));
     // reset angle
     m_controller.povUp().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
     // m_controller.povUp().onTrue(Commands.runOnce(() -> {
