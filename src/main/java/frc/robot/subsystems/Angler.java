@@ -138,6 +138,15 @@ public class Angler extends SubsystemBase {
   }
 
   /**
+   * @brief move the angler to its maximum position
+   * 
+   * @return Command
+   */
+  public Command goToStore() {
+    return this.goToAngle(kStorePosition);
+  }
+
+  /**
    * @brief Go to the shooting position
    * 
    * @return Command

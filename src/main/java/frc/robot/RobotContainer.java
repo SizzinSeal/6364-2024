@@ -105,6 +105,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Retract", Commands.runOnce(() -> m_deployer.retract().schedule()));
     NamedCommands.registerCommand("SpinUp", Commands.runOnce(() -> m_flywheel.forwards().schedule()));
     NamedCommands.registerCommand("ToShoot", Commands.runOnce(() -> m_angler.goToShoot().schedule()));
+    NamedCommands.registerCommand("Store", Commands.runOnce(() -> m_angler.goToStore().schedule()));
   }
 
   /**

@@ -74,6 +74,7 @@ public class Constants {
     public static final double kMaxPosition = 0.211111; // 76 degrees
     public static final double kMinPosition = 0.083333; // 30 degrees
     public static final double kZeroPosition = 0.2111111; // 76 degrees
+    public static final double kStorePosition = 0.205;
     public static final double kShootingPosition = 0.169;
     public static final double kLoadingPosition = 0.1;
     // speeds (in rotations per second)

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.4024637937545776,
-      "y": 5.508944988250732
+      "x": 0.4943923056125641,
+      "y": 3.948357105255127
     },
-    "rotation": 0.0
+    "rotation": -60.0001403060998
   },
   "command": {
     "type": "sequential",
@@ -38,72 +38,6 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Intake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Central 1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Central 4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Intake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Central 2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Central 3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
             "waitTime": 0.75
           }
         },
@@ -116,13 +50,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Central 5"
+            "pathName": "right 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Central 6"
+            "pathName": "right 2"
           }
         },
         {
