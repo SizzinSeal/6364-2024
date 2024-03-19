@@ -78,13 +78,13 @@ public class Constants {
     public static final double kShootingPosition = 0.169;
     public static final double kLoadingPosition = 0.1;
     // speeds (in rotations per second)
-    public static final double kMaxSpeed = 0.2;
+    public static final double kMaxSpeed = 0.4;
     public static final double kProbeFastSpeed = 3; // volts
     public static final double kProbeSlowSpeed = 1; // volts
     // acceleration (in rotations per second squared)
-    public static final double kAcceleration = 1;
+    public static final double kAcceleration = 2;
     // jerk (in rotations per second cubed)
-    public static final double kJerk = 2;
+    public static final double kJerk = 4;
     // tolerances (in rotations)
     public static final double kTolerance = 0.013889; // 5 degrees
     // ratios (driven/driver)
