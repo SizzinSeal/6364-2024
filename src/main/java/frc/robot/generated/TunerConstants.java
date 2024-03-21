@@ -26,11 +26,10 @@ public class TunerConstants {
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
-  // TODO: switch to FOC when PRO license has been obtained
   private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
   // The closed-loop output type to use for the drive motors;
   // This affects the PID/FF gains for the drive motors
-  // TODO: switch to FOC when PRO license has been obtained
+  // TODO: switch to FOC
   private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
   // The stator current at which the wheels start to slip;
@@ -60,18 +59,18 @@ public class TunerConstants {
   private static final double kSteerInertia = 0.05;
   private static final double kDriveInertia = 0.08;
 
-  private static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
-      .withPigeon2Id(kPigeonId).withCANbusName(kCANbusName);
+  private static final SwerveDrivetrainConstants DrivetrainConstants =
+      new SwerveDrivetrainConstants().withPigeon2Id(kPigeonId).withCANbusName(kCANbusName);
 
-  private static final SwerveModuleConstantsFactory ConstantCreator = new SwerveModuleConstantsFactory()
-      .withDriveMotorGearRatio(kDriveGearRatio)
-      .withSteerMotorGearRatio(kSteerGearRatio).withWheelRadius(kWheelRadiusInches)
-      .withSlipCurrent(kSlipCurrentA).withSteerMotorGains(steerGains)
-      .withDriveMotorGains(driveGains).withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
-      .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
-      .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps).withSteerInertia(kSteerInertia)
-      .withDriveInertia(kDriveInertia).withFeedbackSource(SteerFeedbackType.FusedCANcoder)
-      .withCouplingGearRatio(kCoupleRatio).withSteerMotorInverted(kSteerMotorReversed);
+  private static final SwerveModuleConstantsFactory ConstantCreator =
+      new SwerveModuleConstantsFactory().withDriveMotorGearRatio(kDriveGearRatio)
+          .withSteerMotorGearRatio(kSteerGearRatio).withWheelRadius(kWheelRadiusInches)
+          .withSlipCurrent(kSlipCurrentA).withSteerMotorGains(steerGains)
+          .withDriveMotorGains(driveGains).withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
+          .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
+          .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps).withSteerInertia(kSteerInertia)
+          .withDriveInertia(kDriveInertia).withFeedbackSource(SteerFeedbackType.FusedCANcoder)
+          .withCouplingGearRatio(kCoupleRatio).withSteerMotorInverted(kSteerMotorReversed);
 
   // Front Left
   private static final int kFrontLeftDriveMotorId = 3;
@@ -137,6 +136,6 @@ public class TunerConstants {
       .withDriveMotorClosedLoopOutput(SwerveModule.ClosedLoopOutputType.Voltage)
       .withSteerMotorClosedLoopOutput(SwerveModule.ClosedLoopOutputType.Voltage);
 
-  public static final CommandSwerveDrivetrain DriveTrain = new CommandSwerveDrivetrain(DrivetrainConstants, FrontLeft,
-      FrontRight, BackLeft, BackRight);
+  public static final CommandSwerveDrivetrain DriveTrain =
+      new CommandSwerveDrivetrain(DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
 }

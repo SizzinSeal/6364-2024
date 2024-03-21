@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix.led.StrobeAnimation;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -114,18 +115,17 @@ public class Constants {
     public static final double kV = 0;
     public static final double kA = 0;
     public static final double kG = 0;
-    // positions (rotations) TODO: tune this so 90 degrees is up relative to the
     // ground
     public static final double kMaxPosition = 0;
     public static final double kMinPosition = 1;
     // speeds (rotations per second)
-    public static final double kSpeed = 80; // TODO: find this value
+    public static final double kSpeed = 80;
     // acceleration (rotations per second squared)
-    public static final double kAccel = 0; // TODO: find this value
+    public static final double kAccel = 0;
     // jerk (rotations per second cubed)
-    public static final double kJerk = 0; // TODO: find this value
+    public static final double kJerk = 0;
     // tolerances (rotations)
-    public static final double kTolerance = 0; // TODO: find this value
+    public static final double kTolerance = 0;
     // ratios (driven/driver)
     public static final double kRatio = 90;
     // SysId constants
@@ -153,19 +153,19 @@ public class Constants {
     public static final double kV = 2.0077;
     public static final double kA = 1.4688;
     public static final double kG = 0.0;
-    // positions (rotations) TODO: tune this so 90 degrees is up relative to the
+    // positions (rotations)E
     // ground
     public static final double kMaxPosition = 0.49;
     public static final double kAmpPosition = 0.465;
     public static final double kMinPosition = 0;
     // speeds (rotations per second)
-    public static final double kSpeed = 0.7; // TODO: find this value
+    public static final double kSpeed = 0.7;
     // acceleration (rotations per second squared)
-    public static final double kAccel = 0.4; // TODO: find this value
+    public static final double kAccel = 0.4;
     // jerk (rotations per second cubed)
-    public static final double kJerk = 0; // TODO: find this value
+    public static final double kJerk = 0;
     // tolerances (rotations)
-    public static final double kTolerance = 0.1; // TODO: find this value
+    public static final double kTolerance = 0.1;
     // ratios (driven/driver)
     public static final double kRatio = 32.5;
     // current limit (we use this to limit accel)
@@ -206,14 +206,14 @@ public class Constants {
     public static final double kLowerKV = 0.10863;
     public static final double kLowerKA = 0.018805;
     // speeds (in rotations per second)
-    public static final double kUpperSpeed = 100 / 3; // AMP: 100/3
+    public static final double kUpperSpeed = 100; // AMP: 100/3
     public static final double kLowerSpeed = 100; // AMP: 5
     // acceleration (in rotations per second squared)
-    public static final double kUpperAccel = 0; // TODO: find this value
-    public static final double kLowerAccel = 0; // TODO: find this value
+    public static final double kUpperAccel = 0;
+    public static final double kLowerAccel = 0;
     // tolerances (in rotations)
-    public static final double kUpperTolerance = 20; // TODO: find this value
-    public static final double kLowerTolerance = 20; // TODO: find this value
+    public static final double kUpperTolerance = 20;
+    public static final double kLowerTolerance = 20;
     // ratios (driven/driver)
     public static final double kUpperRatio = 1;
     public static final double kLowerRatio = 1;
@@ -319,5 +319,15 @@ public class Constants {
       else
         return new Pose2d(kBlueAmpLineupX, kBlueAmpLineupY, new Rotation2d(kBlueAmpLineupTheta));
     }
+  }
+
+  public class Lights {
+    // Device Id.
+    public static final int kDeviceId = 21;
+    // RGB values.
+    public static final int[] kRGBvalues = { 255, 255, 255 };
+    // Strobe animation.
+    public static final StrobeAnimation kAnimation = new StrobeAnimation(kRGBvalues[0], kRGBvalues[1], kRGBvalues[2],
+        255, 1.0, 200);
   }
 }

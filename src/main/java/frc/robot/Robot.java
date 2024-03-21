@@ -4,10 +4,8 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -25,10 +23,6 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     m_robotContainer.limelight1.init();
     this.addPeriodic(() -> m_robotContainer.pollBeamBreaks(), 0.002);
-    // PortForwarder.add(5800, "photonvision.local", 5800);
-
-    autoChooser.addOption("Auto1", 1);
-    autoChooser.addOption("Auto2", 2);
     // etc.
     SmartDashboard.putData("Autonomous routine", autoChooser);
   }
@@ -36,6 +30,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    // if (m_robotContainer.m_indexer.isNoteDetected()) {
+    // m_robotContainer.m_lights.runRainbowAnimation();
+    // } else {
+    // m_robotContainer.m_lights.disableAnimation();
+    // }
     // m_robotContainer.updatePoseEstimator();
   }
 
@@ -47,9 +46,14 @@ public class Robot extends TimedRobot {
   public void disabledExit() {
   }
 
-  @Override
-  public void autonomousInit() {
-    // limit motor currents
+  /**
+   * @brief sets the current limit of the drivetrain. Useful for making auto
+   *        consistent on good
+   *        batteries and bad batteries
+   * 
+   * @param currentLimit The current limit, in amps
+   */
+  private void setDriveCurrentLimit(double currentLimit) {
     var m0Config = new TalonFXConfiguration();
     var m1Config = new TalonFXConfiguration();
     var m2Config = new TalonFXConfiguration();
@@ -58,10 +62,10 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_drivetrain.getModule(1).getDriveMotor().getConfigurator().refresh(m1Config);
     m_robotContainer.m_drivetrain.getModule(2).getDriveMotor().getConfigurator().refresh(m2Config);
     m_robotContainer.m_drivetrain.getModule(3).getDriveMotor().getConfigurator().refresh(m3Config);
-    m0Config.CurrentLimits.StatorCurrentLimit = 30;
-    m1Config.CurrentLimits.StatorCurrentLimit = 30;
-    m2Config.CurrentLimits.StatorCurrentLimit = 30;
-    m3Config.CurrentLimits.StatorCurrentLimit = 30;
+    m0Config.CurrentLimits.StatorCurrentLimit = currentLimit;
+    m1Config.CurrentLimits.StatorCurrentLimit = currentLimit;
+    m2Config.CurrentLimits.StatorCurrentLimit = currentLimit;
+    m3Config.CurrentLimits.StatorCurrentLimit = currentLimit;
     m0Config.CurrentLimits.StatorCurrentLimitEnable = true;
     m1Config.CurrentLimits.StatorCurrentLimitEnable = true;
     m2Config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -70,7 +74,12 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_drivetrain.getModule(1).getDriveMotor().getConfigurator().apply(m1Config);
     m_robotContainer.m_drivetrain.getModule(2).getDriveMotor().getConfigurator().apply(m2Config);
     m_robotContainer.m_drivetrain.getModule(3).getDriveMotor().getConfigurator().apply(m3Config);
+  }
 
+  @Override
+  public void autonomousInit() {
+    // limit motor currents
+    setDriveCurrentLimit(30);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -93,6 +102,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // disable motor current limits, turn the bull loose
+    setDriveCurrentLimit(60);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

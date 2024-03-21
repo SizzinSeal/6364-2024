@@ -29,20 +29,22 @@ import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Releaser;
 
 public class RobotContainer {
 
   // 6 meters per second desired top speed.
-  private static final double kMaxSpeed = 1.5;
+  private static final double kMaxSpeed = 6;
 
   // Half a rotation per second max angular velocity.
-  private static final double kMaxAngularRate = 1.0 * Math.PI;
+  private static final double kMaxAngularRate = 2.0 * Math.PI;
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
 
   // Subsystems initialization
+  public final Lights m_lights = new Lights();
   private final Angler m_angler = new Angler();
   private final Deployer m_deployer = new Deployer();
   private final Intake m_intake = new Intake();
@@ -59,7 +61,8 @@ public class RobotContainer {
 
   // test request
   private final SwerveRequest.FieldCentricFacingAngle m_angleRequest = new SwerveRequest.FieldCentricFacingAngle()
-      .withDeadband(kMaxSpeed * 0.05).withRotationalDeadband(kMaxAngularRate * 0.05)
+      .withDeadband(kMaxSpeed * 0.05)
+      .withRotationalDeadband(kMaxAngularRate * 0.05)
       .withDriveRequestType(DriveRequestType.Velocity);
 
   // Swerve drive request initialization. Using FieldCentric request type.
@@ -76,11 +79,12 @@ public class RobotContainer {
       .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to intake a note which will be shot in the amp
-  private final Command m_ampIntakeCommand = Commands.sequence(m_deployer.deploy(), m_angler.goToLoad(),
-      Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.ampIntake(),
-      Commands.waitUntil(() -> m_intake.isNoteDetected()), m_intake.ampLoad(),
-      Commands.waitUntil(() -> !m_intake.isNoteDetected()),
-      m_intake.stop(), m_deployer.toAmp(), Commands.waitSeconds(2.0))
+  private final Command m_ampIntakeCommand = Commands
+      .sequence(m_deployer.deploy(), m_angler.goToLoad(),
+          Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.ampIntake(),
+          Commands.waitUntil(() -> m_intake.isNoteDetected()), m_intake.ampLoad(),
+          Commands.waitUntil(() -> !m_intake.isNoteDetected()), m_intake.stop(),
+          m_deployer.toAmp(), Commands.waitSeconds(2.0))
       .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
 
   // command to shoot
@@ -102,9 +106,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake", Commands.runOnce(() -> m_intakeCommand.schedule()));
     NamedCommands.registerCommand("Shoot", Commands.runOnce(() -> m_shootCommand.schedule()));
     NamedCommands.registerCommand("Deploy", Commands.runOnce(() -> m_deployer.deploy().schedule()));
-    NamedCommands.registerCommand("Retract", Commands.runOnce(() -> m_deployer.retract().schedule()));
-    NamedCommands.registerCommand("SpinUp", Commands.runOnce(() -> m_flywheel.forwards().schedule()));
-    NamedCommands.registerCommand("ToShoot", Commands.runOnce(() -> m_angler.goToShoot().schedule()));
+    NamedCommands.registerCommand("Retract",
+        Commands.runOnce(() -> m_deployer.retract().schedule()));
+    NamedCommands.registerCommand("SpinUp",
+        Commands.runOnce(() -> m_flywheel.forwards().schedule()));
+    NamedCommands.registerCommand("ToShoot",
+        Commands.runOnce(() -> m_angler.goToShoot().schedule()));
     NamedCommands.registerCommand("Store", Commands.runOnce(() -> m_angler.goToStore().schedule()));
   }
 
@@ -119,13 +126,14 @@ public class RobotContainer {
             .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
     // note detected in the intake
-    m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(),
-        m_indexer.slowLoad()).onlyIf(() -> !m_indexer.isNoteDetected()));
+    m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(), m_indexer.slowLoad())
+        .onlyIf(() -> !m_indexer.isNoteDetected()));
 
     // note detected in the indexer
-    m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(),
-        m_intake.stop(),
+    m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
         m_deployer.retract(), m_angler.goToShoot()));
+    m_indexer.noteDetected.whileTrue(m_lights.strobe());
+    m_indexer.noteDetected.onFalse(m_lights.turnOffLights());
 
     // note left the indexer
     m_indexer.noteDetected.onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
@@ -134,16 +142,14 @@ public class RobotContainer {
     m_controller.rightTrigger().whileTrue(m_intakeCommand);
     // intake button released;
     m_controller.rightTrigger()
-        .onFalse(Commands.sequence(m_intake.stop(), m_indexer.stop(),
-            m_deployer.retract()));
+        .onFalse(Commands.sequence(m_intake.stop(), m_indexer.stop(), m_deployer.retract()));
     // shoot button pressed
     m_controller.leftBumper().onTrue(m_shootCommand);
     // amp intake button pressed
     m_controller.a().onTrue(m_ampIntakeCommand);
     // outtake
-    m_controller.b().onTrue(
-        Commands.sequence(m_intake.ampShoot(), Commands.waitSeconds(1.0), m_intake.stop(), Commands.waitSeconds(1.0),
-            m_deployer.retract()));
+    m_controller.b().onTrue(Commands.sequence(m_intake.ampShoot(), Commands.waitSeconds(1.0),
+        m_intake.stop(), Commands.waitSeconds(1.0), m_deployer.retract()));
     // climber controls
     m_secondary.povDown().whileTrue(m_climber.down());
     m_secondary.povDown().onFalse(m_climber.stop());
