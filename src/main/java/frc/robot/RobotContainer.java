@@ -14,6 +14,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,7 +40,7 @@ public class RobotContainer {
   private static final double kMaxSpeed = 6;
 
   // Half a rotation per second max angular velocity.
-  private static final double kMaxAngularRate = 2.0 * Math.PI;
+  private static final double kMaxAngularRate = 1.5 * Math.PI;
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
@@ -115,14 +117,26 @@ public class RobotContainer {
     NamedCommands.registerCommand("Store", Commands.runOnce(() -> m_angler.goToStore().schedule()));
   }
 
+  private double getLeftY() {
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red)
+      return m_controller.getLeftY();
+    return -m_controller.getLeftY();
+  }
+
+  private double getLeftX() {
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red)
+      return m_controller.getLeftX();
+    return -m_controller.getLeftX();
+  }
+
   /**
    * @brief Configure the controller bindings for teleop
    */
   private void configureBindings() {
     // drivetrain control
     m_drivetrain.setDefaultCommand(
-        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(-m_controller.getLeftY() * kMaxSpeed)
-            .withVelocityY(-m_controller.getLeftX() * kMaxSpeed)
+        m_drivetrain.applyRequest(() -> m_drive.withVelocityX(getLeftY() * kMaxSpeed)
+            .withVelocityY(getLeftX() * kMaxSpeed)
             .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
     // note detected in the intake

@@ -30,12 +30,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    // if (m_robotContainer.m_indexer.isNoteDetected()) {
-    // m_robotContainer.m_lights.runRainbowAnimation();
-    // } else {
-    // m_robotContainer.m_lights.disableAnimation();
-    // }
-    // m_robotContainer.updatePoseEstimator();
   }
 
   @Override
