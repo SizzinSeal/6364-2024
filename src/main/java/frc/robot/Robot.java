@@ -96,7 +96,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    // disable motor current limits, turn the bull loose
+    // 60A limit
     setDriveCurrentLimit(60);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

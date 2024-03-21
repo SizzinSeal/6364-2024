@@ -76,7 +76,7 @@ public class Constants {
     public static final double kMinPosition = 0.083333; // 30 degrees
     public static final double kZeroPosition = 0.2111111; // 76 degrees
     public static final double kStorePosition = 0.205;
-    public static final double kShootingPosition = 0.169;
+    public static final double kShootingPosition = 0.176;
     public static final double kLoadingPosition = 0.1;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 0.4;
@@ -261,12 +261,14 @@ public class Constants {
     // motor inversion
     public static final InvertedValue kMotorInverted = InvertedValue.CounterClockwise_Positive;
     // speeds (voltage)
-    public static final double kIntakeSpeed = 8;
+    public static final double kIntakeSpeed = 7;
     public static final double kSlowIntakeSpeed = 3;
     public static final double kOuttakeSpeed = 8;
     public static final double kAmpIntakeSpeed = 2;
     public static final double kAmpLoadSpeed = 1;
     public static final double kAmpShootSpeed = 6;
+    // current limit
+    public static final double kCurrentLimit = 50;
     // ratios (driven/driver)
     public static final double kRatio = 1;
   }

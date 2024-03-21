@@ -49,6 +49,11 @@ public class Intake extends SubsystemBase {
     config.MotorOutput.Inverted = kMotorInverted;
     // set motor ratios
     config.Feedback.SensorToMechanismRatio = kRatio;
+    // current limit
+    config.CurrentLimits.StatorCurrentLimit = kCurrentLimit;
+    config.CurrentLimits.SupplyCurrentLimit = kCurrentLimit;
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
     // apply configuration
     m_motor.getConfigurator().apply(config);
     // commands

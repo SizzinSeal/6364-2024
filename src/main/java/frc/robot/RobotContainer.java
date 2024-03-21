@@ -167,10 +167,7 @@ public class RobotContainer {
     // climber controls
     m_secondary.povDown().whileTrue(m_climber.down());
     m_secondary.povDown().onFalse(m_climber.stop());
-    m_secondary.povUp().whileTrue(m_climber.up());
-    m_secondary.povUp().onFalse(m_climber.stop());
-    m_secondary.povRight().onTrue(m_releaser.release());
-    m_secondary.povLeft().onTrue(m_releaser.ready());
+    m_secondary.povUp().onTrue(m_releaser.release());
 
     // reset angle
     m_controller.povUp().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
