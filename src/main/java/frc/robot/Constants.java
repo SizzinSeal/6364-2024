@@ -64,7 +64,7 @@ public class Constants {
     // gravity type
     public static final GravityTypeValue kGravityType = GravityTypeValue.Arm_Cosine;
     // controller constants
-    public static final double kP = 800;
+    public static final double kP = 1000;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double kS = 0.28898;
@@ -75,8 +75,8 @@ public class Constants {
     public static final double kMaxPosition = 0.211111; // 76 degrees
     public static final double kMinPosition = 0.083333; // 30 degrees
     public static final double kZeroPosition = 0.2111111; // 76 degrees
-    public static final double kStorePosition = 0.205;
-    public static final double kShootingPosition = 0.176;
+    public static final double kStorePosition = 0.202;
+    public static final double kShootingPosition = 0.177;
     public static final double kLoadingPosition = 0.1;
     // speeds (in rotations per second)
     public static final double kMaxSpeed = 0.4;
@@ -244,7 +244,7 @@ public class Constants {
     // speeds (rotations per second)
     public static final double kEjectSpeed = 12;
     public static final double kLoadSpeed = 3;
-    public static final double kSlowLoadSpeed = 2.0;
+    public static final double kSlowLoadSpeed = 2.1;
     // ratios
     public static final double kRatio = 1;
   }
@@ -268,7 +268,7 @@ public class Constants {
     public static final double kAmpLoadSpeed = 1;
     public static final double kAmpShootSpeed = 6;
     // current limit
-    public static final double kCurrentLimit = 50;
+    public static final double kCurrentLimit = 100;
     // ratios (driven/driver)
     public static final double kRatio = 1;
   }

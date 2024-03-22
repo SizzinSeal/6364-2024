@@ -134,6 +134,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // drivetrain control
+
     m_drivetrain.setDefaultCommand(
         m_drivetrain.applyRequest(() -> m_drive.withVelocityX(getLeftY() * kMaxSpeed)
             .withVelocityY(getLeftX() * kMaxSpeed)
@@ -152,6 +153,9 @@ public class RobotContainer {
     // note left the indexer
     m_indexer.noteDetected.onFalse(Commands.sequence(m_indexer.stop(), m_angler.goToLoad()));
 
+    // indexer back button
+    m_controller.b().whileTrue(m_indexer.reverse().finallyDo(() -> m_indexer.slowLoad().schedule())
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     // intake button pressed
     m_controller.rightTrigger().whileTrue(m_intakeCommand);
     // intake button released;
@@ -160,14 +164,19 @@ public class RobotContainer {
     // shoot button pressed
     m_controller.leftBumper().onTrue(m_shootCommand);
     // amp intake button pressed
-    m_controller.a().onTrue(m_ampIntakeCommand);
+    // m_controller.a().onTrue(m_ampIntakeCommand);s
     // outtake
     m_controller.b().onTrue(Commands.sequence(m_intake.ampShoot(), Commands.waitSeconds(1.0),
         m_intake.stop(), Commands.waitSeconds(1.0), m_deployer.retract()));
     // climber controls
     m_secondary.povDown().whileTrue(m_climber.down());
     m_secondary.povDown().onFalse(m_climber.stop());
-    m_secondary.povUp().onTrue(m_releaser.release());
+    m_secondary.povUp().onTrue(m_climber.up());
+    m_secondary.povUp().onFalse(m_climber.stop());
+    m_secondary.povRight().onTrue(m_releaser.release());
+    // secondary angler control
+    m_controller.y().onTrue(m_angler.goToAngle(0.18));
+    m_controller.a().onTrue(m_angler.goToAngle(0.184));
 
     // reset angle
     m_controller.povUp().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));
