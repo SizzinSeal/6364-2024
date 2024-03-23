@@ -61,6 +61,9 @@ public class RobotContainer {
   public static final CommandSwerveDrivetrain m_drivetrain = TunerConstants.DriveTrain;
   private final SendableChooser<Command> autoChooser;
 
+  // shooting angle
+  private volatile double m_shootingAngle = 0.177;
+
   // test request
   private final SwerveRequest.FieldCentricFacingAngle m_angleRequest = new SwerveRequest.FieldCentricFacingAngle()
       .withDeadband(kMaxSpeed * 0.05)
@@ -113,7 +116,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("SpinUp",
         Commands.runOnce(() -> m_flywheel.forwards().schedule()));
     NamedCommands.registerCommand("ToShoot",
-        Commands.runOnce(() -> m_angler.goToShoot().schedule()));
+        Commands.runOnce(() -> m_angler.goToAngle(m_shootingAngle).schedule()));
     NamedCommands.registerCommand("Store", Commands.runOnce(() -> m_angler.goToStore().schedule()));
   }
 
@@ -127,6 +130,10 @@ public class RobotContainer {
     if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red)
       return m_controller.getLeftX();
     return -m_controller.getLeftX();
+  }
+
+  private void goToShoot() {
+    m_angler.goToAngle(m_shootingAngle).schedule();
   }
 
   /**
@@ -146,7 +153,7 @@ public class RobotContainer {
 
     // note detected in the indexer
     m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
-        m_deployer.retract(), m_angler.goToShoot()));
+        m_deployer.retract(), Commands.runOnce(() -> goToShoot())));
     m_indexer.noteDetected.whileTrue(m_lights.strobe());
     m_indexer.noteDetected.onFalse(m_lights.turnOffLights());
 
@@ -175,8 +182,16 @@ public class RobotContainer {
     m_secondary.povUp().onFalse(m_climber.stop());
     m_secondary.povRight().onTrue(m_releaser.release());
     // secondary angler control
-    m_controller.y().onTrue(m_angler.goToAngle(0.18));
-    m_controller.a().onTrue(m_angler.goToAngle(0.184));
+    m_controller.y()
+        .onTrue(Commands.runOnce(() -> {
+          m_shootingAngle += 0.002;
+          m_angler.goToAngle(m_shootingAngle).schedule();
+        }));
+    m_controller.a()
+        .onTrue(Commands.runOnce(() -> {
+          m_shootingAngle -= 0.002;
+          m_angler.goToAngle(m_shootingAngle).schedule();
+        }));
 
     // reset angle
     m_controller.povUp().onTrue(Commands.runOnce(() -> m_drivetrain.seedFieldRelative()));

@@ -6,11 +6,14 @@ package frc.robot;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.util.PixelFormat;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -23,6 +26,8 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     m_robotContainer.limelight1.init();
     this.addPeriodic(() -> m_robotContainer.pollBeamBreaks(), 0.002);
+    var cam = CameraServer.startAutomaticCapture(0);
+    cam.setVideoMode(PixelFormat.kMJPEG, 320, 240, 15);
     // etc.
     SmartDashboard.putData("Autonomous routine", autoChooser);
   }

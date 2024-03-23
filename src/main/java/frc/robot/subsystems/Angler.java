@@ -88,7 +88,6 @@ public class Angler extends SubsystemBase {
     // set 0 position
     m_motor.setPosition(kZeroPosition);
     // commands
-    SmartDashboard.putData("Angler To Shoot", this.goToShoot());
     SmartDashboard.putData("Angler To Load", this.goToLoad());
     SmartDashboard.putData("Angler Calibrate", this.calibrate());
   }
@@ -144,15 +143,6 @@ public class Angler extends SubsystemBase {
    */
   public Command goToStore() {
     return this.goToAngle(kStorePosition);
-  }
-
-  /**
-   * @brief Go to the shooting position
-   * 
-   * @return Command
-   */
-  public Command goToShoot() {
-    return this.goToAngle(kShootingPosition);
   }
 
   /**
