@@ -58,9 +58,10 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   // test request
-  private final SwerveRequest.FieldCentricFacingAngle m_angleRequest = new SwerveRequest.FieldCentricFacingAngle()
-      .withDeadband(kMaxSpeed * 0.05).withRotationalDeadband(kMaxAngularRate * 0.05)
-      .withDriveRequestType(DriveRequestType.Velocity);
+  private final SwerveRequest.FieldCentricFacingAngle m_angleRequest =
+      new SwerveRequest.FieldCentricFacingAngle().withDeadband(kMaxSpeed * 0.05)
+          .withRotationalDeadband(kMaxAngularRate * 0.05)
+          .withDriveRequestType(DriveRequestType.Velocity);
 
   // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
@@ -76,16 +77,18 @@ public class RobotContainer {
       .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to intake a note which will be shot in the amp
-  private final Command m_ampIntakeCommand = Commands.sequence(m_deployer.deploy(), m_angler.goToLoad(),
-      Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.ampIntake(),
-      Commands.waitUntil(() -> m_intake.isNoteDetected()), m_intake.ampLoad(),
-      Commands.waitUntil(() -> !m_intake.isNoteDetected()),
-      m_intake.stop(), m_deployer.toAmp(), Commands.waitSeconds(2.0))
-      .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+  private final Command m_ampIntakeCommand =
+      Commands
+          .sequence(m_deployer.deploy(), m_angler.goToLoad(),
+              Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.ampIntake(),
+              Commands.waitUntil(() -> m_intake.isNoteDetected()), m_intake.ampLoad(),
+              Commands.waitUntil(() -> !m_intake.isNoteDetected()), m_intake.stop(),
+              m_deployer.toAmp(), Commands.waitSeconds(2.0))
+          .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
 
   // command to shoot
-  private final Command m_shootCommand = Commands.sequence(m_indexer.eject(), Commands.waitSeconds(1.0),
-      m_indexer.stop());
+  private final Command m_shootCommand =
+      Commands.sequence(m_indexer.eject(), Commands.waitSeconds(1.0), m_indexer.stop());
 
   /**
    * @brief Poll the beam break sensors
@@ -102,9 +105,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake", Commands.runOnce(() -> m_intakeCommand.schedule()));
     NamedCommands.registerCommand("Shoot", Commands.runOnce(() -> m_shootCommand.schedule()));
     NamedCommands.registerCommand("Deploy", Commands.runOnce(() -> m_deployer.deploy().schedule()));
-    NamedCommands.registerCommand("Retract", Commands.runOnce(() -> m_deployer.retract().schedule()));
-    NamedCommands.registerCommand("SpinUp", Commands.runOnce(() -> m_flywheel.forwards().schedule()));
-    NamedCommands.registerCommand("ToShoot", Commands.runOnce(() -> m_angler.goToShoot().schedule()));
+    NamedCommands.registerCommand("Retract",
+        Commands.runOnce(() -> m_deployer.retract().schedule()));
+    NamedCommands.registerCommand("SpinUp",
+        Commands.runOnce(() -> m_flywheel.forwards().schedule()));
+    NamedCommands.registerCommand("ToShoot",
+        Commands.runOnce(() -> m_angler.goToShoot().schedule()));
     NamedCommands.registerCommand("Store", Commands.runOnce(() -> m_angler.goToStore().schedule()));
   }
 
@@ -119,12 +125,11 @@ public class RobotContainer {
             .withRotationalRate(-m_controller.getRightX() * kMaxAngularRate)));
 
     // note detected in the intake
-    m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(),
-        m_indexer.slowLoad()).onlyIf(() -> !m_indexer.isNoteDetected()));
+    m_intake.noteDetected.onTrue(Commands.sequence(m_intake.slowIntake(), m_indexer.slowLoad())
+        .onlyIf(() -> !m_indexer.isNoteDetected()));
 
     // note detected in the indexer
-    m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(),
-        m_intake.stop(),
+    m_indexer.noteDetected.onTrue(Commands.sequence(m_indexer.stop(), m_intake.stop(),
         m_deployer.retract(), m_angler.goToShoot()));
 
     // note left the indexer
@@ -132,18 +137,18 @@ public class RobotContainer {
 
     // intake button pressed
     m_controller.rightTrigger().whileTrue(m_intakeCommand);
+
+    m_controller.rightBumper().whileTrue(m_flywheel.forwards());
     // intake button released;
     m_controller.rightTrigger()
-        .onFalse(Commands.sequence(m_intake.stop(), m_indexer.stop(),
-            m_deployer.retract()));
+        .onFalse(Commands.sequence(m_intake.stop(), m_indexer.stop(), m_deployer.retract()));
     // shoot button pressed
     m_controller.leftBumper().onTrue(m_shootCommand);
     // amp intake button pressed
     m_controller.a().onTrue(m_ampIntakeCommand);
     // outtake
-    m_controller.b().onTrue(
-        Commands.sequence(m_intake.ampShoot(), Commands.waitSeconds(1.0), m_intake.stop(), Commands.waitSeconds(1.0),
-            m_deployer.retract()));
+    m_controller.b().onTrue(Commands.sequence(m_intake.ampShoot(), Commands.waitSeconds(1.0),
+        m_intake.stop(), Commands.waitSeconds(1.0), m_deployer.retract()));
     // climber controls
     m_secondary.povDown().whileTrue(m_climber.down());
     m_secondary.povDown().onFalse(m_climber.stop());
@@ -217,8 +222,7 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon
-   *        startup
+   * @brief Construct the container for the robot. This will be called upon startup
    */
   public RobotContainer() {
     ConfigureCommands();
