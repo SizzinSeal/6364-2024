@@ -34,10 +34,10 @@ import frc.robot.subsystems.Releaser;
 public class RobotContainer {
 
   // 6 meters per second desired top speed.
-  private static final double kMaxSpeed = 1.5;
+  private static final double kMaxSpeed = 0.2;
 
   // Half a rotation per second max angular velocity.
-  private static final double kMaxAngularRate = 1.0 * Math.PI;
+  private static final double kMaxAngularRate = 0.3 * Math.PI;
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
@@ -58,10 +58,10 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   // test request
-  private final SwerveRequest.FieldCentricFacingAngle m_angleRequest =
-      new SwerveRequest.FieldCentricFacingAngle().withDeadband(kMaxSpeed * 0.05)
-          .withRotationalDeadband(kMaxAngularRate * 0.05)
-          .withDriveRequestType(DriveRequestType.Velocity);
+  private final SwerveRequest.FieldCentricFacingAngle m_angleRequest = new SwerveRequest.FieldCentricFacingAngle()
+      .withDeadband(kMaxSpeed * 0.05)
+      .withRotationalDeadband(kMaxAngularRate * 0.05)
+      .withDriveRequestType(DriveRequestType.Velocity);
 
   // Swerve drive request initialization. Using FieldCentric request type.
   private final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
@@ -77,18 +77,17 @@ public class RobotContainer {
       .onlyIf(() -> !m_indexer.isNoteDetected());
 
   // command to intake a note which will be shot in the amp
-  private final Command m_ampIntakeCommand =
-      Commands
-          .sequence(m_deployer.deploy(), m_angler.goToLoad(),
-              Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.ampIntake(),
-              Commands.waitUntil(() -> m_intake.isNoteDetected()), m_intake.ampLoad(),
-              Commands.waitUntil(() -> !m_intake.isNoteDetected()), m_intake.stop(),
-              m_deployer.toAmp(), Commands.waitSeconds(2.0))
-          .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+  private final Command m_ampIntakeCommand = Commands
+      .sequence(m_deployer.deploy(), m_angler.goToLoad(),
+          Commands.waitUntil(() -> m_deployer.isDeployed()), m_intake.ampIntake(),
+          Commands.waitUntil(() -> m_intake.isNoteDetected()), m_intake.ampLoad(),
+          Commands.waitUntil(() -> !m_intake.isNoteDetected()), m_intake.stop(),
+          m_deployer.toAmp(), Commands.waitSeconds(2.0))
+      .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
 
   // command to shoot
-  private final Command m_shootCommand =
-      Commands.sequence(m_indexer.eject(), Commands.waitSeconds(1.0), m_indexer.stop());
+  private final Command m_shootCommand = Commands.sequence(m_indexer.eject(), Commands.waitSeconds(1.0),
+      m_indexer.stop());
 
   /**
    * @brief Poll the beam break sensors
@@ -222,7 +221,8 @@ public class RobotContainer {
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon startup
+   * @brief Construct the container for the robot. This will be called upon
+   *        startup
    */
   public RobotContainer() {
     ConfigureCommands();
@@ -238,6 +238,13 @@ public class RobotContainer {
     m_angleRequest.HeadingController.setP(3);
     m_angleRequest.HeadingController.setI(0);
     m_angleRequest.HeadingController.setD(0);
+  }
+
+  public void PrintControllerOut() {
+    System.out
+        .println(" LeftX " + m_controller.getLeftX() + " LeftY " + m_controller.getLeftY() + " RightX "
+            + m_controller.getRightX() + " RightY " +
+            m_controller.getRightY());
   }
 
   /**
