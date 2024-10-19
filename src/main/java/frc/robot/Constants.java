@@ -189,6 +189,7 @@ public class Constants {
     public static final InvertedValue kUpperMotorInverted = InvertedValue.CounterClockwise_Positive;
     public static final InvertedValue kLowerMotorInverted = InvertedValue.CounterClockwise_Positive;
     // motor neutral modes
+    //testing
     public static final NeutralModeValue kUpperNeutralMode = NeutralModeValue.Brake;
     public static final NeutralModeValue kLowerNeutralMode = NeutralModeValue.Brake;
     // upper motor controller gains
