@@ -206,8 +206,8 @@ public class Constants {
     public static final double kLowerKV = 0.10863;
     public static final double kLowerKA = 0.018805;
     // speeds (in rotations per second)
-    public static final double kUpperSpeed = 100 / 3; // AMP: 100/3
-    public static final double kLowerSpeed = 100; // AMP: 5
+    public static final double kUpperSpeed = 100 / 3 * 2; // AMP: 100/3
+    public static final double kLowerSpeed = 100 * 2; // AMP: 5
     // acceleration (in rotations per second squared)
     public static final double kUpperAccel = 0; // TODO: find this value
     public static final double kLowerAccel = 0; // TODO: find this value
