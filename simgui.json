@@ -13,6 +13,9 @@
       "/SmartDashboard/Angler": "Subsystem",
       "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/Autonomous routine": "String Chooser",
+      "/SmartDashboard/CalibrateAngler": "Command",
+      "/SmartDashboard/Climber Down": "Command",
+      "/SmartDashboard/Climber Up": "Command",
       "/SmartDashboard/Deployer": "Subsystem",
       "/SmartDashboard/Deployer Down": "Command",
       "/SmartDashboard/Deployer Up": "Command",
@@ -137,6 +140,15 @@
   },
   "NetworkTables Info": {
     "Clients": {
+      "open": true
+    },
+    "DartClient_43706814@1": {
+      "Publishers": {
+        "open": true
+      },
+      "Subscribers": {
+        "open": true
+      },
       "open": true
     },
     "Server": {

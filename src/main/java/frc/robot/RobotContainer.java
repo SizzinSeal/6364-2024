@@ -39,6 +39,7 @@ import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import java.util.List;
+import java.util.OptionalDouble;
 import org.ejml.equation.Variable;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -85,8 +86,9 @@ public class RobotContainer {
   private final Telemetry m_logger = new Telemetry(kMaxSpeed);
 
   // command to move the deployer down
-  private final SequentialCommandGroup m_deployerDownCommand = new SequentialCommandGroup(m_deployer.down()
-      .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
+  private final SequentialCommandGroup m_deployerDownCommand =
+      new SequentialCommandGroup(m_deployer.down()
+          .andThen(Commands.waitUntil(() -> m_deployer.isDeployed())).andThen(m_deployer.stop()));
 
   // command to move the deployer up
   private final SequentialCommandGroup m_deployerUpCommand = new SequentialCommandGroup(m_deployer
@@ -118,17 +120,18 @@ public class RobotContainer {
   }
 
   // command to shoot
-  private final SequentialCommandGroup m_shootCommand = new SequentialCommandGroup(
-      m_flywheel.forwards().andThen(m_angler.goToShoot()).andThen(e())
+  private final SequentialCommandGroup m_shootCommand =
+      new SequentialCommandGroup(m_flywheel.forwards().andThen(m_angler.goToShoot()).andThen(e())
           .andThen(m_indexer.eject()).andThen(Commands.waitSeconds(1)).andThen(m_flywheel.stop())
           .andThen(m_indexer.stop()).andThen(m_angler.goToLoad()));
 
   // command to calibrate angler
-  private final SequentialCommandGroup m_calibrateCommand = new SequentialCommandGroup(m_angler.setSpeed(-3))
-      .andThen(Commands.waitUntil(() -> m_angler.getLimit())).andThen(m_angler.setSpeed(5))
-      .andThen(Commands.waitSeconds(0.2)).andThen(m_angler.setSpeed(-1))
-      .andThen(Commands.waitUntil(() -> m_angler.getLimit())).andThen(m_angler.setSpeed(0))
-      .andThen(Commands.waitSeconds(1)).andThen(m_angler.zero());
+  private final SequentialCommandGroup m_calibrateCommand =
+      new SequentialCommandGroup(m_angler.setSpeed(-3))
+          .andThen(Commands.waitUntil(() -> m_angler.getLimit())).andThen(m_angler.setSpeed(5))
+          .andThen(Commands.waitSeconds(0.2)).andThen(m_angler.setSpeed(-1))
+          .andThen(Commands.waitUntil(() -> m_angler.getLimit())).andThen(m_angler.setSpeed(0))
+          .andThen(Commands.waitSeconds(1)).andThen(m_angler.zero());
 
   private final SequentialCommandGroup m_climberUp = new SequentialCommandGroup(m_climber.up()
       .andThen(Commands.waitUntil(() -> m_climber.isRetracted())).andThen(m_climber.stop()));
@@ -137,8 +140,8 @@ public class RobotContainer {
   private final SequentialCommandGroup m_climberDown = new SequentialCommandGroup(m_climber.down()
       .andThen(Commands.waitUntil(() -> m_climber.isDeployed())).andThen(m_deployer.stop()));
 
-  private final SequentialCommandGroup m_manualLoad = new SequentialCommandGroup(
-      m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected())
+  private final SequentialCommandGroup m_manualLoad =
+      new SequentialCommandGroup(m_indexer.slowLoad().onlyIf(() -> !m_indexer.noteDetected())
           .andThen(Commands.waitUntil(() -> m_indexer.noteDetected())).andThen(m_indexer.stop())
           .andThen(m_intake.stop()));
 
@@ -240,41 +243,49 @@ public class RobotContainer {
   public void updatePoseEstimator() {
     double lateralDeviation; // standard deviation of the x and y measurements
     double angularDeviation; // standard deviation of the angle measurement
-    final MeasurementInfo internalTag = visionInstance.new MeasurementInfo(visionHandler.getAprilTagID(),
-        visionHandler.getNumberofTags(), visionHandler.areaOfAprilTag());
+    // final MeasurementInfo internalTag =
+    // visionInstance.new MeasurementInfo(visionHandler.getAprilTagID(),
+    // visionHandler.getNumberofTags(), visionHandler.areaOfAprilTag());
+
+
 
     final double posDiff = m_drivetrain.getPoseDifference(visionHandler.k3Dto2D());
 
-    // return if no tag detected
-    if (internalTag.tagId == -1)
-      return;
-    // more than 1 tag in view
-    if (internalTag.tagCount > 1) {
-      lateralDeviation = 0.5;
-      angularDeviation = 6;
-    }
-    // 1 target with large area and close to estimated pose
-    else if (internalTag.tagArea > 0.8 && posDiff < 0.5) {
-      lateralDeviation = 1.0;
-      angularDeviation = 12;
-    }
-    // 1 target farther away and estimated pose is close
-    else if (internalTag.tagArea > 0.1 && posDiff < 0.3) {
-      lateralDeviation = 2.0;
-      angularDeviation = 30;
-    }
-    // conditions don't match to add a vision measurement
-    else
-      return;
+    // // return if no tag detected
+    // if (internalTag.tagId == -1)
+    // return;
+    // // more than 1 tag in view
+    // if (internalTag.tagCount > 1) {
+    lateralDeviation = 0.5;
+    angularDeviation = 6;
+    // }
+    // // 1 target with large area and close to estimated pose
+    // else if (internalTag.tagArea > 0.8 && posDiff < 0.5) {
+    // lateralDeviation = 1.0;
+    // angularDeviation = 12;
+    // }
+    // // 1 target farther away and estimated pose is close
+    // else if (internalTag.tagArea > 0.1 && posDiff < 0.3) {
+    // lateralDeviation = 2.0;
+    // angularDeviation = 30;
+    // }
+    // // conditions don't match to add a vision measurement
+    // else
+    // return;
     // update the pose estimator
-    m_drivetrain.addVisionMeasurement(visionHandler.k3Dto2D(),
-        visionHandler.getLatestLatencyAdjustedTimeStamp(), VecBuilder.fill(lateralDeviation,
-            lateralDeviation, Units.degreesToRadians(angularDeviation)));
+    final Pose2d visPose2d = visionHandler.k3Dto2D();
+    final OptionalDouble visionstamp = visionHandler.getLatestLatencyAdjustedTimeStamp();
+
+    if (visionstamp.isEmpty() || visPose2d == null) {
+      return;
+    } else {
+      m_drivetrain.addVisionMeasurement(visPose2d, visionstamp.getAsDouble(), VecBuilder
+          .fill(lateralDeviation, lateralDeviation, Units.degreesToRadians(angularDeviation)));
+    }
   }
 
   /**
-   * @brief Construct the container for the robot. This will be called upon
-   *        startup
+   * @brief Construct the container for the robot. This will be called upon startup
    */
   public RobotContainer() {
     ConfigureCommands();
