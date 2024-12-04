@@ -45,6 +45,7 @@
       "/SmartDashboard/Upper Dynamic Routine Up": "Command",
       "/SmartDashboard/Upper Quasistatic Routine Down": "Command",
       "/SmartDashboard/Upper Quasistatic Routine Up": "Command",
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/calibrate": "Command"
     },
     "windows": {
@@ -152,6 +153,9 @@
       "open": true
     },
     "Server": {
+      "Publishers": {
+        "open": true
+      },
       "open": true
     },
     "visible": true

@@ -1,14 +1,13 @@
 package frc.robot;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.OptionalDouble;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -18,91 +17,119 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotState;
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 public class PhotonVisionHandler {
 
-  public PhotonVisionHandler() {
+  private PhotonCameraSim cameraSim;
+  private VisionSystemSim visionSim;
+  private PhotonCamera vision;
+  private AprilTagFieldLayout aprilTagFieldLayout;
+  private boolean simulated;
 
-  }
+  private final Transform3d robotToCam =
+      new Transform3d(new Translation3d(Units.inchesToMeters(10.4), Units.inchesToMeters(-6.5),
+          Units.inchesToMeters(13.8)), new Rotation3d(0, Math.toRadians(-15), 0)); // Adjusted
+                                                                                   // camera angle
 
-  private double inchToMeter(double inchValue) {
-    double meter = inchValue * 0.025399986284;
-    return meter;
-  }
-
-  AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-
-  private PhotonCamera vision = new PhotonCamera("photonvision");
-
-  private PhotonTrackedTarget target = vision.getLatestResult().getBestTarget();
-
-  // print this to verify it actually works
-  private final double latencyMilis = vision.getLatestResult().getLatencyMillis() / 1000.0;
-  private final double kCameraHeight = inchToMeter(13.8);
   private DoubleArraySubscriber m_poseSubscriber;
 
-  // camera dimensions from center of robot (x, y, z) (10.4x, -6.5y, 13.8z) inches
-  // front is intake (y), pos x to the right of that, z right
-  private final Transform3d robotToCam =
-      new Transform3d(new Translation3d(inchToMeter(10.4), inchToMeter(-6.5), inchToMeter(13.8)),
-          new Rotation3d(0, 0, 0));// ***REMINDER GET ROTATION VALUES OF CAMERA MOUNT***
+  public PhotonVisionHandler() {
+    vision = new PhotonCamera("photonvision");
+    simulated = edu.wpi.first.wpilibj.RobotBase.isSimulation();
 
-  /**
-   * @breif Get the number of April Tags in total
-   */
-  public int getNumberofTags() {
-    return vision.getLatestResult().getTargets().size();
+    // Load AprilTag field layout
+    try {
+      aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    } catch (Exception e) {
+      System.err.println("Error loading AprilTag field layout: " + e.getMessage());
+      aprilTagFieldLayout = null;
+    }
+
+    if (simulated) {
+      initializeSimulation();
+    }
+  }
+
+  private void initializeSimulation() {
+    if (aprilTagFieldLayout == null) {
+      System.out.println("AprilTag field layout is null. Simulation will not include tags.");
+      return;
+    }
+
+    visionSim = new VisionSystemSim("main");
+    visionSim.addAprilTags(aprilTagFieldLayout);
+
+    var cameraProps = new SimCameraProperties();
+    cameraProps.setCalibration(1280, 800, Rotation2d.fromDegrees(90));
+    cameraProps.setCalibError(0.35, 0.10);
+    cameraProps.setFPS(120);
+    cameraProps.setAvgLatencyMs(50);
+    cameraProps.setLatencyStdDevMs(15);
+    // cameraProps.setFOV(75); // Set appropriate FOV for your camera
+    cameraProps.setAvgLatencyMs(11.0); // Based on actual PhotonVision latency
+    cameraProps.setLatencyStdDevMs(3.0);
+
+    cameraSim = new PhotonCameraSim(vision, cameraProps);
+    visionSim.addCamera(cameraSim, robotToCam);
+
+    cameraSim.enableDrawWireframe(true);
+    System.out.println("PhotonVision simulation initialized with Phoenix 6 support.");
+  }
+
+  public void updateSimulation(Pose2d robotPose) {
+    if (simulated && visionSim != null) {
+      Pose3d pose3d = new Pose3d(robotPose.getX(), robotPose.getY(), 0.0,
+          new Rotation3d(0.0, 0.0, robotPose.getRotation().getRadians()));
+      visionSim.update(robotPose);
+    }
+  }
+
+  public double getLatencySeconds() {
+    var result = vision.getLatestResult();
+    return result.getLatencyMillis() / 1000.0;
+  }
+
+  public int getNumberOfTags() {
+    var result = vision.getLatestResult();
+    return result.hasTargets() ? result.getTargets().size() : 0;
   }
 
   public int getAprilTagID() {
-
-
-    return target.getFiducialId(); // gets apriltag being identified
+    var result = vision.getLatestResult();
+    PhotonTrackedTarget target = result.getBestTarget();
+    return (target != null) ? target.getFiducialId() : -1;
   }
 
   public double areaOfAprilTag() {
-    return target.getArea(); // gets area of apriltag
+    var result = vision.getLatestResult();
+    PhotonTrackedTarget target = result.getBestTarget();
+    return (target != null) ? target.getArea() : 0.0;
   }
 
-  public double latency() {
-    return latencyMilis;
-  }
-
-  /**
-   * @breif gets the position in 3d and then converts it to 2d field relative pose
-   * 
-   * @return pos2d
-   */
-  public Pose2d k3Dto2D() { // gets the position in 3d and then converts it to 2d field relative
-                            // pose
-    // Error Code raised if pose 2d is returned as n
-
-
-    // Transform3d fieldToCamera;
-    // if (vision.getLatestResult().getMultiTagResult().estimatedPose.isPresent) {
-    // fieldToCamera = vision.getLatestResult().getMultiTagResult().estimatedPose.best;
-    // } else {
-
-    // }
-
-    // Transform3d fieldToRobot = fieldToCamera.inverse()
-
-    if (vision.isConnected()) {
-      Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(),
-          aprilTagFieldLayout.getTagPose(target.getFiducialId()).get(), robotToCam);
-
-      double Xcoord = robotPose.getTranslation().getX();
-      double Ycoord = robotPose.getTranslation().getY();
-      Rotation2d Thetacord = robotPose.getRotation().toRotation2d();
-
-      Pose2d pos2d = new Pose2d(Xcoord, Ycoord, Thetacord);
-      return pos2d;
-    } else {
+  public Pose2d estimateRobotPose() {
+    var result = vision.getLatestResult();
+    if (!result.hasTargets() || aprilTagFieldLayout == null) {
       return null;
     }
 
+    PhotonTrackedTarget target = result.getBestTarget();
+    var tagPoseOptional = aprilTagFieldLayout.getTagPose(target.getFiducialId());
+
+    if (tagPoseOptional.isEmpty()) {
+      return null;
+    }
+
+    Pose3d cameraPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(),
+        tagPoseOptional.get(), robotToCam);
+
+    return cameraPose.toPose2d();
   }
 
   public OptionalDouble getLatestLatencyAdjustedTimeStamp() {
@@ -111,6 +138,7 @@ public class PhotonVisionHandler {
     } else {
       final TimestampedDoubleArray internal2 = m_poseSubscriber.getAtomic();
       return OptionalDouble.of((internal2.timestamp - internal2.value[6]) * 0.001);
+
     }
   }
 }

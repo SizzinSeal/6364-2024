@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants.Drivetrain;
 import frc.robot.Vision.MeasurementInfo;
 import frc.robot.subsystems.Climber;
 import frc.robot.generated.TunerConstants;
@@ -240,6 +241,10 @@ public class RobotContainer {
   /**
    * @brief Update the pose estimator with vision measurements
    */
+  public void updatePhoenixSim() {
+    visionHandler.updateSimulation(m_drivetrain.getPose());
+  }
+
   public void updatePoseEstimator() {
     double lateralDeviation; // standard deviation of the x and y measurements
     double angularDeviation; // standard deviation of the angle measurement
@@ -249,7 +254,7 @@ public class RobotContainer {
 
 
 
-    final double posDiff = m_drivetrain.getPoseDifference(visionHandler.k3Dto2D());
+    final double posDiff = m_drivetrain.getPoseDifference(visionHandler.estimateRobotPose());
 
     // // return if no tag detected
     // if (internalTag.tagId == -1)
@@ -273,7 +278,7 @@ public class RobotContainer {
     // else
     // return;
     // update the pose estimator
-    final Pose2d visPose2d = visionHandler.k3Dto2D();
+    final Pose2d visPose2d = visionHandler.estimateRobotPose();
     final OptionalDouble visionstamp = visionHandler.getLatestLatencyAdjustedTimeStamp();
 
     if (visionstamp.isEmpty() || visPose2d == null) {
