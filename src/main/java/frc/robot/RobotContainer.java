@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -64,6 +65,10 @@ public class RobotContainer {
   List<PhotonTrackedTarget> photonTrackedTargets = new ArrayList<>(1);
 
   private Optional<EstimatedRobotPose> prevVisionOut = Optional.empty();
+  private Optional<EstimatedRobotPose> Visionout;
+  private final Field2d m_Visionpose = new Field2d();
+
+
   // Optional
   // .of(new EstimatedRobotPose(new Pose3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)), 0,
   // photonTrackedTargets, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)); // Replace
@@ -272,7 +277,6 @@ public class RobotContainer {
     // visionInstance.new MeasurementInfo(visionHandler.getAprilTagID(),
     // visionHandler.getNumberofTags(), visionHandler.areaOfAprilTag());
 
-    Optional<EstimatedRobotPose> Visionout;
     if (prevVisionOut.isPresent()) {
       Visionout =
           visionHandler.getEstimatedGlobalPose(prevVisionOut.get().estimatedPose.toPose2d());
@@ -312,13 +316,17 @@ public class RobotContainer {
     // final Pose2d visPose2d = visionHandler.estimateRobotPose();
     // final OptionalDouble visionstamp = visionHandler.getLatestLatencyAdjustedTimeStamp();
 
-    if (Visionout.isPresent() && Utils.isSimulation() == false)
+    if (Visionout.isPresent()) {
+      m_Visionpose.setRobotPose(Visionout.get().estimatedPose.toPose2d());
 
-    {
-      Pose2d visPose2d = Visionout.get().estimatedPose.toPose2d();
-      double visionstamp = Visionout.get().timestampSeconds;
-      m_drivetrain.addVisionMeasurement(visPose2d, visionstamp, VecBuilder.fill(lateralDeviation,
-          lateralDeviation, Units.degreesToRadians(angularDeviation)));
+      if (Utils.isSimulation() == false)
+
+      {
+        Pose2d visPose2d = Visionout.get().estimatedPose.toPose2d();
+        double visionstamp = Visionout.get().timestampSeconds;
+        m_drivetrain.addVisionMeasurement(visPose2d, visionstamp, VecBuilder.fill(lateralDeviation,
+            lateralDeviation, Units.degreesToRadians(angularDeviation)));
+      }
     }
   }
 
@@ -331,6 +339,7 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     configureBindings();
     limelight1.init();
+    SmartDashboard.putData("VisionSimPose", m_Visionpose);
     SmartDashboard.putData("Auto Chooser", autoChooser);
     SmartDashboard.putData("Intake", m_intake);
     SmartDashboard.putData("Indexer", m_indexer);
