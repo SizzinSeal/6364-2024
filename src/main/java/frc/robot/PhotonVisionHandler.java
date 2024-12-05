@@ -50,9 +50,6 @@ public class PhotonVisionHandler {
     vision = new PhotonCamera("photonvision");
     simulated = Utils.isSimulation();
 
-    photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, vision, robotToCam);
-
 
     // Load AprilTag field layout
     try {
@@ -61,6 +58,10 @@ public class PhotonVisionHandler {
       System.err.println("Error loading AprilTag field layout: " + e.getMessage());
       aprilTagFieldLayout = null;
     }
+
+    photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_RIO, vision, robotToCam);
+
 
     if (simulated) {
       initializeSimulation();
@@ -124,6 +125,13 @@ public class PhotonVisionHandler {
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+    boolean run = false;
+
+    if (run == false) {
+      run = true;
+      return photonPoseEstimator.update();
+    }
+
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator.update();
   }

@@ -61,11 +61,12 @@ public class RobotContainer {
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
-  List<PhotonTrackedTarget> photonTrackedTargets = new ArrayList<>();
+  List<PhotonTrackedTarget> photonTrackedTargets = new ArrayList<>(1);
 
-  private Optional<EstimatedRobotPose> prevVisionOut = Optional
-      .of(new EstimatedRobotPose(new Pose3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)), 0,
-          photonTrackedTargets, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)); // Replace
+  private Optional<EstimatedRobotPose> prevVisionOut = Optional.empty();
+  // Optional
+  // .of(new EstimatedRobotPose(new Pose3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)), 0,
+  // photonTrackedTargets, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)); // Replace
 
   // Optional.of(new EstimatedRobotPose(new Pose3d(m_drivetrain.getPose()), 0,
   // new List<PhotonTrackedTarget>(), PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR));
@@ -259,16 +260,29 @@ public class RobotContainer {
   }
 
   public void updatePoseEstimator() {
+
+    if (aprilTagFieldLayout == null) {
+      System.err.println("AprilTagFieldLayout is null. Skipping pose estimation update.");
+      return;
+    }
+
     double lateralDeviation; // standard deviation of the x and y measurements
     double angularDeviation; // standard deviation of the angle measurement
     // final MeasurementInfo internalTag =
     // visionInstance.new MeasurementInfo(visionHandler.getAprilTagID(),
     // visionHandler.getNumberofTags(), visionHandler.areaOfAprilTag());
 
-
-    Optional<EstimatedRobotPose> Visionout =
-        visionHandler.getEstimatedGlobalPose(prevVisionOut.get().estimatedPose.toPose2d());
+    Optional<EstimatedRobotPose> Visionout;
+    if (prevVisionOut.isPresent()) {
+      Visionout =
+          visionHandler.getEstimatedGlobalPose(prevVisionOut.get().estimatedPose.toPose2d());
+    } else {
+      Visionout = visionHandler
+          .getEstimatedGlobalPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+    }
     prevVisionOut = Visionout;
+
+
 
     // final double posDiff = m_drivetrain.getPoseDifference();
 
@@ -298,15 +312,16 @@ public class RobotContainer {
     // final Pose2d visPose2d = visionHandler.estimateRobotPose();
     // final OptionalDouble visionstamp = visionHandler.getLatestLatencyAdjustedTimeStamp();
 
-    if (!Visionout.isEmpty()) {
-      final Pose2d visPose2d = Visionout.get().estimatedPose.toPose2d();
-      final double visionstamp = Visionout.get().timestampSeconds;
-      // visionstamp == null ||
+    if (Visionout.isPresent() && Utils.isSimulation() == false)
+
+    {
+      Pose2d visPose2d = Visionout.get().estimatedPose.toPose2d();
+      double visionstamp = Visionout.get().timestampSeconds;
       m_drivetrain.addVisionMeasurement(visPose2d, visionstamp, VecBuilder.fill(lateralDeviation,
           lateralDeviation, Units.degreesToRadians(angularDeviation)));
     }
-
   }
+
 
   /**
    * @brief Construct the container for the robot. This will be called upon startup
