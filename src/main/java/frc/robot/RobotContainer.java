@@ -39,9 +39,12 @@ import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import org.ejml.equation.Variable;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -58,6 +61,16 @@ public class RobotContainer {
 
   // Vision - Limelight - initialization.
   public final Vision limelight1 = new Vision("limelight");
+  List<PhotonTrackedTarget> photonTrackedTargets = new ArrayList<>();
+
+  private Optional<EstimatedRobotPose> prevVisionOut = Optional
+      .of(new EstimatedRobotPose(new Pose3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)), 0,
+          photonTrackedTargets, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)); // Replace
+
+  // Optional.of(new EstimatedRobotPose(new Pose3d(m_drivetrain.getPose()), 0,
+  // new List<PhotonTrackedTarget>(), PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR));
+
+
 
   // photonvision camera initialization
   public final PhotonVisionHandler visionHandler = new PhotonVisionHandler();
@@ -253,8 +266,11 @@ public class RobotContainer {
     // visionHandler.getNumberofTags(), visionHandler.areaOfAprilTag());
 
 
+    Optional<EstimatedRobotPose> Visionout =
+        visionHandler.getEstimatedGlobalPose(prevVisionOut.get().estimatedPose.toPose2d());
+    prevVisionOut = Visionout;
 
-    final double posDiff = m_drivetrain.getPoseDifference(visionHandler.estimateRobotPose());
+    // final double posDiff = m_drivetrain.getPoseDifference();
 
     // // return if no tag detected
     // if (internalTag.tagId == -1)
@@ -278,15 +294,18 @@ public class RobotContainer {
     // else
     // return;
     // update the pose estimator
-    final Pose2d visPose2d = visionHandler.estimateRobotPose();
-    final OptionalDouble visionstamp = visionHandler.getLatestLatencyAdjustedTimeStamp();
+    //// glkdfgdfsdfg
+    // final Pose2d visPose2d = visionHandler.estimateRobotPose();
+    // final OptionalDouble visionstamp = visionHandler.getLatestLatencyAdjustedTimeStamp();
 
-    if (visionstamp.isEmpty() || visPose2d == null) {
-      return;
-    } else {
-      m_drivetrain.addVisionMeasurement(visPose2d, visionstamp.getAsDouble(), VecBuilder
-          .fill(lateralDeviation, lateralDeviation, Units.degreesToRadians(angularDeviation)));
+    if (!Visionout.isEmpty()) {
+      final Pose2d visPose2d = Visionout.get().estimatedPose.toPose2d();
+      final double visionstamp = Visionout.get().timestampSeconds;
+      // visionstamp == null ||
+      m_drivetrain.addVisionMeasurement(visPose2d, visionstamp, VecBuilder.fill(lateralDeviation,
+          lateralDeviation, Units.degreesToRadians(angularDeviation)));
     }
+
   }
 
   /**

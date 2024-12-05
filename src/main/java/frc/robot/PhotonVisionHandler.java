@@ -1,7 +1,11 @@
 package frc.robot;
 
+import java.util.Optional;
 import java.util.OptionalDouble;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonUtils;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -22,6 +26,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotState;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -32,6 +37,7 @@ public class PhotonVisionHandler {
   private PhotonCamera vision;
   private AprilTagFieldLayout aprilTagFieldLayout;
   private boolean simulated;
+  private PhotonPoseEstimator photonPoseEstimator;
 
   private final Transform3d robotToCam =
       new Transform3d(new Translation3d(Units.inchesToMeters(10.4), Units.inchesToMeters(-6.5),
@@ -42,7 +48,11 @@ public class PhotonVisionHandler {
 
   public PhotonVisionHandler() {
     vision = new PhotonCamera("photonvision");
-    simulated = edu.wpi.first.wpilibj.RobotBase.isSimulation();
+    simulated = Utils.isSimulation();
+
+    photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, vision, robotToCam);
+
 
     // Load AprilTag field layout
     try {
@@ -80,7 +90,7 @@ public class PhotonVisionHandler {
     visionSim.addCamera(cameraSim, robotToCam);
 
     cameraSim.enableDrawWireframe(true);
-    System.out.println("PhotonVision simulation initialized with Phoenix 6 support.");
+    System.out.println("PhotonVision simulation initialized");
   }
 
   public void updateSimulation(Pose2d robotPose) {
@@ -113,24 +123,46 @@ public class PhotonVisionHandler {
     return (target != null) ? target.getArea() : 0.0;
   }
 
-  public Pose2d estimateRobotPose() {
-    var result = vision.getLatestResult();
-    if (!result.hasTargets() || aprilTagFieldLayout == null) {
-      return null;
-    }
-
-    PhotonTrackedTarget target = result.getBestTarget();
-    var tagPoseOptional = aprilTagFieldLayout.getTagPose(target.getFiducialId());
-
-    if (tagPoseOptional.isEmpty()) {
-      return null;
-    }
-
-    Pose3d cameraPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(),
-        tagPoseOptional.get(), robotToCam);
-
-    return cameraPose.toPose2d();
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+    photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+    return photonPoseEstimator.update();
   }
+  // pose3d.toPose2d();
+  // public Pose2d P3toP2(Pose3d pose3d) {
+  //
+  // double x = pose3d.getX();
+  // double y = pose3d.getY();
+  // Rotation2d thetarot = pose3d.getRotation().toRotation2d();
+  // return new Pose2d(x, y, thetarot);
+  // }
+
+
+
+  // public Pose2d estimateRobotPose() {
+  // var result = vision.getLatestResult();
+  // if (!result.hasTargets() || aprilTagFieldLayout == null) {
+  // return null;
+  // }
+
+  // if (result.getMultiTagResult().estimatedPose.isPresent) {
+  // Transform3d fieldToCamera = result.getMultiTagResult().estimatedPose.best;
+  // }
+
+
+  // PhotonTrackedTarget target = result.getBestTarget();
+  // var tagPoseOptional = aprilTagFieldLayout.getTagPose(target.getFiducialId());
+
+  // if (tagPoseOptional.isEmpty()) {
+  // return null;
+  // }
+
+  // Pose3d cameraPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(),
+  // tagPoseOptional.get(), robotToCam);
+
+
+
+  // return cameraPose.toPose2d();
+  // }
 
   public OptionalDouble getLatestLatencyAdjustedTimeStamp() {
     if (this.m_poseSubscriber == null) {
