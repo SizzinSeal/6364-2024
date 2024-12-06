@@ -102,6 +102,14 @@ public class PhotonVisionHandler {
     }
   }
 
+  // public double getEstimatedUncertainty() {
+  // var result = vision.getLatestResult();
+
+  // var estStdDevs = result.getEstimationStdDevs();
+
+  // return
+  // }
+
   public double getLatencySeconds() {
     var result = vision.getLatestResult();
     return result.getLatencyMillis() / 1000.0;
@@ -124,6 +132,7 @@ public class PhotonVisionHandler {
     return (target != null) ? target.getArea() : 0.0;
   }
 
+
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
     boolean run = false;
 
@@ -131,6 +140,7 @@ public class PhotonVisionHandler {
       run = true;
       return photonPoseEstimator.update();
     }
+
 
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator.update();

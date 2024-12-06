@@ -189,7 +189,6 @@ public class RobotContainer {
     NamedCommands.registerCommand("ManualLoad", m_manualLoad);
     NamedCommands.registerCommand("ClimerDown", m_climberDown);
     NamedCommands.registerCommand("ClimberUp", m_climberUp);
-
   }
 
   /**
@@ -206,9 +205,8 @@ public class RobotContainer {
     // m_controller.a().onTrue(Commands.runOnce(() -> m_trajectory
     // .generate(new Pose2d(new Translation2d(3, 5), Rotation2d.fromDegrees(90)))));
 
-    // m_controller.a().whileTrue(m_drivetrain
-    // .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5),
-    // Rotation2d.fromDegrees(180)))));
+    m_controller.a().whileTrue(m_drivetrain
+        .findAndFollowPath((new Pose2d(new Translation2d(3, 5.5), Rotation2d.fromDegrees(180)))));
 
     // m_controller.b().whileTrue(m_drivetrain.applyRequest(() -> m_point
     // .withModuleDirection(new Rotation2d(-m_controller.getLeftY(),
@@ -286,37 +284,37 @@ public class RobotContainer {
     }
     prevVisionOut = Visionout;
 
-
-
-    // final double posDiff = m_drivetrain.getPoseDifference();
-
-    // // return if no tag detected
-    // if (internalTag.tagId == -1)
-    // return;
-    // // more than 1 tag in view
-    // if (internalTag.tagCount > 1) {
-    lateralDeviation = 0.5;
-    angularDeviation = 6;
-    // }
-    // // 1 target with large area and close to estimated pose
-    // else if (internalTag.tagArea > 0.8 && posDiff < 0.5) {
-    // lateralDeviation = 1.0;
-    // angularDeviation = 12;
-    // }
-    // // 1 target farther away and estimated pose is close
-    // else if (internalTag.tagArea > 0.1 && posDiff < 0.3) {
-    // lateralDeviation = 2.0;
-    // angularDeviation = 30;
-    // }
-    // // conditions don't match to add a vision measurement
-    // else
-    // return;
-    // update the pose estimator
-    //// glkdfgdfsdfg
-    // final Pose2d visPose2d = visionHandler.estimateRobotPose();
-    // final OptionalDouble visionstamp = visionHandler.getLatestLatencyAdjustedTimeStamp();
-
     if (Visionout.isPresent()) {
+
+      final Pose2d visPose = Visionout.get().estimatedPose.toPose2d();
+      final double posDiff = m_drivetrain.getPoseDifference(visPose);
+
+      final List<PhotonTrackedTarget> tags = Visionout.get().targetsUsed;
+
+
+      // return if no tag detected
+      if (tags.size() < 1) {
+        return;
+      }
+      // more than 1 tag in view
+      if (tags.size() > 1) {
+        lateralDeviation = 0.5;
+        angularDeviation = 6;
+      }
+      // 1 target with large area and close to estimated pose
+      else if (tags.get(0).getArea() > 80 && posDiff < 0.5) {
+        lateralDeviation = 1.0;
+        angularDeviation = 12;
+      }
+      // 1 target farther away and estimated pose is close
+      else if (tags.get(0).getArea() > 10 && posDiff < 0.3) {
+        lateralDeviation = 2.0;
+        angularDeviation = 30;
+      }
+      // conditions don't match to add a vision measurement
+      else
+        return;
+
       m_Visionpose.setRobotPose(Visionout.get().estimatedPose.toPose2d());
 
       if (Utils.isSimulation() == false)
