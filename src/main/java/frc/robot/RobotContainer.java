@@ -297,7 +297,7 @@ public class RobotContainer {
         return;
       }
       // more than 1 tag in view
-      if (tags.size() > 1) {
+      if (tags.size() > 1 && visionHandler.avgTagArea(tags) > 80) {
         lateralDeviation = 0.5;
         angularDeviation = 6;
       }
@@ -317,9 +317,10 @@ public class RobotContainer {
 
       m_Visionpose.setRobotPose(Visionout.get().estimatedPose.toPose2d());
 
-      if (Utils.isSimulation() == false)
+      if (Utils.isSimulation() == true)
 
       {
+
         Pose2d visPose2d = Visionout.get().estimatedPose.toPose2d();
         double visionstamp = Visionout.get().timestampSeconds;
         m_drivetrain.addVisionMeasurement(visPose2d, visionstamp, VecBuilder.fill(lateralDeviation,

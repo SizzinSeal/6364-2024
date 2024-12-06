@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import org.photonvision.EstimatedRobotPose;
@@ -144,6 +145,19 @@ public class PhotonVisionHandler {
 
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator.update();
+  }
+
+
+  public double avgTagArea(List<PhotonTrackedTarget> tags) {
+    double temparea = 0;
+
+    for (int i = 0; i < tags.size(); i++) {
+      temparea += tags.get(i).getArea();
+    }
+
+    temparea = temparea / tags.size();
+
+    return temparea;
   }
   // pose3d.toPose2d();
   // public Pose2d P3toP2(Pose3d pose3d) {
